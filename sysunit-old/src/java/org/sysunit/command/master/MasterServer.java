@@ -28,6 +28,7 @@ import org.sysunit.command.test.SetUpTBeansCommand;
 import org.sysunit.command.test.TearDownTBeansCommand;
 import org.sysunit.command.test.RunTestCommand;
 import org.sysunit.jelly.JvmNameExtractor;
+import org.sysunit.SysUnitException;
 import org.sysunit.SynchronizationException;
 
 /**
@@ -84,6 +85,10 @@ public class MasterServer
 		this.jvmNames = jvmNameExtractor.getJvmNames(xml);
 
         System.err.println( "###################### " + jvmNames );
+
+        if ( this.members.isEmpty() ) {
+            throw new SysUnitException( "No slave JVMs" );
+        }
 
 		roundRobbinJvms(xml);
 	}

@@ -75,6 +75,13 @@
     ${testPlugin.setVariable('testcase', 'org.sysunit.SumoSystemTestSuite')}
     <attainGoal name="test:single"/>
   </goal>
+
+  <goal name="sysunit:register">
+    <test:dependency-handle/>
+    <postGoal name="test:test">
+       <attainGoal name="sysunit:test"/>
+    </postGoal>
+  </goal>
  
 </project>
 
