@@ -57,16 +57,29 @@ public class ScenarioInfoBuilder
 
         JvmInfo[] jvms = testInfo.getJvms();
 
+        String defaultTag = props.getProperty( "jvm.*.tag" );
+        String defaultJdk = props.getProperty( "jvm.*.jdk" );
+                
         for ( int i = 0 ; i < jvms.length ; ++i )
         {
             String tag = props.getProperty( "jvm." + jvms[i].getName() + ".tag" );
             String jdk = props.getProperty( "jvm." + jvms[i].getName() + ".jdk" );
+
+            if ( tag == null )
+            {
+                tag = defaultTag;
+            }
 
             if ( tag != null )
             {
                 tag = tag.trim();
                 scenarioInfo.setTag( jvms[ i ],
                                      tag );
+            }
+
+            if ( jdk == null )
+            {
+                jdk = defaultJdk;
             }
 
             if ( jdk != null )

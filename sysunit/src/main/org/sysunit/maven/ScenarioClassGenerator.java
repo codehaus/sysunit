@@ -70,7 +70,7 @@ public class ScenarioClassGenerator
        text.append( "\n" );
        text.append( "    public static DistributedSystemTestInfo getSystemTestInfo() throws Exception\n" );
        text.append( "    {\n" );
-       text.append( "        return DistributedSystemTestInfoBuilder.build( new File( \"" + sysTestFile.getPath() + "\" ) );\n" );
+       text.append( "        return DistributedSystemTestInfoBuilder.build( new File( \"" + getPath( sysTestFile ) + "\" ) );\n" );
        text.append( "    }\n" );
        text.append( "}\n" );
 

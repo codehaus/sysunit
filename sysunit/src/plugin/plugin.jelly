@@ -58,7 +58,7 @@
 
     <sysunit:gen-scenario baseDir="${testDir}" 
                           outputDir="${maven.build.dir}/sysunit" 
-                           extension="scenario"/>
+                          extension="scenario"/>
 <!--
 
     <j:set var="testDirLen" value="${size(testDir)}"/>

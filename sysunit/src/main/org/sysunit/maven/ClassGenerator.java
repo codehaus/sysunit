@@ -102,6 +102,32 @@ public abstract class ClassGenerator
         }
     }
 
+    public static String getPath(File file)
+    {
+        String path = file.getPath();
+        StringBuffer newPath = new StringBuffer();
+
+        int cur      = -1;
+        int slashLoc = -1;
+
+        while ( ( slashLoc = path.indexOf( '\\',
+                                           cur + 1 ) ) >= 0 )
+        {
+            newPath.append( path.substring( cur + 1,
+                                            slashLoc ) );
+            newPath.append( "\\\\" );
+
+            cur = slashLoc;
+        }
+
+        if ( slashLoc < 0 )
+        {
+            newPath.append( path.substring( cur + 1 ) );
+        }
+
+        return newPath.toString();
+    }
+
     public abstract void generateClass(String packageName,
                                        String className,
                                        File source,

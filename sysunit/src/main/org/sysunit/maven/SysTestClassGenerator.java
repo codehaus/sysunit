@@ -40,7 +40,7 @@ public class SysTestClassGenerator
         text.append( "\n" );
         text.append( "    public static DistributedSystemTestInfo getTestInfo() throws Exception\n" );
         text.append( "    {\n" );
-        text.append( "        return DistributedSystemTestInfoBuilder.build( new File( \"" + source.getPath() + "\" ) );\n" );
+        text.append( "        return DistributedSystemTestInfoBuilder.build( new File( \"" + getPath( source ) + "\" ) );\n" );
         text.append( "    }\n" );
         text.append( "}" );
 
