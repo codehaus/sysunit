@@ -118,6 +118,7 @@ public class TBeanThread
             tbean.run();
         } catch (Throwable e) {
             setError( e );
+            getSynchronizer().error( getTBeanId() );
         }
     }
 

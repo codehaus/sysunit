@@ -227,4 +227,8 @@ public class LocalSynchronizer
 
         this.waitingTBeanIds.clear();
     }
+
+    void error(String tbeanId) {
+        unregisterSynchronizableTBean( tbeanId );
+    }
 }

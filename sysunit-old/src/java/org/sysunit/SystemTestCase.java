@@ -511,6 +511,8 @@ public class SystemTestCase
 
         suite.addTest( (Test) systemTestClass.newInstance() );
 
+        suite.setName( systemTestClass.getName() );
+
         return suite;
     }
 }
