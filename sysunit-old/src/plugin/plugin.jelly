@@ -13,24 +13,28 @@
     <test:dependency-handle/>
     <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
     <j:set var="testDir">${testPlugin.findVariable('maven.test.dest')}</j:set>
-    <j:set var="testDirLen" value="${size(testDir)}"/>
-    <fileScanner var="xmlTests">
-      <fileset dir="${testDir}">
-        <patternset>
-          <include name="**/*.systest"/>
-        </patternset>
-      </fileset>
-    </fileScanner>
-
-    <j:file name="${testDir}/sysunit-tests.properties" omitXmlDeclaration="true">
-      <j:whitespace trim="false">
-        <j:forEach var="xmlTest" items="${xmlTests.iterator()}">
-            <j:set var="tmp" value="${xmlTest.getPath().toString().substring(testDirLen)}"/>
-            <util:replace var="tmp" value="${tmp}" oldChar="\" newChar="/"/>
-            ${tmp.substring(1)} = on
-        </j:forEach>
-      </j:whitespace>
-    </j:file>
+    <util:file var="listFile" name="${testDir}/sysunit-tests.properties"/>
+    <j:if test="${not(listFile.exists())}">
+        <echo>generating test list</echo>
+        <j:set var="testDirLen" value="${size(testDir)}"/>
+        <fileScanner var="xmlTests">
+          <fileset dir="${testDir}">
+            <patternset>
+              <include name="**/*.systest"/>
+            </patternset>
+          </fileset>
+        </fileScanner>
+    
+        <j:file name="${testDir}/sysunit-tests.properties" omitXmlDeclaration="true">
+          <j:whitespace trim="false">
+            <j:forEach var="xmlTest" items="${xmlTests.iterator()}">
+                <j:set var="tmp" value="${xmlTest.getPath().toString().substring(testDirLen)}"/>
+                <util:replace var="tmp" value="${tmp}" oldChar="\" newChar="/"/>
+                ${tmp.substring(1)} = on
+            </j:forEach>
+          </j:whitespace>
+        </j:file>
+    </j:if>
   </goal>
 
   <goal name="sysunit:generate-jar-list">
