@@ -20,13 +20,13 @@ import junit.textui.TestRunner;
  * @author James Strachan
  * @version $Revision$
  */
-public class TestMasterNode extends TestCase {
+public class MasterNodeTest extends TestCase {
     public static void main(String[] args) {
         TestRunner.run(suite());
     }
 
     public static Test suite() {
-        return new TestSuite(TestMasterNode.class);
+        return new TestSuite(MasterNodeTest.class);
     }
 
     public void testMasterAndSlave() throws Exception {

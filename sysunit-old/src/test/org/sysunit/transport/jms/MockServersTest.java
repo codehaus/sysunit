@@ -25,7 +25,7 @@ import org.apache.commons.messenger.MessengerManager;
  * @author James Strachan
  * @version $Revision$
  */
-public class TestMockServers extends TestCase {
+public class MockServersTest extends TestCase {
 
     protected String messengerName = "topicConnection";
     protected String masterGroupSubject = "SYSUNIT.MASTERS";
@@ -44,7 +44,7 @@ public class TestMockServers extends TestCase {
     }
 
     public static Test suite() {
-        return new TestSuite(TestMockServers.class);
+        return new TestSuite(MockServersTest.class);
     }
 
     public void testMasterAndSlave() throws Exception {

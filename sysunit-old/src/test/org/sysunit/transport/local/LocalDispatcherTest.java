@@ -22,7 +22,7 @@ import org.sysunit.command.Dispatcher;
  * @author James Strachan
  * @version $Revision$
  */
-public class TestLocalDispatcher extends TestCase {
+public class LocalDispatcherTest extends TestCase {
 
 	protected MockServer server = new MockServer();
 	
@@ -31,7 +31,7 @@ public class TestLocalDispatcher extends TestCase {
     }
 
     public static Test suite() {
-        return new TestSuite(TestLocalDispatcher.class);
+        return new TestSuite(LocalDispatcherTest.class);
     }
 
     public void testSimpleDispatch() throws Exception {
