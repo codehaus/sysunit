@@ -8,7 +8,9 @@
   <description/>
   <shortDescription>SysUnit Plugin</shortDescription>
   <developers/>
+
   <dependencies>
+
     <dependency>
       <id>junit</id>
       <version>3.8.1</version>
@@ -16,5 +18,58 @@
         <classloader>root</classloader>
       </properties>
     </dependency>
+
+    <dependency>
+      <id>commons-logging</id>
+      <version>1.0.2</version>
+    </dependency>
+
+    <dependency>
+      <id>commons-jelly</id>
+      <version>SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <id>commons-jexl</id>
+      <version>1.0-beta-1</version>
+    </dependency>
+    
+    <dependency>
+      <id>commons-logging</id>
+      <version>1.0.2</version>
+    </dependency>
+
+    <dependency>
+      <id>commons-beanutils</id>
+      <version>1.6</version>
+    </dependency>
+
+    <dependency>
+      <id>commons-collections</id>
+      <version>3.0-dev</version>
+    </dependency>
+
+    <dependency>
+      <id>commons-digester</id>
+      <version>1.3</version>
+    </dependency>
+
+    <dependency>
+      <id>commons-messenger</id>
+      <version>1.0-dev-13</version>
+    </dependency>
+    
+    <dependency>
+      <id>dom4j</id>
+      <version>1.4-dev-8</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jbossall-client</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
   </dependencies>
+
 </project>

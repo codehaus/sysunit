@@ -1,5 +1,6 @@
 <project xmlns:j="jelly:core" 
          xmlns:ant="jelly:ant"
+         xmlns:util="jelly:util"
          xmlns:test="test">
 
   <goal name="sysunit:slave" prereqs="setclasspath" description="Runs a slave node">
@@ -25,6 +26,7 @@
       <j:whitespace trim="false">
         <j:forEach var="xmlTest" items="${xmlTests.iterator()}">
             <j:set var="tmp" value="${xmlTest.getPath().toString().substring(testDirLen)}"/>
+            <util:replace var="tmp" value="${tmp}" oldChar="\" newChar="/"/>
             ${tmp.substring(1)} = on
         </j:forEach>
       </j:whitespace>

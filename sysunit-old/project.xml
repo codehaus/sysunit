@@ -88,12 +88,12 @@
   </contributors>
 
   <dependencies>
+
     <dependency>
       <id>commons-logging</id>
       <version>1.0.2</version>
     </dependency>
 
-		<!-- used by the Jelly library -->
     <dependency>
       <id>commons-jelly</id>
       <version>SNAPSHOT</version>
@@ -144,8 +144,6 @@
       <version>2.2.1</version>
     </dependency>
 
-
-	<!-- a sample JMS to use -->
     <dependency>
       <id>openjms</id>
       <version>0.7.5</version>
@@ -158,12 +156,7 @@
       <id>jta</id>
       <version>1.0.1</version>
     </dependency>
-<!--
--->
-	
-	
 
-	<!-- used by the JMX connectors -->
     <dependency>
       <id>mx4j+jmx</id>
       <version>1.1.1</version>
@@ -172,53 +165,6 @@
       <id>mx4j+tools</id>
       <version>1.1.1</version>
     </dependency>
-<!--
--->
-
-		<!-- jars for jboss -->
-<!--
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss-system</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss-common</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss-jmx</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jmx-adaptor-plugin</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jnp-client</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jnet</artifactId>
-      <version>3.2.1</version>
-    </dependency>
--->
 
     <dependency>
       <groupId>jboss</groupId>
@@ -226,20 +172,11 @@
       <version>3.2.1</version>
     </dependency>
 
-<!--
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss-j2ee</artifactId>
-      <version>3.2.1</version>
-    </dependency>
--->
-
-		<!-- jars for unit tests -->
-
     <dependency>
       <id>junit</id>
       <version>3.8.1</version>
     </dependency>    
+
   </dependencies>
   
   <build>
