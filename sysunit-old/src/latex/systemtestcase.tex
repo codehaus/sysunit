@@ -1,5 +1,7 @@
 \chapter{The \indexclass{SystemTestCase} Class}
 
+\section{Overview}
+
 When using the base JUnit framework, each unit test
 is represented by a single method of the form 
 \indexmethod{TestCase}{textXXX()} on a subclass of \indexclass{TestCase}.
@@ -33,3 +35,229 @@ for a test:
 \end{enumerate}
 
 
+\section{\class{TBean} Factory Method}
+
+To configure a unit of code to execute concurrently, a
+\emph{TBean factory method} may be used.  It is simply
+a method that begins with the prefix \texttt{tbean} and returns
+a \indexclass{TBean}.  When the test class is executed, each
+\class{TBean} factory method will be called to generate
+the set of \class{TBean} instances used for the test.
+
+\begin{codelisting}
+public class MySystemTest
+  extends SystemTestCase
+\{
+    public TBean tbeanOrderAcceptor()
+    \{
+        return new OrderAcceptorTBean();
+    \}
+
+    public TBean tbeanInventoryVerifier()
+    \{
+        return new InventoryVerifierTBean();
+    \}
+\}
+\end{codelisting}
+
+\section{Thread\index{threads} Factory Method}
+
+To aide in creating concurrent tests without the need of
+embodying each unit of code within a \class{TBean}, SysUnit
+supports the notion of a \emph{thread factory method}.
+In addition to the \class{TBean} factory method for creating executable
+segments of code, any method that has the prefix of \texttt{thread}
+will also be run concurrently.
+
+\begin{note}
+The term ``thread'' is used through this manual to denote a
+general thread of execution, and not necessarily instances of
+\texttt{java.lang.}\indexclass{Thread}, though they may certainly be
+implemented using the \class{Thread} class under the covers.
+\end{note}
+
+\begin{codelisting}
+public class MySystemTest
+  extends SystemTestCase
+\{
+    public void threadOrderAcceptor()
+        throws Exception
+    \{
+         // the logic for running the order acceptor
+    \}
+
+    public void threadInventoryVerifier()
+        throws Exception
+    \{
+         // the logic for running the inventory verifier
+    \}
+\}
+\end{codelisting}
+
+\section{Synchronization\index{synchronization}}
+
+Many times, while multiple segments of code are running in independent
+threads of execution, it is desirable to synchronize at a point.  In
+multi-threaded programming, this is considered a
+\emph{barrier}\index{barrier},
+which is a point in the code that causes the threads to block and wait
+until all threads reach the same point, and then continue
+independently once unblocked.
+
+\begin{note}
+The term ``synchronization'' implies coordination, not unlike
+how secret-agents will synchronize their watches to ensure 
+activities happen at the same time.  SysUnit's usage of
+``synchronization'' should not be confused with Java's
+\texttt{synchronized} keyword, which actually ensures that
+multiple things \emph{do not} occur at the same time.
+\end{note}
+
+\subsection{\indexclass{Synchronizer}}
+
+The basis for synchronizing across multiple threads (local or
+distributed) is the \class{Synchronizer}, which describes a single
+\indexmethod{Synchronizer}{sync(...)} method.  
+
+\begin{codelisting}
+public interface Synchronizer 
+\{
+    void sync(String tbeanId,
+              String syncPointName)
+        throws SynchronizationException, InterruptedException;
+\}
+\end{codelisting}
+
+The \class{Synchronizer} provides a means for blocking at a named
+barrier, or \emph{sync-point}\index{sync-point} until all other threads of execution 
+block at a sync-point or have completed.  The \texttt{tbeanId}
+parameter identifies the \class{TBean} requesting the synchronization,
+while the \texttt{syncPointName} identifies the particular sync-point
+to wait for.  The \texttt{tbeanId} is typically derrived from the
+\method{tbeanXXX()} and \method{threadXXX()} method names, after
+removing the prefix.
+
+The \texttt{syncPointName} is any arbitrarily chosen identifier
+for the synchronization rendezvous.  The following example shows
+three \class{TBean} instances synchronizing at a sync-point
+named ``after-initialization''
+
+\begin{codelisting}
+    synchronizer.sync( "FirstTBean",
+                       "after-initialization" );
+\vskip0.5em
+\hrule
+\vskip0.5em
+    synchronizer.sync( "SecondTBean",
+                       "after-initialization" );
+\vskip0.5em
+\hrule
+\vskip0.5em
+    synchronizer.sync( "ThirdTBean",
+                       "after-initialization" );
+\end{codelisting}
+
+The \class{Synchronizer} guarantees that all three threads will
+reach the call to \method{sync(...)} and wait until the others
+have also reached that point.  All threads will then simultaneously
+unblock, allowing execution to continue.
+Any number of sync-points\index{sync-point!multiple} may be used through-out a test in order
+to allow coordination of multiple phases.
+
+\subsection{\indexclass{SynchronizableTBean},
+\indexclass{AbstractSynchronizableTBean}\\
+and \indexclass{TBeanSynchronizer}}
+
+The base \class{TBean} interface does not allow for synchronization. The
+\class{TBean} sub-interface \class{SynchronizableTBean} adds
+\indexmethod{SynchronizableTBean}{setSynchronizer(...)} method which
+signals to the SysUnit framework that a specialized \indexclass{TBeanSynchronizer}
+should be provided for synchronization within the \class{TBean}. 
+
+\begin{codelisting}
+public interface SynchronizableTBean
+    extends TBean 
+\{
+    void setSynchronizer(TBeanSynchronizer synchronizer);
+\}
+\end{codelisting}
+
+The \indexclass{TBeanSynchronizer} manages the \texttt{tbeanId}
+parameter required by \\ \class{Synchronizer.sync(...)}, providing
+a simple synchronization interface which requires only a
+\texttt{syncPointName} parameter.
+
+\begin{codelisting}
+public interface TBeanSynchronizer
+\{
+    void sync(String syncPointName)
+        throws SynchronizationException, InterruptedException;
+\}
+\end{codelisting}
+
+The \indexclass{AbstractSynchronizableTBean} provides a base
+for implementations of \indexclass{SynchronizableTBean} to
+manage the \indexclass{TBeanSynchronizer} and provides a convenience
+\indexmethod{AbstractSynchronizableTBean}{sync(...)} method.
+
+\begin{codelisting}
+public class MyFirstTBean
+    extends AbstractSynchronizableTBean
+\{
+    public void run()
+        throws Exception
+    \{
+        doSomething();
+        sync( "after-something" );
+        doSomethingElse();
+        sync( "after-something-else" );
+    \}
+\}
+
+\vskip0.5em
+\hrule
+\vskip0.5em
+
+public class MySecondTBean
+    extends AbstractSynchronizableTBean
+\{
+    public void run()
+        throws Exception
+    \{
+        doDifferentSomething();
+        sync( "after-something" );
+        doDifferentSomethingElse();
+        sync( "after-something-else" );
+    \}
+\}
+\end{codelisting}
+
+In general, \class{TBean} implementations should extend the
+\class{AbstractSynchronizableTBean} abstract class to make
+writing test code simpler.  Management of the \class{Synchronizer}
+and \texttt{tbeanId} will be managed automatically.
+
+\subsection{\class{SystemTestCase}.\indexmethod{SystemTestCase}{sync(...)}}
+
+When using the \method{threadXXX(...)} form for creating implicit
+\class{TBean} instances, the \indexclass{SystemTestCase} provides
+a simple \indexmethod{SystemTestCase}{sync(...)} identical to the
+one provided by \class{AbstractSynchronizableTBean}.  
+
+\begin{codelisting}
+public class MySystemTest
+    extends SystemTestCase
+\{
+    public void threadOne()
+    \{
+        doSomething();
+        sync( "after-something" );
+    \}
+
+    public void threadTwo()
+    \{
+        doDifferentSomething();
+        sync( "after-something" );
+    \}
+\}
+\end{codelisting}

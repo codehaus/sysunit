@@ -13,30 +13,7 @@ testing requires concurrently executing several bits of code,
 synchronizing their execution, and verifying the results
 across the entire environment.
 
-Throughout this documentation, the imaginary system used for
-the examples is an application which is responsible for accepting
-orders for books and attempting to fullfill them by generating
-pick lists for warehouse workers and freight bills for
-the shipping department.
-
-The various units, which may be tested independently include
-
-\begin{itemize}
-	\item Order entry
-	\item Inventory verification
-	\item Pick list production
-	\item Freight bill production
-\end{itemize}
-
-Each unit is assumed to already be tested and verified
-to work in isolation.  The order entry unit successfully
-accepts orders and stores them.  The inventory verification
-unit can successfully verify the stock levels of a book.
-The pick list production unit can successfully produce
-a pick list for a given set of books, and the freight bill
-unit can successfully produce a freight bill for a given
-set of books.
-
-Of interest is whether all of the units may function
-in an end-to-end manner.  The system test is responsible
-for this verification.
+\begin{ednote}
+More description about how to write good system-tests is 
+needed here.  Examples, etc.
+\end{ednote}

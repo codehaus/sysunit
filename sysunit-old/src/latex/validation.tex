@@ -1,0 +1,77 @@
+\chapter{Test Validation\index{validation}}
+
+\section{Introduction}
+
+Code does not a test make.  Only through validating the results
+of the code does a test gain true value.  JUnit provides a range
+of assertion \index{assertion} methods for validating the state
+of a test.  Assertions are a way of validating that the code
+being tested produced the expected results.
+
+\section{Validation with \indexclass{AbstractTBean}}
+
+The abstract convenience \indexclass{TBean} implementations of
+\indexclass{AbstractTBean} and \\
+\indexclass{AbstractSynchronizableTBean} extend the
+base JUnit \indexclass{Assert} class, allowing for all
+normal JUnit validation methods to be used.
+
+\begin{codelisting}
+public class MyFirstTBean
+    extends AbstractSynchronizableTBean
+\{
+    public void run()
+        throws Exception
+    \{
+        String result = doSomething();
+        sync( "after-something" );
+        assertEquals( "garbonzo",
+                      result );
+    \}
+\}
+\end{codelisting}
+
+Additionally, the \class{TBean} class provides for an
+\indexmethod{TBean}{assertValid()} method to do validation
+after all threads have completed.
+
+\begin{codelisting}
+public class MyFirstTBean
+    extends AbstractSynchronizableTBean
+\{
+    public void run()
+        throws Exception
+    \{
+        doSomething();
+    \}
+
+    public void assertValid()
+        throws Exception
+    \{
+        assertEquals( this.garbonzo,
+                      "garbonzo"
+    \}
+\}
+\end{codelisting}
+
+\section{Validation with \method{threadXXX(...)} methods}
+
+Since \method{threadXXX(...)} methods appear on implements
+of \indexclass{SystemTestCase} which itself is a subclass of
+JUnit's \indexclass{TestCase}, all \class{Assert} methods
+are available.
+
+\begin{codelisting}
+public class MyFirstSystemCase
+    extends SystemTestCase
+\{
+    public void threadOne()
+    \{
+        String result = doSomething();
+        sync( "after-something" );
+        assertEquals( "garbonzo",
+                      result );
+    \}
+\}
+\end{codelisting}
+
