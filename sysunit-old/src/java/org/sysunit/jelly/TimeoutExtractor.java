@@ -18,21 +18,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.remote.RemoteTBeanManager;
 
-/**
- * A helper class which is used by the Master node to extract all the
- * different JVMs which need to be created for a given system test XML document
-
- * 
- * @author James Strachan
- * @version $Revision$
- */
-public class JvmNameExtractor {
-    private static final Log log = LogFactory.getLog(JvmNameExtractor.class);
+public class TimeoutExtractor {
+    private static final Log log = LogFactory.getLog(TimeoutExtractor.class);
     
     private JellyContext context;
-    private RemoteTBeanManager manager;// = new RemoteTBeanManager();
+    private RemoteTBeanManager manager;
 
-    public JvmNameExtractor() {
+    public TimeoutExtractor() {
         context = new JellyContext();
         context.registerTagLibrary("", new SysUnitTagLibrary());
         manager = new RemoteTBeanManager( null,
@@ -41,14 +33,7 @@ public class JvmNameExtractor {
                                           null );
     }
 
-    /**
-     * Extracts the list of JVM names which are mentioned in the given
-     * system test XML document
-     * 
-     * @param xml
-     */
-    public List getJvmNames(String xml) throws Exception {
-        // lets assume the XML is on the classpath
+    public long getTimeout(String xml) throws Exception {
         URL url = getClass().getClassLoader().getResource(xml);
         if (url == null) {
             url = Thread.currentThread().getContextClassLoader().getResource(xml);
@@ -56,15 +41,14 @@ public class JvmNameExtractor {
                 url = ClassLoader.getSystemClassLoader().getSystemResource(xml);
                 if (url == null) {
                     throw new ResourceNotFoundException(xml);
-                };
+                }
             }
         }
-        XMLOutput output = XMLOutput.createDummyXMLOutput();
 
-        System.err.println( "((((((((((((((((" + url );
+        XMLOutput output = XMLOutput.createDummyXMLOutput();
         context.runScript(url, output);
         
         // grab the names...
-        return (List) context.getVariable("org.sysunit.jvmList");
+        return ((Long)context.getVariable("org.sysunit.timeout")).longValue();
     }
 }

@@ -12,6 +12,7 @@ package org.sysunit.command.master;
 import java.io.File;
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.util.Date;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,8 +33,10 @@ import org.sysunit.command.test.SetUpTBeansCommand;
 import org.sysunit.command.test.TearDownTBeansCommand;
 import org.sysunit.command.test.RunTestCommand;
 import org.sysunit.jelly.JvmNameExtractor;
+import org.sysunit.jelly.TimeoutExtractor;
 import org.sysunit.SysUnitException;
 import org.sysunit.SynchronizationException;
+import org.sysunit.WatchdogException;
 
 /**
  * The Server for Master nodes on the network
@@ -51,9 +54,11 @@ public class MasterServer
 	private Map testNodes = new HashMap();
 	private String xml;
 	private long waitTime = 1000L;
+    private long timeout;
 
     private Dispatcher slaveGroupDispatcher;
 	private JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
+	private TimeoutExtractor timeoutExtractor = new TimeoutExtractor();
     private MasterSynchronizer synchronizer = new MasterSynchronizer();
 
     private Object isDoneLock = new Object();
@@ -87,6 +92,7 @@ public class MasterServer
 
 		// now lets start kicking off the JVMs
 		this.jvmNames = jvmNameExtractor.getJvmNames(xml);
+        this.timeout = timeoutExtractor.getTimeout(xml);
 
         System.err.println( "###################### " + jvmNames );
 
@@ -184,25 +190,40 @@ public class MasterServer
     }
 
     public Throwable[] waitFor()
-        throws InterruptedException {
+        throws Exception {
 
-        //long waitFor = 15000;
-        //long waitSoFar = 0;
+        long start = new Date().getTime();
 
-        log.info( "waitForing" );
+        long timeLeft = timeout;
+
+        log.info( "waitForing: " + timeLeft );
         synchronized ( this.isDoneLock ) {
             while ( ! this.isDone ) {
-                log.info( "this.isDone == " + this.isDone );
-                this.isDoneLock.wait( 1000 );
-                //waitSoFar += 1000;
+                log.info( "this.isDone == " + this.isDone + " timeLeft: " + timeLeft );
+                this.isDoneLock.wait( timeLeft );
 
-                //if ( waitSoFar >= waitFor ) {
-                    //break;
-                //}
+                if ( timeout > 0 ) {
+                    long now = new Date().getTime();
+                    timeLeft = timeout - ( now - start );
+                }
+
+                if ( timeout > 0
+                     &&
+                     timeLeft <= 0 ) {
+                    
+                    killAll();
+                    throw new WatchdogException( timeout,
+                                                 new String[0] );
+                }
             }
         }
 
         return (Throwable[]) this.errors.toArray( EMPTY_THROWABLE_ARRAY );
+    }
+
+    public void killAll()
+        throws DispatchException {
+
     }
 
     public void addErrors(Throwable[] errors) {

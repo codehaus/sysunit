@@ -41,7 +41,7 @@
   <goal name="sysunit:a" prereqs="setclasspath,sysunit:generate-jar-list,jar:jar,sysunit:jar-test-classes" description="Runs system test A on a bunch of slave nodes">
     <java classname="org.sysunit.transport.jms.MasterNode" fork="yes">
       <classpath refid="test.classpath"/>
-      <arg value="org/sysunit/jelly/sampleSystemTest.jelly"/>
+      <arg value="org/sysunit/jelly/sampleSystemTest.systest"/>
     </java>
   </goal>
  
@@ -67,7 +67,8 @@
     <j:file name="${testDir}/sysunit-tests.properties" omitXmlDeclaration="true">
       <j:whitespace trim="false">
         <j:forEach var="xmlTest" items="${xmlTests.iterator()}">
-            ${xmlTest.getPath().toString().substring(testDirLen)} = on
+            <j:set var="tmp" value="${xmlTest.getPath().toString().substring(testDirLen)}"/>
+            ${tmp.substring(1)} = on
         </j:forEach>
       </j:whitespace>
     </j:file>
@@ -88,7 +89,7 @@
  
   </goal>
 
-  <goal name="sysunit:jar-test-classes" prereqs="test:compile,sysunit:generate-jar-list">
+  <goal name="sysunit:jar-test-classes" prereqs="test:compile,sysunit:generate-jar-list,sysunit:generate-test-list">
     <test:dependency-handle/>
     <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
     <ant:jar

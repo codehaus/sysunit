@@ -43,6 +43,9 @@ public class SystemTestTag extends TagSupport {
     /** The system test class */
     private Class systemTestClass;
 
+    /** Watchdog timeout, possibly 0 (infinite). */
+    private long timeout;
+
     private RemoteTBeanManager manager;
 
     /** All the JVMs to be created in client mode */
@@ -66,34 +69,46 @@ public class SystemTestTag extends TagSupport {
     // Tag interface
     //-------------------------------------------------------------------------                    
     public void doTag(XMLOutput output) throws MissingAttributeException, JellyTagException {
+        /*
         if (className == null) {
             throw new MissingAttributeException("className");
         }
+        */
         
         // lets register the JVM list into the context so folks can extract it from outside of Jelly
         jvms.clear();
         context.setVariable("org.sysunit.jvmList", jvms);
         
         systemTestClass = null;
-        try {
-            ClassLoader classLoader = getClassLoader();
-            systemTestClass = classLoader.loadClass(className);
-        }
-        catch (ClassNotFoundException e) {
+
+        if ( className != null ) {
             try {
-                systemTestClass = getClass().getClassLoader().loadClass(className);
+                ClassLoader classLoader = getClassLoader();
+                systemTestClass = classLoader.loadClass(className);
             }
-            catch (ClassNotFoundException e2) {
+            catch (ClassNotFoundException e) {
                 try {
-                    systemTestClass = Class.forName(className);
+                    systemTestClass = getClass().getClassLoader().loadClass(className);
                 }
-                catch (ClassNotFoundException e3) {
-                    log.error("Could not load class: " + className + " exception: " + e, e);
-                    throw new JellyTagException(
-                        "Could not find class: " + className + " using ClassLoader: " + classLoader);
+                catch (ClassNotFoundException e2) {
+                    try {
+                        systemTestClass = Class.forName(className);
+                    }
+                    catch (ClassNotFoundException e3) {
+                        log.error("Could not load class: " + className + " exception: " + e, e);
+                        throw new JellyTagException(
+                            "Could not find class: " + className + " using ClassLoader: " + classLoader);
+                    }
                 }
             }
         }
+
+        System.err.println( "######################################################## timeout: " + getTimeout() );
+
+        getContext().setVariable( "org.sysunit.timeout",
+                                  new Long( getTimeout() ) );
+
+        
 
         invokeBody(output);
     }
@@ -115,6 +130,17 @@ public class SystemTestTag extends TagSupport {
         this.className = className;
     }
 
+
+    public void setTimeout(long timeout) {
+        System.err.println( "######################################################## set timeout: " + timeout );
+        this.timeout = timeout;
+    }
+
+    public long getTimeout() {
+        System.err.println( "######################################################## get timeout: " + this.timeout );
+        return this.timeout;
+    }
+    
     /**
      * Sets the ClassLoader to use to load the class. 
      * If no value is set then the current threads context class

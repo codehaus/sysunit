@@ -1,9 +1,0 @@
-<systemTest name="simple" className="org.sysunit.jelly.ExampleSystemTest"> 
-  <jvm name="a" count="4"> 
-    <thread method="threadClient" count="2"/> 
-  </jvm> 
- 
-  <jvm name="b" count="2"> 
-    <thread method="threadServer" count="1"/> 
-  </jvm> 
-</systemTest>

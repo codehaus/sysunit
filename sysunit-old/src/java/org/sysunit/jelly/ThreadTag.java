@@ -62,6 +62,11 @@ public class ThreadTag extends TagSupport {
         invokeBody(output);
 
         Class testClass = systemTestTag.getSystemTestClass();
+
+        if ( testClass == null ) {
+            throw new JellyTagException( "Class attribute in <systemTest> tag required for <thread> tag usage" );
+        }
+
 		RemoteTBeanManager manager = systemTestTag.getManager();
         try {
             for (int i = 0; i < count; i++) {
