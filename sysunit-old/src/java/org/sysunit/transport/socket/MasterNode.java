@@ -1,5 +1,6 @@
 package org.sysunit.transport.socket;
 
+import org.sysunit.util.MultiThrowable;
 import org.sysunit.command.master.MasterServer;
 
 import org.apache.commons.logging.Log;
@@ -25,11 +26,19 @@ public class MasterNode
                                           args[0] );
 
         node.start();
+
+        Throwable[] errors = node.getErrors();
+
+        if ( errors.length != 0 ) {
+            throw new MultiThrowable( errors );
+        }
+            
     }
 
     private InetAddress beaconAddr;
     private int beaconPort;
     private String xml;
+    private Throwable[] errors;
 
     public MasterNode(InetAddress beaconAddr,
                       int beaconPort,
@@ -49,6 +58,10 @@ public class MasterNode
 
     public String getXml() {
         return this.xml;
+    }
+
+    public Throwable[] getErrors() {
+        return this.errors;
     }
 
     public void start()
@@ -82,6 +95,6 @@ public class MasterNode
 
         server.start();
 
-        server.waitFor();
+        this.errors = server.waitFor();
     }
 }
