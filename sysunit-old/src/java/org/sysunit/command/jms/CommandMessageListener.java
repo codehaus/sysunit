@@ -1,8 +1,11 @@
 /*
- * Created on Jul 30, 2003
+ * Copyright (C) SpiritSoft, Inc. All rights reserved.
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * This software is published under the terms of the SpiritSoft Software License
+ * version 1.0, a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * $Id$
  */
 package org.sysunit.command.jms;
 
@@ -13,7 +16,6 @@ import javax.jms.ObjectMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.command.Command;
-import org.sysunit.command.NodeContext;
 
 /**
  * A JMS MessageListener which will consume Command objects and execute them against
@@ -26,9 +28,9 @@ public class CommandMessageListener implements MessageListener {
 
     private static final Log log = LogFactory.getLog(CommandMessageListener.class);
 
-    private NodeContext context;
+    private JmsNodeContext context;
 
-	public CommandMessageListener(NodeContext context) {
+	public CommandMessageListener(JmsNodeContext context) {
 		this.context = context;
 	}
 	
@@ -38,7 +40,7 @@ public class CommandMessageListener implements MessageListener {
             try {
                 Object value = objectMessage.getObject();
                 if (value instanceof Command) {
-                    onCommand((Command) value);
+                    onCommand(message, (Command) value);
                 }
                 else {
                     log.error("Received object which was not a command: " + value);
@@ -59,8 +61,9 @@ public class CommandMessageListener implements MessageListener {
     /**
      * @param command
      */
-    protected void onCommand(Command command) throws Exception {
-        command.run(context);
+    protected void onCommand(Message message, Command command) throws Exception {
+    	command.setReplyDispatcher(context.getReplyDispatcher(message));
+    	command.run(context);
     }
 
 }

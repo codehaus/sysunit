@@ -1,8 +1,11 @@
 /*
- * Created on Jul 30, 2003
+ * Copyright (C) SpiritSoft, Inc. All rights reserved.
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * This software is published under the terms of the SpiritSoft Software License
+ * version 1.0, a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * $Id$
  */
 package org.sysunit.command.jms;
 
@@ -16,6 +19,9 @@ import org.sysunit.command.DispatchException;
 import org.sysunit.command.Dispatcher;
 
 /**
+ * A Dispatcher implementation which uses a remote Queue or Topic
+ * to dispatch commands
+ * 
  * @author James Strachan
  * @version $Revision$
  */
@@ -23,6 +29,7 @@ public class JmsDispatcher implements Dispatcher {
 	
 	private Messenger messenger;
 	private Destination destination;
+	private Destination replyToDestination;
 
 	public JmsDispatcher() {
 	}
@@ -33,14 +40,18 @@ public class JmsDispatcher implements Dispatcher {
 	 * @param messenger
 	 * @param destination
 	 */
-	public JmsDispatcher(Messenger messenger, Destination destination) {
+	public JmsDispatcher(Messenger messenger, Destination destination, Destination replyToDestination) {
 		setMessenger(messenger);
 		setDestination(destination);
+		setReplyToDestination(replyToDestination);
 	}
 
     public void dispatch(Command command) throws DispatchException {
     	try {
             Message message = messenger.createObjectMessage(command);
+            if (replyToDestination != null) {
+            	message.setJMSReplyTo(replyToDestination);
+            }
             messenger.send(destination, message);
         }
         catch (JMSException e) {
@@ -77,6 +88,20 @@ public class JmsDispatcher implements Dispatcher {
      */
     public void setMessenger(Messenger messenger) {
         this.messenger = messenger;
+    }
+
+    /**
+     * @return
+     */
+    public Destination getReplyToDestination() {
+        return replyToDestination;
+    }
+
+    /**
+     * @param replyToDestination
+     */
+    public void setReplyToDestination(Destination replyToDestination) {
+        this.replyToDestination = replyToDestination;
     }
 
 }

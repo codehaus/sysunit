@@ -9,25 +9,17 @@
  */
 package org.sysunit.command;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
- * A notification Command when the Sync has finished.
+ * A Command sent by the Master to the group to request which members are
+ * interested in being part of a test run. This command is typically broadcast
+ * or multicast to all members of a network.
  * 
  * @author James Strachan
  * @version $Revision$
  */
-public class SyncCompletedCommand extends Command {
-    private static final Log log = LogFactory.getLog(SyncCompletedCommand.class);
-
-    private String name;
-
-    public SyncCompletedCommand(String name) {
-    	this.name = name;
-    }
-
+public class RequestMembersCommand extends Command {
     public void run(NodeContext context) throws Exception {
-    	/** @todo */
+    	getReplyDispatcher().dispatch(new AcceptMembershipCommand(context.getName()));
     }
 }

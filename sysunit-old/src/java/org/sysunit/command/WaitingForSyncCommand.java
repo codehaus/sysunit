@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
  * @author James Strachan
  * @version $Revision$
  */
-public class WaitingForSyncCommand implements Command {
+public class WaitingForSyncCommand extends Command {
     private static final Log log = LogFactory.getLog(WaitingForSyncCommand.class);
 
     private String name;

@@ -9,6 +9,9 @@
  */
 package org.sysunit.command;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.jelly.JvmRunner;
@@ -23,22 +26,45 @@ public class NodeContext {
     private static final Log log = LogFactory.getLog(NodeContext.class);
 
 	private JvmRunner runner = new JvmRunner();
+	private Map members = new HashMap();
+	private String name;
 	
     public NodeContext() {
     }
 
-    /**
-     * @return
-     */
+	/**
+	 * Typically this method is only used by the master to find members
+	 * 
+	 * @param dispatcher
+	 */
+	public void acceptMember(AcceptMembershipCommand command) {
+		members.put(command.getName(), command.getReplyDispatcher());
+	}
+
+	// Properties
+	//-------------------------------------------------------------------------    
+
+	/**
+	 * @return a Map keyed by name of all the members's Dispatcher object
+	 */
+	public Map getMemberMap() {
+		return members;
+	}
+	
     public JvmRunner getRunner() {
         return runner;
     }
 
-    /**
-     * @param runner
-     */
     public void setRunner(JvmRunner runner) {
         this.runner = runner;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

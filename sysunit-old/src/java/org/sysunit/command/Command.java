@@ -17,7 +17,9 @@ import java.io.Serializable;
  * @author James Strachan
  * @version $Revision$
  */
-public interface Command extends Serializable {
+public abstract class Command implements Serializable {
+	
+	private transient Dispatcher replyDispatcher;
 	
 	/**
 	 * Executes this command on the given node context
@@ -25,5 +27,24 @@ public interface Command extends Serializable {
 	 * @param context
 	 * @throws Exception
 	 */
-    public void run(NodeContext context) throws Exception;
+    public abstract void run(NodeContext context) throws Exception;
+    
+    /**
+     * @return the dispatcher which can be used to dispatch replies to this command
+     */
+    public Dispatcher getReplyDispatcher() {
+        return replyDispatcher;
+    }
+
+    /**
+     * This method allows a local reply dispatcher to be attached to this command.
+     * This method should only be called by some remote-Command framework. Such as when
+     * a Command has been deserialized and need to be bound to the local reply-dispatcher
+     * 
+     * @param replyDispatcher
+     */
+    public void setReplyDispatcher(Dispatcher replyDispatcher) {
+        this.replyDispatcher = replyDispatcher;
+    }
+
 }

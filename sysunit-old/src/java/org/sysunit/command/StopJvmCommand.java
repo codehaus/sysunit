@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
  * @author James Strachan
  * @version $Revision$
  */
-public class StopJvmCommand implements Command {
+public class StopJvmCommand extends Command {
     private static final Log log = LogFactory.getLog(StopJvmCommand.class);
 
     private String name;

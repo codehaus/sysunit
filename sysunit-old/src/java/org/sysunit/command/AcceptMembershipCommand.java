@@ -9,25 +9,27 @@
  */
 package org.sysunit.command;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
- * A notification Command when the Sync has finished.
+ * A reply to the {@link RequestMembersCommand} to indicate that 
+ * this node would like to join the test network.
  * 
  * @author James Strachan
  * @version $Revision$
  */
-public class SyncCompletedCommand extends Command {
-    private static final Log log = LogFactory.getLog(SyncCompletedCommand.class);
-
-    private String name;
-
-    public SyncCompletedCommand(String name) {
-    	this.name = name;
-    }
-
+public class AcceptMembershipCommand extends Command {
+	private String name;
+	
+	public AcceptMembershipCommand(String name) {
+		this.name = name;
+	}
+    
     public void run(NodeContext context) throws Exception {
-    	/** @todo */
+    	context.acceptMember(this);
     }
+    
+    public String getName() {
+        return name;
+    }
+
 }

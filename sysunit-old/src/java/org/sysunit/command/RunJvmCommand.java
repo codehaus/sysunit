@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
  * @author James Strachan
  * @version $Revision$
  */
-public class RunJvmCommand implements Command {
+public class RunJvmCommand extends Command {
     private static final Log log = LogFactory.getLog(RunJvmCommand.class);
 
     private String xml;
