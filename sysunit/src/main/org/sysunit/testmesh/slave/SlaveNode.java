@@ -61,9 +61,9 @@ public class SlaveNode
     public void stop()
         throws InterruptedException
     {
-        System.err.println( "SlaveNode::stop()" );
+        //System.err.println( "SlaveNode::stop()" );
         super.stop();
-        System.err.println( "SlaveNode::stop() complete" );
+        //System.err.println( "SlaveNode::stop() complete" );
     }
 
     public RemoteNodeInfo getMasterNodeInfo()

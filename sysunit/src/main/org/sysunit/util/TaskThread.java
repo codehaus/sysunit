@@ -26,7 +26,7 @@ public class TaskThread
         }
         catch (InterruptedException e)
         {
-            System.err.println( this + " joining" );
+            //System.err.println( this + " joining" );
             return;
         }
 
@@ -50,10 +50,10 @@ public class TaskThread
         }
         catch (InterruptedException e)
         {
-            System.err.println( this + " joining" );
+            //System.err.println( this + " joining" );
             return;
         }
 
-        System.err.println( this + " joining" );
+        //System.err.println( this + " joining" );
     }
 }

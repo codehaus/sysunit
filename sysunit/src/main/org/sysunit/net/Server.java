@@ -62,7 +62,7 @@ public class Server
     public synchronized void stop()
         throws InterruptedException
     {
-        System.err.println( "Server::stop()" );
+        //System.err.println( "Server::stop()" );
         synchronized ( this.shouldRunLock )
         {
             this.shouldRun = false;
@@ -84,7 +84,7 @@ public class Server
             // swallow
         }
 
-        System.err.println( "Server::stop() complete" );
+        //System.err.println( "Server::stop() complete" );
     }
 
     public int getPort()

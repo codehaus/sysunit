@@ -30,7 +30,7 @@ public class ServerThread
         }
         catch (InterruptedException e)
         {
-            System.err.println( "ServerThread joining" );
+            //System.err.println( "ServerThread joining" );
             return;
         }
 
@@ -80,10 +80,10 @@ public class ServerThread
         }
         catch (InterruptedException e)
         {
-            System.err.println( "ServerThread joining" );
+            //System.err.println( "ServerThread joining" );
             return;
         }
 
-        System.err.println( "ServerThread joining" );
+        //System.err.println( "ServerThread joining" );
     }
 }
