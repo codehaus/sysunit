@@ -79,7 +79,16 @@
   <goal name="sysunit:register">
     <test:dependency-handle/>
     <postGoal name="test:test">
-       <attainGoal name="sysunit:test"/>
+       <j:if test="${context.findVariable('sysunit.test.skip') != 'true'}">
+         <echo>NOT SKIPPING SYSUNIT TESTS</echo>
+         <attainGoal name="sysunit:test"/>
+       </j:if>
+    </postGoal>
+    <preGoal name="clover:test">
+       <j:set var="sysunit.test.skip" value="true"/>
+    </preGoal>
+    <postGoal name="clover:test">
+       <j:set var="sysunit.test.skip" value="false"/>
     </postGoal>
   </goal>
  
