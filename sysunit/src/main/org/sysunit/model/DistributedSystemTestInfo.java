@@ -43,6 +43,21 @@ public class DistributedSystemTestInfo
         return (JvmInfo[]) this.jvms.toArray( EMPTY_JVMINFO_ARRAY );
     }
 
+    public JvmInfo getJvm(String name)
+    {
+        JvmInfo[] jvms = getJvms();
+
+        for ( int i = 0 ; i < jvms.length ; ++i )
+        {
+            if ( jvms[ i ].getName().equals( name ) )
+            {
+                return jvms[ i ];
+            }
+        }
+
+        return null;
+    }
+
     public int getTotalJvms()
     {
         int num = 0;
