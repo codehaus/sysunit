@@ -29,11 +29,13 @@ public class InVmSlaveServer extends Server {
     }
 
     /**
+     * Starts a new TestNode 
      * @param command
      */
     public void startTestNode(StartTestNodeCommand command) {
 
-		String destination = "to be defined";
+		// the TestNode needs to know the destination of the Master
+		String destination = command.getMasterID();
 		
 		String[] args = {destination, command.getXml(), command.getJvmName()};  
 		

@@ -12,6 +12,7 @@ package org.sysunit.command.test;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.command.Dispatcher;
+import org.sysunit.command.MissingPropertyException;
 import org.sysunit.command.Server;
 import org.sysunit.command.master.TestNodeStartedCommand;
 import org.sysunit.jelly.JvmRunner;
@@ -36,7 +37,11 @@ public class TestServer extends Server {
     }
 
     public void start() throws Exception {
-        getMasterDispatcher().dispatch(new TestNodeStartedCommand(getName()));
+    	Dispatcher dispatcher = getMasterDispatcher();
+    	if (dispatcher == null) {
+    		throw new MissingPropertyException(this, "masterDispatcher");
+    	}
+		dispatcher.dispatch(new TestNodeStartedCommand(getName()));
 
         // start the test running
         getRunner().run(xml, jvmName);

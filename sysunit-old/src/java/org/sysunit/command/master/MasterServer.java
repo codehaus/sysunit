@@ -156,7 +156,7 @@ public class MasterServer extends Server {
 			
 			log.info("Dispatching jvm: " + jvmName + " to dispatcher: " + dispatcher);
 			
-			dispatcher.dispatch(new StartTestNodeCommand(xml, jvmName));
+			dispatcher.dispatch(new StartTestNodeCommand(xml, jvmName, getName()));
 		}
 	}
 }

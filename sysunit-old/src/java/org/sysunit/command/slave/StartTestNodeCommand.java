@@ -21,10 +21,12 @@ package org.sysunit.command.slave;
 public class StartTestNodeCommand extends SlaveCommand {
     private String xml;
     private String jvmName;
+    private String masterID;
 
-    public StartTestNodeCommand(String xml, String jvmName) {
+    public StartTestNodeCommand(String xml, String jvmName, String masterID) {
 		this.xml = xml;
 		this.jvmName = jvmName;
+		this.masterID = masterID;
    }
 
     public void run(SlaveServer context) throws Exception {
@@ -38,4 +40,9 @@ public class StartTestNodeCommand extends SlaveCommand {
     public String getJvmName() {
         return this.jvmName;
     }
+    
+    public String getMasterID() {
+        return masterID;
+    }
+
 }
