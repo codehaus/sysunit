@@ -364,7 +364,6 @@ public class SystemTestCase
      */
     public void run(TestResult testResult) {
 
-        System.err.println( "FOO" );
         testResult.startTest( this );
         try {
             initializeFactories();
@@ -376,19 +375,7 @@ public class SystemTestCase
                                  t );
         } finally {
             testResult.endTest( this );
-            System.err.println( "BAR" );
         }
-
-
-
-/* finally {
-            try {
-                tearDownTBeans();
-            } catch (Throwable t) {
-                testResult.addError( this,
-                                     t );
-            }
-            } */
     }
 
     protected void startTBeans(TestResult testResult)
