@@ -25,12 +25,12 @@
   	SysUnit is a JUnit framework for system testing
   </description>
   
-  <url>http://sysunit.codehaus.org/</url>
+  <url>http://www.sysunit.org/</url>
 <!--
   <issueTrackingUrl>http://sourceforge.net/tracker/?group_id=76653</issueTrackingUrl>
 -->
   
-  <siteAddress>sysunit.codehaus.org</siteAddress>
+  <siteAddress>sysunit.org</siteAddress>
   <siteDirectory>/www/sysunit.codehaus.org</siteDirectory>
 <!--
   <distributionDirectory>/home/groups/s/sy/sysunit/htdocs/dist</distributionDirectory>
