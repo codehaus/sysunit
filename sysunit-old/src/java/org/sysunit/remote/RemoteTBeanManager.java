@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestResult;
@@ -48,6 +50,8 @@ public class RemoteTBeanManager { // implements Runnable {
     //     Constants
     // ----------------------------------------------------------------------
 
+    private static final Throwable[] EMPTY_THROWABLE_ARRAY = new Throwable[0];
+
 	/** The Log to which logging calls will be made. */
 	private static final Log log = LogFactory.getLog(RemoteTBeanManager.class);
 	
@@ -72,6 +76,7 @@ public class RemoteTBeanManager { // implements Runnable {
     private Blocker beginBlocker;
     private CheckpointCallback endCallback;
     private Blocker endBlocker;
+    private CheckpointCallback doneCallback;
 
 
     // ----------------------------------------------------------------------
@@ -83,7 +88,8 @@ public class RemoteTBeanManager { // implements Runnable {
      */
     public RemoteTBeanManager(Synchronizer synchronizer,
                               CheckpointCallback beginCallback,
-                              CheckpointCallback endCallback) {
+                              CheckpointCallback endCallback,
+                              CheckpointCallback doneCallback) {
         this.tbeans = new HashMap();
         this.tbeanThreads = new HashSet();
         this.synchronizer = synchronizer;
@@ -91,6 +97,7 @@ public class RemoteTBeanManager { // implements Runnable {
         this.beginBlocker = new Blocker();
         this.endCallback = endCallback;
         this.endBlocker = new Blocker();
+        this.doneCallback = doneCallback;
     }
 
     // ----------------------------------------------------------------------
@@ -191,6 +198,10 @@ public class RemoteTBeanManager { // implements Runnable {
         Checkpoint endCheckpoint = new Checkpoint( "end",
                                                    tbeans.size() + 1,
                                                    this.endCallback );
+
+        Checkpoint doneCheckpoint = new Checkpoint( "done",
+                                                    tbeans.size() + 1,
+                                                    this.doneCallback );
         
         for (Iterator tbeanIdIter = this.tbeans.keySet().iterator(); tbeanIdIter.hasNext();) {
             
@@ -211,13 +222,15 @@ public class RemoteTBeanManager { // implements Runnable {
                                                   beginCheckpoint,
                                                   this.beginBlocker, 
                                                   endCheckpoint,
-                                                  this.endBlocker );
+                                                  this.endBlocker,
+                                                  doneCheckpoint );
 
             this.tbeanThreads.add(thread);
 
             thread.start();
         }
 
+        doneCheckpoint.pass();
         endCheckpoint.pass();
         beginCheckpoint.pass();
     }
@@ -287,6 +300,28 @@ public class RemoteTBeanManager { // implements Runnable {
                 }
             }
         }
+    }
+
+    public Throwable[] collectErrors() {
+
+        TBeanThread[] threads = getTBeanThreads();
+        List errors = new ArrayList();
+
+        for (int i = 0; i < threads.length; ++i) {
+            if (threads[i].hasError()) {
+                Throwable t = threads[i].getError();
+                errors.add( t );
+            } else {
+                try {
+                    threads[i].getTBean().assertValid();
+                }
+                catch (Throwable t) {
+                    errors.add( t );
+                }
+            }
+        }    
+
+        return (Throwable[]) errors.toArray( EMPTY_THROWABLE_ARRAY );
     }
     
 	// ----------------------------------------------------------------------

@@ -37,6 +37,7 @@ public class JvmNameExtractor {
         context.registerTagLibrary("", new SysUnitTagLibrary());
         manager = new RemoteTBeanManager( null,
                                           null,
+                                          null,
                                           null );
     }
 

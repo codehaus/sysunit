@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -51,9 +52,13 @@ public class MasterServer
     private List jvmNames;
     private int setUpServers;
     private int ranServers;
+    private int doneServers;
+
+    private List errors;
 	
     public MasterServer(String xml) {
     	this.xml = xml;
+        this.errors = new ArrayList();
     }
 
 	public void start() throws Exception {
@@ -138,11 +143,33 @@ public class MasterServer
     public void tbeansRan(String testServerName)
         throws Exception {
         ++this.ranServers;
-
+        
         if ( this.ranServers == jvmNames.size() ) {
             tearDownTBeans();
         }
     }
+    
+    public void tbeansDone(String testServerName,
+                           Throwable[] errors) {
+        addErrors( errors );
+        
+        ++this.doneServers;
+        
+        if ( this.doneServers == jvmNames.size() ) {
+            if ( ! this.errors.isEmpty() ) {
+                log.error( "THERE WERE ERRORS: " + this.errors );
+            } else {
+                log.info( "SUCCESSFUL" );
+            }
+        }
+    }
+
+    public void addErrors(Throwable[] errors) {
+        for ( int i = 0 ; i < errors.length ; ++i ) {
+            this.errors.add( errors[i] );
+        }
+    }
+        
 
     protected void runTest()
         throws Exception {

@@ -18,6 +18,7 @@ public class TBeanThread
     private Blocker beginBlocker;
     private Checkpoint endCheckpoint;
     private Blocker endBlocker;
+    private Checkpoint doneCheckpoint;
     private Throwable error;
     private boolean isDone;
 
@@ -27,7 +28,8 @@ public class TBeanThread
                        Checkpoint beginCheckpoint,
                        Blocker beginBlocker,
                        Checkpoint endCheckpoint,
-                       Blocker endBlocker) {
+                       Blocker endBlocker,
+                       Checkpoint doneCheckpoint) {
         super( "tbean-thread." + tbeanId );
         this.tbeanId         = tbeanId;
         this.tbean           = tbean;
@@ -36,6 +38,7 @@ public class TBeanThread
         this.beginBlocker    = beginBlocker;
         this.endCheckpoint   = endCheckpoint;
         this.endBlocker      = endBlocker;
+        this.doneCheckpoint  = doneCheckpoint;
         this.isDone          = false;
     }
 
@@ -66,44 +69,56 @@ public class TBeanThread
     public Blocker getEndBlocker() {
         return this.endBlocker;
     }
+
+    public Checkpoint getDoneCheckpoint() {
+        return this.doneCheckpoint;
+    }
     
     public void run() {
         try {
-            tbean.setUp();
-            getBeginCheckpoint().pass();
-            getBeginBlocker().block();
-        } catch (Exception e) {
-            setError( e );
-            return;
-        }
-
-        try {
-            tbean.run();
-        } catch (Throwable e) {
-            setError( e );
-            e.printStackTrace();
-            getSynchronizer().error( getTBeanId() );
-        } finally {
-            if ( getTBean() instanceof SynchronizableTBean ) {
-                try {
-                    getSynchronizer().unregisterSynchronizableTBean( getTBeanId() );
-                } catch (SynchronizationException e) {
-                    setError( e );
-                }
-            }
-            synchronized ( this ) {
-                this.isDone = true;
-            }
             try {
-                getEndCheckpoint().pass();
-                getEndBlocker().block();
-                try {
-                    tbean.tearDown();
-                } catch (Throwable t) {
-                    setError( t );
-                }
-            } catch (InterruptedException e) {
+                tbean.setUp();
+                getBeginCheckpoint().pass();
+                getBeginBlocker().block();
+            } catch (Exception e) {
+                setError( e );
                 return;
+            }
+            
+            try {
+                tbean.run();
+            } catch (Throwable e) {
+                setError( e );
+                e.printStackTrace();
+                getSynchronizer().error( getTBeanId() );
+            } finally {
+                if ( getTBean() instanceof SynchronizableTBean ) {
+                    try {
+                        getSynchronizer().unregisterSynchronizableTBean( getTBeanId() );
+                    } catch (SynchronizationException e) {
+                        setError( e );
+                    }
+                }
+                synchronized ( this ) {
+                    this.isDone = true;
+                }
+                try {
+                    getEndCheckpoint().pass();
+                    getEndBlocker().block();
+                    try {
+                        tbean.tearDown();
+                    } catch (Throwable t) {
+                        setError( t );
+                    }
+                } catch (InterruptedException e) {
+                    return;
+                } catch (Exception e) {
+                    return;
+                }
+            }
+        } finally {
+            try {
+                getDoneCheckpoint().pass();
             } catch (Exception e) {
                 return;
             }

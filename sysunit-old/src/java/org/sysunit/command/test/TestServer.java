@@ -20,6 +20,7 @@ import org.sysunit.command.master.RegisterSynchronizableTBeanCommand;
 import org.sysunit.command.master.UnregisterSynchronizableTBeanCommand;
 import org.sysunit.command.master.TBeansSetUpCommand;
 import org.sysunit.command.master.TBeansRanCommand;
+import org.sysunit.command.master.TBeansDoneCommand;
 import org.sysunit.command.master.SyncCommand;
 import org.sysunit.jelly.JvmRunner;
 import org.sysunit.util.Checkpoint;
@@ -51,6 +52,7 @@ public class TestServer
         this.synchronizer = new TestSynchronizer();
         this.runner = new JvmRunner( this,
                                      this,
+                                     this,
                                      this );
     }
 
@@ -73,12 +75,13 @@ public class TestServer
         //getRunner().getManager().run();
     }
 
-    public void runTest() throws Exception {
-        getRunner().getManager().runTest();
-    }
 
     public void setUpTBeans() throws Exception {
         getRunner().getManager().setUpTBeans();
+    }
+
+    public void runTest() throws Exception {
+        getRunner().getManager().runTest();
     }
 
     public void tearDownTBeans() throws Exception {
@@ -164,9 +167,16 @@ public class TestServer
         log.info( "################## &&&&&&&  ########  checkpoint: " + checkpoint.getName() );
         if ( checkpoint.getName().equals( "begin" ) ) {
             getMasterDispatcher().dispatch( new TBeansSetUpCommand( getName() ) );
-        } else {
+        } else if ( checkpoint.getName().equals( "end" ) ) {
             getMasterDispatcher().dispatch( new TBeansRanCommand( getName() ) );
+        } else if ( checkpoint.getName().equals( "done" ) ) {
+            Throwable[] errors = getRunner().getManager().collectErrors();
+            getMasterDispatcher().dispatch( new TBeansDoneCommand( getName(),
+                                                                   errors ) );
+        } else {
+            log.error( "unknown checkpoint: " + checkpoint.getName() );
         }
+
     }
 
 }

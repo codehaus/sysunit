@@ -58,18 +58,21 @@ public class JvmRunner {
         //this.synchronizer = new TestSynchronizer();
         this( new LocalSynchronizer(),
               null,
+              null,
               null );
     }
 
     public JvmRunner(Synchronizer synchronizer,
                      CheckpointCallback beginCallback,
-                     CheckpointCallback endCallback) {
+                     CheckpointCallback endCallback,
+                     CheckpointCallback doneCallback) {
         this.context = new JellyContext();
         this.context.registerTagLibrary("", new SysUnitTagLibrary());
         this.synchronizer = synchronizer;
         this.manager = new RemoteTBeanManager( this.synchronizer,
                                                beginCallback,
-                                               endCallback);
+                                               endCallback,
+                                               doneCallback );
     }
 
     public void setTestServerName(String testServerName) {
