@@ -65,7 +65,7 @@ public class ScenarioClassGenerator
        text.append( "\n" );
        text.append( "    public static ScenarioInfo getScenarioInfo(DistributedSystemTestInfo testInfo) throws Exception\n" );
        text.append( "    {\n" );
-       text.append( "        return ScenarioInfoBuilder.build( testInfo, new File( \"" + source.getPath() + "\" ) );\n" );
+       text.append( "        return ScenarioInfoBuilder.build( testInfo, new File( \"" + getPath( source ) + "\" ) );\n" );
        text.append( "    }\n" );
        text.append( "\n" );
        text.append( "    public static DistributedSystemTestInfo getSystemTestInfo() throws Exception\n" );
@@ -74,15 +74,15 @@ public class ScenarioClassGenerator
        text.append( "    }\n" );
        text.append( "}\n" );
 
-        FileWriter out = new FileWriter( destination );
-
-        try
-        {
-            out.write( text.toString() );
-        }
-        finally
-        {
-            out.close();
-        }
+       FileWriter out = new FileWriter( destination );
+       
+       try
+       {
+           out.write( text.toString() );
+       }
+       finally
+       {
+           out.close();
+       }
     }
 }
