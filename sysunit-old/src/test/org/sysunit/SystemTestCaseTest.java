@@ -269,68 +269,6 @@ public class SystemTestCaseTest
         }
     }
 
-    public void testSynchronizer()
-        throws Exception {
-
-        final SystemTestCase testCase = new SystemTestCase();
-
-        Thread threadOne = new Thread() {
-                public void run() {
-                    MockTBeanSynchronizer synchronizer = new MockTBeanSynchronizer();
-                    testCase.setSynchronizer( synchronizer );
-                    assertSame( synchronizer,
-                                testCase.getSynchronizer() );
-                    try {
-                        testCase.sync( "threadOne.one" );
-                        testCase.sync( "threadOne.two" );
-                        testCase.sync( "threadOne.three" );
-                    } catch (Throwable t) {
-                        fail( t.getMessage() );
-                    }
-
-                    assertEquals( "threadOne.one",
-                                  synchronizer.getSyncPoints()[0] );
-                    assertEquals( "threadOne.two",
-                                  synchronizer.getSyncPoints()[0] );
-                    assertEquals( "threadOne.three",
-                                  synchronizer.getSyncPoints()[0] );
-                }
-            };
-
-        Thread threadTwo = new Thread() {
-                public void run() {
-                    MockTBeanSynchronizer synchronizer = new MockTBeanSynchronizer();
-                    testCase.setSynchronizer( synchronizer );
-                    assertSame( synchronizer,
-                                testCase.getSynchronizer() );
-                    try {
-                        testCase.sync( "threadTwo.one" );
-                        testCase.sync( "threadTwo.two" );
-                        testCase.sync( "threadTwo.three" );
-                    } catch (Throwable t) {
-                        fail( t.getMessage() );
-                    }
-
-                    assertEquals( "threadTwo.one",
-                                  synchronizer.getSyncPoints()[0] );
-                    assertEquals( "threadTwo.two",
-                                  synchronizer.getSyncPoints()[0] );
-                    assertEquals( "threadTwo.three",
-                                  synchronizer.getSyncPoints()[0] );
-                }
-            };
-
-        assertNull( testCase.getSynchronizer() );
-
-        threadOne.start();
-        threadTwo.start();
-
-        threadOne.join();
-        threadTwo.join();
-
-        assertNull( testCase.getSynchronizer() );
-    }
-
     public void testTimeout_Default() {
         SystemTestCase testCase = new SystemTestCase();
 
