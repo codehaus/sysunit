@@ -62,15 +62,17 @@ public class JvmExecutor
 
     public String[] getCommandArray()
     {
-        String[] commandArray = new String[ this.arguments.length + 2 ];
+        String[] commandArray = new String[ this.arguments.length + 4 ];
 
         commandArray[ 0 ] = getJava();
-        commandArray[ 1 ] = getClassName();
+        commandArray[ 1 ] = "-classpath";
+        commandArray[ 2 ] = System.getProperty( "java.class.path" );
+        commandArray[ 3 ] = getClassName();
 
         String[] arguments = getArguments();
 
         for ( int i = 0 ; i < arguments.length ; ++i ) {
-            commandArray[ i + 2 ] = arguments[ i ];
+            commandArray[ i + 4 ] = arguments[ i ];
         }
 
         return commandArray;
@@ -105,6 +107,9 @@ public class JvmExecutor
             envArray[0] = getClasspathEnv();
         }
 
+        System.err.println( "ENVIRONMENT:" );
+        System.err.println( Arrays.asList( envArray ) );
+        System.err.flush();
         return envArray;
     }
 
@@ -117,8 +122,8 @@ public class JvmExecutor
         try
         {
             process = runtime.exec( getCommandArray(),
-                                    getEnvArray() );
-            
+                                    null );
+
             Thread stdoutEater = new Thread( new InputStreamEater( process.getInputStream() ) );
             Thread stderrEater = new Thread( new InputStreamEater( process.getErrorStream() ) );
             
