@@ -69,6 +69,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Timer;
 
 /**
  * Base for all system tests.
@@ -121,6 +122,8 @@ public class SystemTestCase
      *  to head test case if distributed. */
     private TBeanManager tbeanManager;
 
+    private Watchdog watchdog;
+
     // ----------------------------------------------------------------------
     //     Constructors
     // ----------------------------------------------------------------------
@@ -137,12 +140,6 @@ public class SystemTestCase
      *
      * @param testName The name of the test to run. 
      */
-/*
-    public SystemTestCase(String testName) {
-        super( testName );
-        this.tbeanFactories = new HashMap();
-    }
-*/
 
     // ----------------------------------------------------------------------
     //     Instance methods
@@ -188,6 +185,11 @@ public class SystemTestCase
      */
     public String[] getTBeanFactoryNames() {
         return (String[]) this.tbeanFactories.keySet().toArray( EMPTY_STRING_ARRAY );
+    }
+
+    public long getTimeout()
+    {
+        return 0;
     }
 
     /**
@@ -313,6 +315,29 @@ public class SystemTestCase
         }
     }
 
+    protected void setUpWatchdog() {
+        if ( getTimeout() <= 0 ) {
+            return;
+        }
+        this.watchdog = new Watchdog( this );
+
+        Timer timer = new Timer( true );
+
+        timer.schedule( this.watchdog,
+                        getTimeout() );
+    }
+
+    protected void cancelWatchdog() {
+        if ( getTimeout() <= 0 ) {
+            return;
+        }
+        this.watchdog.cancel();
+    }
+
+    protected void fireWatchdog() {
+        fail( "watchdog expired before test completion" );
+    }
+
     /**
      * @see TestCase
      */
@@ -321,7 +346,9 @@ public class SystemTestCase
         init();
         setUpTBeans();
         try { 
+            setUpWatchdog();
             super.runBare();
+            cancelWatchdog();
 
             Throwable[] errors = validateTBeans();
 
