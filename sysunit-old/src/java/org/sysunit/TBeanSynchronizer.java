@@ -1,6 +1,5 @@
 package org.sysunit;
 
-import org.sysunit.SynchronizationException;
 
 public class TBeanSynchronizer {
     

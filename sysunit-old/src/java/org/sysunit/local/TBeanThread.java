@@ -60,17 +60,9 @@ package org.sysunit.local;
  *
  */
 
-import org.sysunit.TBean;
 import org.sysunit.SynchronizableTBean;
+import org.sysunit.TBean;
 import org.sysunit.TBeanSynchronizer;
-import org.sysunit.SystemTestCase;
-import org.sysunit.SynchronizationException;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
 
 
 public class TBeanThread

@@ -9,11 +9,6 @@
  */
 package org.sysunit.jelly;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.jelly.JellyTagException;
 import org.apache.commons.jelly.MissingAttributeException;
 import org.apache.commons.jelly.TagSupport;

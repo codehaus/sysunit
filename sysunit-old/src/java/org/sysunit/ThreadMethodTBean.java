@@ -60,8 +60,8 @@ package org.sysunit;
  *
  */
 
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Synthetic <code>TBean</code> whose body comes from a <code>SystemTestCase<code>

@@ -60,8 +60,8 @@ package org.sysunit;
  *
  */
 
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * <code>TBeanFactory</code> implementation which uses a factory method

@@ -60,15 +60,15 @@ package org.sysunit.local;
  *
  */
 
-import org.sysunit.Synchronizer;
-import org.sysunit.SynchronizationException;
-import org.sysunit.AlreadySynchronizedException;
-
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.sysunit.AlreadySynchronizedException;
+import org.sysunit.SynchronizationException;
+import org.sysunit.Synchronizer;
 
 /**
  * Single-JVM <code>Synchronizer</code> implementation.

@@ -60,18 +60,17 @@ package org.sysunit;
  *
  */
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.Assert;
-import junit.framework.TestSuite;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import junit.framework.Assert;
+import junit.framework.Test;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
 
 /**
  * Base for all system tests.

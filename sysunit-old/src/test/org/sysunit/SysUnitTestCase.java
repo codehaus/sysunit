@@ -1,11 +1,8 @@
 package org.sysunit;
 
-import junit.framework.TestCase;
-
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ArrayList;
+
+import junit.framework.TestCase;
 
 public class SysUnitTestCase
     extends TestCase {

@@ -14,7 +14,6 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import org.apache.commons.beanutils.MethodUtils;
-
 import org.apache.commons.jelly.JellyTagException;
 import org.apache.commons.jelly.XMLOutput;
 

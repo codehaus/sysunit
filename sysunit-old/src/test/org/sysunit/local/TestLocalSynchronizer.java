@@ -1,7 +1,6 @@
 package org.sysunit.local;
 
 import org.sysunit.SysUnitTestCase;
-import org.sysunit.AlreadySynchronizedException;
 
 public class TestLocalSynchronizer
     extends SysUnitTestCase {

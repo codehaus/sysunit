@@ -1,14 +1,14 @@
 package org.sysunit.local;
 
-import org.sysunit.TBean;
-import org.sysunit.FailTBean;
-import org.sysunit.NoOpTBean;
-import org.sysunit.AbstractTBean;
-import org.sysunit.NoOpSynchronizableTBean;
-import org.sysunit.TBeanSynchronizer;
-import org.sysunit.SysUnitTestCase;
-
 import junit.framework.AssertionFailedError;
+
+import org.sysunit.AbstractTBean;
+import org.sysunit.FailTBean;
+import org.sysunit.NoOpSynchronizableTBean;
+import org.sysunit.NoOpTBean;
+import org.sysunit.SysUnitTestCase;
+import org.sysunit.TBean;
+import org.sysunit.TBeanSynchronizer;
 
 public class TestTBeanThread
     extends SysUnitTestCase {

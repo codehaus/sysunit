@@ -60,24 +60,21 @@ package org.sysunit.local;
  *
  */
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import junit.framework.AssertionFailedError;
+import junit.framework.TestResult;
+
+import org.sysunit.SynchronizableTBean;
+import org.sysunit.SystemTestCase;
 import org.sysunit.TBean;
 import org.sysunit.TBeanManager;
-import org.sysunit.SynchronizableTBean;
-import org.sysunit.TBeanSynchronizer;
-import org.sysunit.SystemTestCase;
-import org.sysunit.SynchronizationException;
-import org.sysunit.TBeanThrowable;
 import org.sysunit.WatchdogException;
-
-import junit.framework.TestResult;
-import junit.framework.AssertionFailedError;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Date;
 
 /**
  * Single-JVM <code>TBeanManager</code> implementation.

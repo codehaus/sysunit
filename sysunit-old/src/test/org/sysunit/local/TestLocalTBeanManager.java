@@ -1,25 +1,23 @@
 package org.sysunit.local;
 
-import org.sysunit.SystemTestCase;
-import org.sysunit.SysUnitTestCase;
-import org.sysunit.SingleTBeanCase;
-import org.sysunit.DoubleTBeanCase;
-import org.sysunit.MockTBean;
-import org.sysunit.SleepTBean;
-import org.sysunit.FailTBean;
-import org.sysunit.ErrorTBean;
-import org.sysunit.ValidationFailTBean;
-import org.sysunit.ValidationErrorTBean;
-import org.sysunit.MockSynchronizableTBean;
-import org.sysunit.WatchdogException;
-
-import junit.framework.TestResult;
-import junit.framework.TestFailure;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.ArrayList;
+
+import junit.framework.TestFailure;
+import junit.framework.TestResult;
+
+import org.sysunit.DoubleTBeanCase;
+import org.sysunit.ErrorTBean;
+import org.sysunit.FailTBean;
+import org.sysunit.MockTBean;
+import org.sysunit.SingleTBeanCase;
+import org.sysunit.SleepTBean;
+import org.sysunit.SysUnitTestCase;
+import org.sysunit.ValidationErrorTBean;
+import org.sysunit.ValidationFailTBean;
+import org.sysunit.WatchdogException;
 
 public class TestLocalTBeanManager
     extends SysUnitTestCase {
