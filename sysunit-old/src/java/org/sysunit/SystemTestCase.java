@@ -137,10 +137,12 @@ public class SystemTestCase
      *
      * @param testName The name of the test to run. 
      */
+/*
     public SystemTestCase(String testName) {
         super( testName );
         this.tbeanFactories = new HashMap();
     }
+*/
 
     // ----------------------------------------------------------------------
     //     Instance methods
@@ -199,12 +201,13 @@ public class SystemTestCase
      * the test.
      * </p>
      *
-     * @throws InvalidMethodException If a method matching the naming
+     * @throws Exception If a method matching the naming
      *         patterns does not satisfy other conditions, such as public,
-     *         non-static, no-arg and return type.
+     *         non-static, no-arg and return type with public default
+     *         constructor.
      */
     void init()
-        throws InvalidMethodException {
+        throws Exception {
 
         Set names = new HashSet();
 
@@ -232,7 +235,7 @@ public class SystemTestCase
                                names,
                                name );
                 addTBeanFactory( name,
-                                 new ThreadMethodTBeanFactory( this,
+                                 new ThreadMethodTBeanFactory( (SystemTestCase) this.getClass().newInstance(),
                                                                methods[i] ) );
             }
         }

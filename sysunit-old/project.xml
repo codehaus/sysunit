@@ -4,7 +4,7 @@
   <pomVersion>3</pomVersion>
   <name>SysUnit</name>
   <id>sysunit</id>
-  <currentVersion>1.0-beta-2</currentVersion>
+  <currentVersion>1.0-beta-3-dev</currentVersion>
   
   <organization>
     <name>SpritSoft, Inc.</name>
@@ -26,9 +26,7 @@
   </description>
   
   <url>http://www.sysunit.org/</url>
-<!--
-  <issueTrackingUrl>http://sourceforge.net/tracker/?group_id=76653</issueTrackingUrl>
--->
+  <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10150</issueTrackingUrl>
   
   <siteAddress>sysunit.org</siteAddress>
   <siteDirectory>/www/sysunit.codehaus.org</siteDirectory>

@@ -20,6 +20,7 @@ public class TestSystemTestCase
                       testCase.getTBeanFactoryNames() );
     }
 
+    /*
     public void testConstruct_Bare_WithName()
         throws Exception {
 
@@ -34,15 +35,12 @@ public class TestSystemTestCase
         assertLength( 0,
                       testCase.getTBeanFactoryNames() );
     }
+    */
 
     public void testInit_WithThreadMethodTBeanFactory()
         throws Exception {
 
-        SystemTestCase testCase = new SystemTestCase() {
-                public void threadOne() {
-                    // nothing.
-                }
-            };
+        SystemTestCase testCase = new SingleThreadNoOpCase();
 
         testCase.init();
 
@@ -64,11 +62,7 @@ public class TestSystemTestCase
     public void testInit_WithFactoryMethodTBeanFactory()
         throws Exception {
 
-        SystemTestCase testCase = new SystemTestCase() {
-                public TBean tbeanOne() {
-                    return null;
-                }
-            };
+        SystemTestCase testCase = new SingleTBeanNullCase();
         
         testCase.init();
         
