@@ -1,5 +1,15 @@
+/*
+ * Copyright (C) SpiritSoft, Inc. All rights reserved.
+ *
+ * This software is published under the terms of the SpiritSoft Software License
+ * version 1.0, a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * $Id$
+ */
 package org.sysunit.command.slave;
 
+import java.io.File;
 import java.io.IOException;
 
 public class ProcessRunner
@@ -8,6 +18,22 @@ public class ProcessRunner
     private String executable;
     private String[] arguments;
 
+	/**
+	 * A static helper method to create a new instance
+	 * 
+	 * @param arguments
+	 * @return
+	 */
+	public static ProcessRunner newInstance(String[] arguments) {
+		String javaHome = System.getProperty( "java.home" );
+
+		String javaCmd = new File( new File( javaHome,
+											 "bin" ),
+								   "java" ).getPath();
+
+		return new ProcessRunner( javaCmd, arguments );
+	}
+	
     public ProcessRunner(String executable,
                          String[] arguments) {
 
