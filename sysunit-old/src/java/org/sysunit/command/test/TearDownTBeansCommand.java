@@ -1,14 +1,14 @@
 package org.sysunit.command.test;
 
-public class SetUpTBeansCommand
+public class TearDownTBeansCommand
     extends TestCommand {
 
-    public SetUpTBeansCommand() {
+    public TearDownTBeansCommand() {
 
     }
 
     public void run(TestServer testServer)
         throws Exception {
-        testServer.setUpTBeans();
+        testServer.tearDownTBeans();
     }
 }

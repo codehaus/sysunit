@@ -29,6 +29,8 @@ import org.sysunit.Synchronizer;
 import org.sysunit.WatchdogException;
 import org.sysunit.util.Barrier;
 import org.sysunit.util.Blocker;
+import org.sysunit.util.Checkpoint;
+import org.sysunit.util.CheckpointCallback;
 //import org.sysunit.local.LocalSynchronizer;
 import org.sysunit.util.TBeanThread;
 
@@ -56,6 +58,8 @@ public class RemoteTBeanManager { // implements Runnable {
     //     Instace members
     // ----------------------------------------------------------------------
 
+    private String testServerName;
+
     /** <code>TBean</code>s indexed by <code>String</code> identifier. */
     private Map tbeans;
 
@@ -64,7 +68,11 @@ public class RemoteTBeanManager { // implements Runnable {
 
     private Synchronizer synchronizer;
 
-    private Blocker blocker;
+    private CheckpointCallback beginCallback;
+    private Blocker beginBlocker;
+    private CheckpointCallback endCallback;
+    private Blocker endBlocker;
+
 
     // ----------------------------------------------------------------------
     //     Constructors
@@ -73,16 +81,37 @@ public class RemoteTBeanManager { // implements Runnable {
     /**
      * Construct.
      */
-    public RemoteTBeanManager(Synchronizer synchronizer) {
+    public RemoteTBeanManager(Synchronizer synchronizer,
+                              CheckpointCallback beginCallback,
+                              CheckpointCallback endCallback) {
         this.tbeans = new HashMap();
         this.tbeanThreads = new HashSet();
         this.synchronizer = synchronizer;
-        this.blocker = new Blocker();
+        this.beginCallback = beginCallback;
+        this.beginBlocker = new Blocker();
+        this.endCallback = endCallback;
+        this.endBlocker = new Blocker();
     }
 
     // ----------------------------------------------------------------------
     //     Instance methods
     // ----------------------------------------------------------------------
+
+    public Blocker getBeginBlocker() {
+        return this.beginBlocker;
+    }
+
+    public Blocker getEndBlocker() {
+        return this.endBlocker;
+    }
+
+    public void setTestServerName(String testServerName) {
+        this.testServerName = testServerName;
+    }
+
+    public String getTestServerName() {
+        return this.testServerName;
+    }
 
     /**
      * @see TBeanManager
@@ -118,10 +147,6 @@ public class RemoteTBeanManager { // implements Runnable {
 	 */
 	public void addTBean(String tbeanId, TBean tbean) {
 		tbeans.put(tbeanId, tbean);
-        if ( tbean instanceof SynchronizableTBean ) {
-            ((SynchronizableTBean)tbean).setSynchronizer( new TBeanSynchronizer( tbeanId,
-                                                                                 this.synchronizer ) );
-        }
 	}
 
 	/**
@@ -150,33 +175,51 @@ public class RemoteTBeanManager { // implements Runnable {
     }
 
     public void runTest() {
-        getBlocker().unblock();
+        getBeginBlocker().unblock();
     }
 
-    public Blocker getBlocker() {
-        return this.blocker;
+    public void tearDownTBeans() {
+        getEndBlocker().unblock();
     }
 
     public void startTBeans() throws Throwable {
 
-        Barrier beginBarrier = new Barrier(this.tbeans.size());
-        Barrier endBarrier = new Barrier(this.tbeans.size());
-
+        Checkpoint beginCheckpoint = new Checkpoint( "begin",
+                                                     tbeans.size() + 1,
+                                                     this.beginCallback );
+        
+        Checkpoint endCheckpoint = new Checkpoint( "end",
+                                                   tbeans.size() + 1,
+                                                   this.endCallback );
+        
         for (Iterator tbeanIdIter = this.tbeans.keySet().iterator(); tbeanIdIter.hasNext();) {
-
+            
             String tbeanId = (String) tbeanIdIter.next();
+            String qualifiedTBeanId = getTestServerName() + tbeanId;
+
             TBean tbean = (TBean) this.tbeans.get(tbeanId);
 
-            if (tbean instanceof SynchronizableTBean) {
-                synchronizer.registerSynchronizableTBean(tbeanId);
+            if ( tbean instanceof SynchronizableTBean ) {
+                ((SynchronizableTBean)tbean).setSynchronizer( new TBeanSynchronizer( qualifiedTBeanId,
+                                                                                     this.synchronizer ) );
+                synchronizer.registerSynchronizableTBean(qualifiedTBeanId);
             }
-
-            TBeanThread thread = new TBeanThread(tbeanId, tbean, this.synchronizer, beginBarrier, this.blocker, endBarrier);
+            
+            TBeanThread thread = new TBeanThread( qualifiedTBeanId,
+                                                  tbean,
+                                                  this.synchronizer,
+                                                  beginCheckpoint,
+                                                  this.beginBlocker, 
+                                                  endCheckpoint,
+                                                  this.endBlocker );
 
             this.tbeanThreads.add(thread);
 
             thread.start();
         }
+
+        endCheckpoint.pass();
+        beginCheckpoint.pass();
     }
 
     public void waitForTBeans(long timeout) throws InterruptedException, WatchdogException {

@@ -14,26 +14,29 @@ public class TBeanThread
     private String tbeanId;
     private TBean tbean;
     private Synchronizer synchronizer;
-    private Barrier beginBarrier;
-    private Blocker blocker;
-    private Barrier endBarrier;
+    private Checkpoint beginCheckpoint;
+    private Blocker beginBlocker;
+    private Checkpoint endCheckpoint;
+    private Blocker endBlocker;
     private Throwable error;
     private boolean isDone;
 
     public TBeanThread(String tbeanId,
                        TBean tbean,
                        Synchronizer synchronizer,
-                       Barrier beginBarrier,
-                       Blocker blocker,
-                       Barrier endBarrier) {
+                       Checkpoint beginCheckpoint,
+                       Blocker beginBlocker,
+                       Checkpoint endCheckpoint,
+                       Blocker endBlocker) {
         super( "tbean-thread." + tbeanId );
-        this.tbeanId      = tbeanId;
-        this.tbean        = tbean;
-        this.synchronizer = synchronizer;
-        this.beginBarrier = beginBarrier;
-        this.blocker      = blocker;
-        this.endBarrier   = endBarrier;
-        this.isDone       = false;
+        this.tbeanId         = tbeanId;
+        this.tbean           = tbean;
+        this.synchronizer    = synchronizer;
+        this.beginCheckpoint = beginCheckpoint;
+        this.beginBlocker    = beginBlocker;
+        this.endCheckpoint   = endCheckpoint;
+        this.endBlocker      = endBlocker;
+        this.isDone          = false;
     }
 
     public String getTBeanId() {
@@ -48,33 +51,33 @@ public class TBeanThread
         return this.synchronizer;
     }
 
-    public Barrier getBeginBarrier() {
-        return this.beginBarrier;
+    public Checkpoint getBeginCheckpoint() {
+        return this.beginCheckpoint;
     }
 
-    public Barrier getEndBarrier() {
-        return this.endBarrier;
+    public Blocker getBeginBlocker() {
+        return this.beginBlocker;
     }
 
-    public Blocker getBlocker() {
-        return this.blocker;
+    public Checkpoint getEndCheckpoint() {
+        return this.endCheckpoint;
+    }
+
+    public Blocker getEndBlocker() {
+        return this.endBlocker;
     }
     
     public void run() {
         try {
-            getBeginBarrier().block();
-        } catch (InterruptedException e) {
-            return;
-        }
-
-        try {
-            getBlocker().block();
-        } catch (InterruptedException e) {
-            return;
-        }
-
-        try {
             tbean.setUp();
+            getBeginCheckpoint().pass();
+            getBeginBlocker().block();
+        } catch (Exception e) {
+            setError( e );
+            return;
+        }
+
+        try {
             tbean.run();
         } catch (Throwable e) {
             setError( e );
@@ -92,14 +95,17 @@ public class TBeanThread
                 this.isDone = true;
             }
             try {
-                tbean.tearDown();
-            } catch (Throwable t) {
-                setError( t );
-            }
-            try {
-                getEndBarrier().block();
+                getEndCheckpoint().pass();
+                getEndBlocker().block();
+                try {
+                    tbean.tearDown();
+                } catch (Throwable t) {
+                    setError( t );
+                }
             } catch (InterruptedException e) {
-                // swallow and exit
+                return;
+            } catch (Exception e) {
+                return;
             }
         }
     }

@@ -18,8 +18,12 @@ import org.sysunit.command.Server;
 import org.sysunit.command.master.TestNodeLaunchedCommand;
 import org.sysunit.command.master.RegisterSynchronizableTBeanCommand;
 import org.sysunit.command.master.UnregisterSynchronizableTBeanCommand;
+import org.sysunit.command.master.TBeansSetUpCommand;
+import org.sysunit.command.master.TBeansRanCommand;
 import org.sysunit.command.master.SyncCommand;
 import org.sysunit.jelly.JvmRunner;
+import org.sysunit.util.Checkpoint;
+import org.sysunit.util.CheckpointCallback;
 import org.sysunit.Synchronizer;
 import org.sysunit.SynchronizationException;
 
@@ -31,7 +35,7 @@ import org.sysunit.SynchronizationException;
  */
 public class TestServer
     extends Server
-    implements Synchronizer {
+    implements Synchronizer, CheckpointCallback {
     private static final Log log = LogFactory.getLog(TestServer.class);
 
     private JvmRunner runner;
@@ -41,17 +45,20 @@ public class TestServer
     private Synchronizer synchronizer;
 
     public TestServer(String xml, String jvmName) {
-        log.info( "test server " + jvmName + " with " + xml );
+        log.info( "test server " + jvmName + " with " + xml + " is " + getName() );
         this.xml = xml;
         this.jvmName = jvmName;
         this.synchronizer = new TestSynchronizer();
-        this.runner = new JvmRunner( this );
+        this.runner = new JvmRunner( this,
+                                     this,
+                                     this );
     }
 
     public void start() throws Exception {
         log.info( "#######################################" );
         log.info( "starting test server " + getName() );
     	Dispatcher dispatcher = getMasterDispatcher();
+        this.runner.setTestServerName( getName() );
     	if (dispatcher == null) {
     		throw new MissingPropertyException(this, "masterDispatcher");
     	}
@@ -72,6 +79,10 @@ public class TestServer
 
     public void setUpTBeans() throws Exception {
         getRunner().getManager().setUpTBeans();
+    }
+
+    public void tearDownTBeans() throws Exception {
+        getRunner().getManager().tearDownTBeans();
     }
 
     // Properties
@@ -117,7 +128,7 @@ public class TestServer
                                 syncPointName );
     }
 
-    public void unblockAll() {
+    public synchronized void unblockAll() {
         log.info( "unblocking all on " + getName() );
         this.synchronizer.unblockAll();
     }
@@ -146,6 +157,16 @@ public class TestServer
 
     public void error(String tbeanId) {
         log.info( "error in tbean " + tbeanId + " with " + getName() );
+    }
+
+    public void notify(Checkpoint checkpoint)
+        throws Exception {
+        log.info( "################## &&&&&&&  ########  checkpoint: " + checkpoint.getName() );
+        if ( checkpoint.getName().equals( "begin" ) ) {
+            getMasterDispatcher().dispatch( new TBeansSetUpCommand( getName() ) );
+        } else {
+            getMasterDispatcher().dispatch( new TBeansRanCommand( getName() ) );
+        }
     }
 
 }

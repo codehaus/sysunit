@@ -24,6 +24,7 @@ import org.sysunit.command.Server;
 import org.sysunit.command.slave.RequestMembersCommand;
 import org.sysunit.command.slave.LaunchTestNodeCommand;
 import org.sysunit.command.test.SetUpTBeansCommand;
+import org.sysunit.command.test.TearDownTBeansCommand;
 import org.sysunit.command.test.RunTestCommand;
 import org.sysunit.jelly.JvmNameExtractor;
 import org.sysunit.SynchronizationException;
@@ -49,6 +50,7 @@ public class MasterServer
 
     private List jvmNames;
     private int setUpServers;
+    private int ranServers;
 	
     public MasterServer(String xml) {
     	this.xml = xml;
@@ -114,6 +116,15 @@ public class MasterServer
             log.info( "started test on " + testNodeInfo.getName() );
         }
     }
+    protected void tearDownTBeans()
+        throws Exception {
+        for ( Iterator testNodeInfoIter = this.testNodes.values().iterator();
+              testNodeInfoIter.hasNext(); ) {
+            TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
+
+            testNodeInfo.getDispatcher().dispatch( new TearDownTBeansCommand() );
+        }
+    }
 
     public void tbeansSetUp(String testServerName)
         throws Exception {
@@ -121,6 +132,15 @@ public class MasterServer
 
         if ( this.setUpServers == jvmNames.size() ) {
             runTest();
+        }
+    }
+
+    public void tbeansRan(String testServerName)
+        throws Exception {
+        ++this.ranServers;
+
+        if ( this.ranServers == jvmNames.size() ) {
+            tearDownTBeans();
         }
     }
 
@@ -202,7 +222,7 @@ public class MasterServer
 
     public void sync(SyncCommand syncCommand)
         throws SynchronizationException, DispatchException {
-        getSynchronizer().sync( syncCommand.getTestServerName() + ":" + syncCommand.getTBeanId(),
+        getSynchronizer().sync( syncCommand.getTBeanId(),
                                 syncCommand.getSyncPointName() );
     }
 
@@ -239,16 +259,12 @@ public class MasterServer
 
     public void registerSynchronizableTBean(RegisterSynchronizableTBeanCommand command)
         throws DispatchException {
-        String beanName = command.getTestServerName() + ":" + command.getTBeanId();
-        log.info( "registering: " + beanName );
-        this.synchronizer.registerSynchronizableTBean( beanName );
+        this.synchronizer.registerSynchronizableTBean( command.getTBeanId() );
     }
 
     public void unregisterSynchronizableTBean(UnregisterSynchronizableTBeanCommand command)
         throws DispatchException {
-        String beanName = command.getTestServerName() + ":" + command.getTBeanId();
-        log.info( "unregistering: " + beanName );
-        this.synchronizer.unregisterSynchronizableTBean( beanName );
+        this.synchronizer.unregisterSynchronizableTBean( command.getTBeanId() );
     }
 
     public void error(String tbeanId)

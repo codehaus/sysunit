@@ -236,7 +236,7 @@ public class LocalSynchronizer
     /**
      * @see Synchronizer
      */
-    public void unblockAll() {
+    public synchronized void unblockAll() {
         log.info( "unblocking all " + this.waitingTBeanIds );
         for ( Iterator syncPointIter = this.syncPoints.values().iterator();
               syncPointIter.hasNext(); ) {

@@ -35,7 +35,9 @@ public class JvmNameExtractor {
     public JvmNameExtractor() {
         context = new JellyContext();
         context.registerTagLibrary("", new SysUnitTagLibrary());
-        manager = new RemoteTBeanManager( null );
+        manager = new RemoteTBeanManager( null,
+                                          null,
+                                          null );
     }
 
     /**

@@ -20,6 +20,7 @@ import org.sysunit.SynchronizationException;
 import org.sysunit.local.LocalSynchronizer;
 import org.sysunit.command.test.TestSynchronizer;
 import org.sysunit.remote.RemoteTBeanManager;
+import org.sysunit.util.CheckpointCallback;
 
 /**
  * A helper class which will execute the named JVM inside the system test XML document
@@ -55,14 +56,24 @@ public class JvmRunner {
 
     public JvmRunner() {
         //this.synchronizer = new TestSynchronizer();
-        this( new LocalSynchronizer() );
+        this( new LocalSynchronizer(),
+              null,
+              null );
     }
 
-    public JvmRunner(Synchronizer synchronizer) {
+    public JvmRunner(Synchronizer synchronizer,
+                     CheckpointCallback beginCallback,
+                     CheckpointCallback endCallback) {
         this.context = new JellyContext();
         this.context.registerTagLibrary("", new SysUnitTagLibrary());
         this.synchronizer = synchronizer;
-        this.manager = new RemoteTBeanManager( this.synchronizer );
+        this.manager = new RemoteTBeanManager( this.synchronizer,
+                                               beginCallback,
+                                               endCallback);
+    }
+
+    public void setTestServerName(String testServerName) {
+        this.manager.setTestServerName( testServerName );
     }
 
     /**
