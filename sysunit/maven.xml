@@ -14,7 +14,7 @@
   <goal name="sysunit:build-plugin">
     <ant:jar jarfile="${maven.build.dir}/plugin-${maven.final.name}.jar"
              basedir="${basedir}/src/plugin"
-             includes="plugin.jelly,project.xml"/>
+             includes="plugin.jelly,plugin.properties,project.xml"/>
   </goal>
 
   <goal name="sysunit:install-plugin" prereqs="sysunit:build-plugin">

@@ -22,10 +22,20 @@
 
 
   <goal name="sysunit:slave" description="Runs a slave node">
-    <java classname="org.sysunit.transport.socket.SlaveNode" fork="yes">
+    <j:set var="sysunit_conf" value="${plugin.context.getVariable( 'sysunit.conf' )}"/>
+    <java classname="org.sysunit.testmesh.slavehost.SlaveHostMain" fork="yes">
+      <classpath>
+        <pathelement path="${plugin.getDependencyPath( 'junit' )}"/>
+        <pathelement path="${plugin.getDependencyPath( 'sysunit' )}"/>
+      </classpath>
+      <j:if test="${!sysunit_conf.equals('SYSUNIT_CONF_NOT_SET')}">
+        <arg value="${sysunit_conf}"/>
+      </j:if>
+<!--
       <classpath path="${plugin.dependencyClasspath}"/>
       <sysproperty key="sysunit.port" value="${sysunit.port}"/>
       <sysproperty key="sysunit.type" value="${sysunit.type}"/>
+-->
     </java>
   </goal>
 
