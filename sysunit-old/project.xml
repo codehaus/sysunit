@@ -35,9 +35,9 @@
 -->
   
   <repository>
-    <connection>scm:cvs:pserver:anonymous@cvs.codehaus.org:/cvsroot/sysunit:sysunit</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.codehaus.org:/cvsroot/sysunit:sysunit</developerConnection>
-    <url>http://cvs.codehaus.org/viewcvs.cgi/?cvsroot=sysunit</url>
+    <connection>scm:cvs:pserver:anonymous@cvs.codehaus.org:/scm/cvs:sysunit</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.codehaus.org:/scm/cvs:sysunit</developerConnection>
+    <url>http://cvs.codehaus.org/viewcvs.cgi/sysunit/?root=codehaus</url>
   </repository>
   
   <mailingLists>
