@@ -248,6 +248,95 @@ public class TestSystemTestCase
         }
     }
 
+    public void testSetUpWatchdog_ZeroTimeout()
+        throws Exception {
+
+        SystemTestCase testCase = new SystemTestCase();
+
+        testCase.setUpWatchdog();
+
+        assertNull( testCase.getWatchdog() );
+    }
+
+    public void testSetUpWatchdog_NonZeroTimeout()
+        throws Exception {
+
+        SystemTestCase testCase = new SystemTestCase() {
+
+                public long getTimeout() {
+                    return 1000;
+                }
+
+                public void triggerTimeout() {
+                    // do nothing
+                }
+            };
+
+        testCase.setUpWatchdog();
+
+        Thread.sleep( 2000 );
+
+        assertNotNull( testCase.getWatchdog() );
+
+        assertEquals( 1000,
+                      testCase.getWatchdog().getTimeout() );
+    }
+
+    public void testSetUpWatchDog_NonZeroTimeout_WithMultiplierGreaterThanOne()
+        throws Exception {
+
+        System.setProperty( SystemTestCase.WATCHDOG_MULTIPLIER_PROPERTY,
+                            "2.0" );
+
+        SystemTestCase testCase = new SystemTestCase() {
+
+                public long getTimeout() {
+                    return 1000;
+                }
+
+                public void triggerTimeout() {
+                    // do nothing
+                }
+            };
+
+        testCase.setUpWatchdog();
+
+        Thread.sleep( 3000 );
+
+        assertNotNull( testCase.getWatchdog() );
+
+        assertEquals( 2000,
+                      testCase.getWatchdog().getTimeout() );
+    }
+    
+
+    public void testSetUpWatchDog_NonZeroTimeout_WithLessThanOne()
+        throws Exception {
+
+        System.setProperty( SystemTestCase.WATCHDOG_MULTIPLIER_PROPERTY,
+                            "0.5" );
+
+        SystemTestCase testCase = new SystemTestCase() {
+
+                public long getTimeout() {
+                    return 4000;
+                }
+
+                public void triggerTimeout() {
+                    // do nothing
+                }
+            };
+
+        testCase.setUpWatchdog();
+
+        Thread.sleep( 3000 );
+
+        assertNotNull( testCase.getWatchdog() );
+
+        assertEquals( 2000,
+                      testCase.getWatchdog().getTimeout() );
+    }
+    
     public TBean methodFish() {
         return null;
     }

@@ -361,14 +361,18 @@ public class SystemTestCase
     }
 
     protected void cancelWatchdog() {
-        if ( this.watchdog != null ) {
-            this.watchdog.cancel();
+        if ( getWatchdog() != null ) {
+            getWatchdog().cancel();
         }
     }
 
     public void triggerTimeout() {
         fail( "tests did not complete before watchdog expiration in " +
               getAdjustedWatchdogTimeout() + " ms" );
+    }
+
+    Watchdog getWatchdog() {
+        return this.watchdog;
     }
 
     /**
