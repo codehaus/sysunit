@@ -52,17 +52,15 @@
     <test:dependency-handle/>
     <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
     <j:set var="testDir">${testPlugin.findVariable('maven.test.dest')}</j:set>
-
-	  <j:if test="${sysunit_src_exists == 'true'}">
-    	
+	   	
        <sysunit:gen-systest baseDir="${testDir}" 
                          outputDir="${maven.build.dir}/sysunit" 
                          extension="systest"/>
- 
+	    
        <sysunit:gen-scenario baseDir="${testDir}" 
                           outputDir="${maven.build.dir}/sysunit" 
                           extension="scenario"/>
-  	</j:if>
+  	 
   	
 <!--
 
@@ -74,7 +72,7 @@
         </patternset>
       </fileset>
     </fileScanner>
-    
+
     <ant:mkdir dir="${maven.build.dir}/sysunit"/> 
 
     <j:forEach var="xmlTest" items="${xmlTests.iterator()}">
@@ -110,7 +108,7 @@
       </j:file>
     </j:forEach>
 -->
-
+ 
 	<ant:available file="${maven.build.dir}/sysunit" property="sysunit_src_exists"/>
 	<j:if test="${sysunit_src_exists == 'true'}">
     	<ant:path id="sysunit.test.compile.src.set"
