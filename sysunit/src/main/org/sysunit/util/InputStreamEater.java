@@ -10,10 +10,22 @@ public class InputStreamEater
 
     private StringBuffer buffer;
 
+    private boolean multiplex;
+
     public InputStreamEater(InputStream in)
     {
         this.in = in;
         this.buffer = new StringBuffer();
+    }
+
+    public void setMultiplex(boolean multiplex)
+    {
+        this.multiplex = multiplex;
+    }
+
+    public boolean getMultiplex()
+    {
+        return this.multiplex;
     }
 
     public String getOutput()
@@ -38,7 +50,10 @@ public class InputStreamEater
                                                0,
                                                read ) );
 
-                    //System.err.print( new String( buf, 0, read ) );
+                    if ( this.multiplex )
+                    {
+                        System.err.print( new String( buf, 0, read ) );
+                    }
                 }
             }
         }

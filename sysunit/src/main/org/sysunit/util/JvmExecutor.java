@@ -130,6 +130,9 @@ public class JvmExecutor
             this.stdoutEater = new InputStreamEater( process.getInputStream() );
             this.stderrEater = new InputStreamEater( process.getErrorStream() );
 
+            this.stdoutEater.setMultiplex( true );
+            this.stderrEater.setMultiplex( true );
+
             this.stdoutEaterThread = new Thread( this.stdoutEater );
             this.stderrEaterThread = new Thread( this.stderrEater );
             
