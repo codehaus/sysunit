@@ -58,10 +58,12 @@ public class BeaconListenerThread
             MulticastSocket mcastSocket = new MulticastSocket( getBeaconPort() );
             mcastSocket.setSoTimeout( 1000 );
             mcastSocket.joinGroup( getBeaconAddr() );
-            mcastSocket = mcastSocket;
+            beaconSocket = mcastSocket;
+            log.debug( "mcast socketing" );
         } catch (IOException e) {
             try {
                 beaconSocket = new DatagramSocket( getBeaconPort() + 1 );
+                log.debug( "dgram socketing" );
             } catch (SocketException ee) {
                 log.error( ee );
                 return;
@@ -73,6 +75,7 @@ public class BeaconListenerThread
 
             while ( true ) {
                 if ( ( System.currentTimeMillis() - startTime ) >= getListenTime() ) {
+                    log.debug( "time exceeded" );
                     break;
                 }
                 try {
@@ -82,6 +85,7 @@ public class BeaconListenerThread
                 } catch (InterruptedException e) {
                     break;
                 } catch (InterruptedIOException e) {
+                    log.debug( "timeout on receive" );
                     // swallow
                 }
             }

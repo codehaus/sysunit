@@ -66,6 +66,8 @@ public class BeaconTransmitterThread
             mcastSocket.joinGroup( getBeaconAddr() );
             beaconSocket = mcastSocket;
 
+            log.debug( "mcast socket" );
+
             beacon = new DatagramPacket( messageBytes,
                                          messageBytes.length,
                                          getBeaconAddr(),
@@ -75,6 +77,8 @@ public class BeaconTransmitterThread
             try {
                 beaconSocket = new DatagramSocket(); 
                 
+                log.debug( "dgram socket" );
+
                 beacon = new DatagramPacket( messageBytes,
                                              messageBytes.length,
                                              InetAddress.getLocalHost(),
