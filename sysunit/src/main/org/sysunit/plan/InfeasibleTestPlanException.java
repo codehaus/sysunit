@@ -4,6 +4,8 @@ import org.sysunit.SysUnitException;
 import org.sysunit.model.DistributedSystemTestInfo;
 import org.sysunit.model.JvmInfo;
 
+import java.util.Arrays;
+
 public class InfeasibleTestPlanException
     extends SysUnitException
 {
@@ -11,7 +13,7 @@ public class InfeasibleTestPlanException
     private JvmInfo[] unsatisfiedJvms;
 
     public InfeasibleTestPlanException(DistributedSystemTestInfo systemTest,
-                                       JvmInfo[] unsatifiedJvms)
+                                       JvmInfo[] unsatisfiedJvms)
     {
         this.systemTest  = systemTest;
         this.unsatisfiedJvms = unsatisfiedJvms;
@@ -25,5 +27,10 @@ public class InfeasibleTestPlanException
     public JvmInfo[] getUnsatisfiedJvms()
     {
         return this.unsatisfiedJvms;
+    }
+
+    public String getMessage()
+    {
+        return "No slaves to satisfy " + Arrays.asList( this.unsatisfiedJvms );
     }
 }

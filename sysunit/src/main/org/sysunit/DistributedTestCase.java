@@ -2,10 +2,12 @@ package org.sysunit;
 
 import org.sysunit.model.DistributedSystemTestInfo;
 import org.sysunit.model.ScenarioInfo;
+import org.sysunit.plan.InfeasibleTestPlanException;
 import org.sysunit.testmesh.master.MasterNode;
 
 import junit.framework.Test;
 import junit.framework.TestResult;
+import junit.framework.AssertionFailedError;
 
 public class DistributedTestCase
     implements Test {
@@ -65,6 +67,11 @@ public class DistributedTestCase
             {
                 master.stop();
             }
+        }
+        catch (InfeasibleTestPlanException e)
+        {
+            testResult.addFailure( this,
+                                   new AssertionFailedError( e.getMessage() ) );
         }
         catch (Throwable t)
         {

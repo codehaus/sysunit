@@ -42,7 +42,6 @@ public class DistributedSystemTestInfoBuilder
                              Attributes attrs)
         throws SAXException
     {
-        System.err.println( "start: " + localName );
         if ( localName.equals( "systemTest" ) )
         {
             startSystemTest( attrs );

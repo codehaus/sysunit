@@ -2,13 +2,14 @@ package org.sysunit.util;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.InvocationTargetException;
 
 public class PropUtils
 {
     public static void setProperty(Object bean,
                                    String propName,
                                    String propValue)
-        throws InvalidPropertyException
+        throws InvalidPropertyException, IllegalAccessException, InvocationTargetException
     {
         String methodName = "set" + propName.substring( 0, 1 ).toUpperCase();
 
@@ -36,33 +37,64 @@ public class PropUtils
                     {
                         Class paramClass = methods[ i ].getParameterTypes()[0];
 
-                        if ( paramClass.equals( Integer.TYPE )
+                        if ( paramClass.equals( int.class )
                              ||
                              paramClass.equals( Integer.class ) )
                         {
-                            
+                            Integer value = new Integer( propValue );
+
+                            methods[ i ].invoke( bean,
+                                                 new Object[] { value } );
                         }
-                        else if (paramClass.equals( Float.TYPE )
+                        else if (paramClass.equals( float.class )
                                  ||
                                  paramClass.equals( Float.class ) )
                         {
+                            Float value = new Float( propValue );
 
+                            methods[ i ].invoke( bean,
+                                                 new Object[] { value } );
                         }
-                        else if ( paramClass.equals( Long.TYPE )
+                        else if ( paramClass.equals( double.class )
+                                  ||
+                                  paramClass.equals( Double.class ) )
+                        {
+                            Double value = new Double( propValue );
+
+                            methods[ i ].invoke( bean,
+                                                 new Object[] { value } );
+                        }
+                        else if ( paramClass.equals( long.class )
                                   ||
                                   paramClass.equals( Long.class ) )
                         {
+                            Long value = new Long( propValue );
 
+                            methods[ i ].invoke( bean,
+                                                 new Object[] { value } );
                         }
-                        else if ( paramClass.equals( Boolean.TYPE )
+                        else if ( paramClass.equals( boolean.class )
                                   ||
                                   paramClass.equals( Boolean.class ) )
                         {
+                            Boolean value = Boolean.FALSE;
 
+                            if ( propValue.equals( "on" )
+                                 ||
+                                 propValue.equals( "true" )
+                                 ||
+                                 propValue.equals( "yes" ) )
+                            {
+                                value = Boolean.TRUE;
+                            }
+                            
+                            methods[ i ].invoke( bean,
+                                                 new Object[] { value } );
                         }
                         else if ( paramClass.equals( String.class ) )
                         {
-
+                            methods[ i ].invoke( bean,
+                                                 new Object[] { propValue } );
                         }
                     }
                 }

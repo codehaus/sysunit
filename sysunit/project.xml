@@ -117,10 +117,16 @@
         </resource>
       </resources>
       <includes>
-        <include>**/*Test.java</include>
+        <include>**/*Test.class</include>
+<!--
+        <include>**/no_op.class</include>
+-->
       </includes>
       <excludes>
         <exclude>org/sysunit/tests/**/*</exclude>
+<!--
+        <exclude>**/*$*.class</exclude>
+-->
       </excludes>
     </unitTest>
 

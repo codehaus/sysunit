@@ -24,6 +24,14 @@
     </java>
   </goal>
 
+  <preGoal name="test:compile">
+    <attainGoal name="sysunit:generate-test-classes"/>
+  </preGoal>
+
+  <preGoal name="test:single">
+    <attainGoal name="sysunit:generate-test-classes"/>
+  </preGoal>
+
   <goal name="sysunit:generate-test-classes" prereqs="test:test-resources">
     <test:dependency-handle/>
     <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
