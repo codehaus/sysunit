@@ -2,6 +2,84 @@
 
 \section{Overview}
 
+Many times while testing complex systems, threads may become
+ill-behaved and never terminate.  The designer of a test may
+be able to specify a \emph{reasonable} amount of time
+in which a test should successfully complete.  By overrunning
+the time limit, it can be assumed that the test has failed
+internally somehow.  A \emph{watchdog timer}\index{watchdog timer} 
+can keep an eye on the running test and stop the run if
+the time limit is exceeded.
+
 \section{Enabling the Watchdog}
 
+In each \class{SystemTestCase},  the method
+\indexmethod{SystemTestCase}{getTimeout()}
+may be overridden to return a positive integer rerpresenting
+the time limit, in milliseconds, placed upon the test.  If
+the test does not successfully complete, fail an assertion
+or throw an error within the specified timeout a
+\indexclass{WatchdogException} will be thrown indicating
+an error.  The \class{WatchdogException} will contain
+information regarding the threads or \class{TBean} instances
+that were still running at the time of expiration.
+
+\begin{figure}
+\begin{codelisting}
+import org.sysunit.SystemTestCase;
+
+public class TestTheBadServer
+    extends SystemTestCase
+\{
+    public long getTimeout() 
+    \{
+        return 15 * 1000;
+    \}
+
+    public void threadServer() 
+    \{
+        while ( true ) 
+        \{
+            Thread.sleep( 1000 );
+        \}
+    \}
+\}
+\end{codelisting}
+\caption{Example of 15 second watchdog using
+\indexmethod{SystemTestCase}{getTimeout()}.}
+\end{figure}
+
 \section{Accomodating Different Environments}
+
+While the test designer specifies a reasonable watchdog timeout,
+``reasonable'' may differ from one environment to another. In order
+to accomodate both higher and lower performance test environments,
+the watchdog timers can be adjusted using the
+\texttt{org.sysunit.timeout.multiplier}\index{watchdog
+multiplier|see timeout multiplier}\index{timeout multiplier} system
+property.  This property may be set to any floating-point number to
+increase or decrease the actual watchdog timeout used by the test run.
+
+
+\begin{figure}
+\begin{tabular}{c|c|c}
+\hline
+\textbf{\texttt{getTimeout()}} &
+\textbf{org.sysunit.timeout.multiplier} & 
+\textbf{actual timeout}\\
+\hline 
+\emph{(unset)} & \emph{(unset)} & \emph{(none)} \\
+\hline
+\emph{(unset)} & 2 & \emph{(none)} \\
+\hline
+15000 & \emph{(unset)} & 15000 \\
+\hline
+15000 & 2 & 30000 \\
+\hline
+15000 & 0.25 & 3750 \\
+\hline
+\end{tabular}
+\caption{Examples of \texttt{org.sysunit.timeout.multiplier}.}
+\end{figure}
+
+
