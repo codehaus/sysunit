@@ -8,6 +8,8 @@ import org.sysunit.MockTBean;
 import org.sysunit.SleepTBean;
 import org.sysunit.FailTBean;
 import org.sysunit.ErrorTBean;
+import org.sysunit.ValidationFailTBean;
+import org.sysunit.ValidationErrorTBean;
 import org.sysunit.MockSynchronizableTBean;
 import org.sysunit.WatchdogException;
 
@@ -420,6 +422,142 @@ public class TestLocalTBeanManager
 
         ErrorTBean tbeanOne = new ErrorTBean( exceptionOne );
         FailTBean tbeanTwo = new FailTBean();
+
+        DoubleTBeanCase testCase = new DoubleTBeanCase( tbeanOne,
+                                                        tbeanTwo);
+
+        testCase.initializeFactories();
+
+        LocalTBeanManager manager = new LocalTBeanManager();
+
+        TestResult testResult = new TestResult();
+
+        manager.startTBeans( testCase,
+                             testResult );
+
+        manager.waitForTBeans( testCase,
+                               0 );
+
+        assertTrue( tbeanOne.hasRun() );
+        assertTrue( tbeanTwo.hasRun() );
+
+        assertEquals( 0,
+                      testResult.failureCount() );
+
+        assertEquals( 0,
+                      testResult.errorCount() );
+
+        manager.validateTBeans( testCase,
+                                testResult );
+
+        assertEquals( 1,
+                      testResult.failureCount() );
+
+        assertEquals( 1,
+                      testResult.errorCount() );
+
+        assertContainsThrowable( exceptionOne,
+                                 testResult.errors() );
+    }
+
+    // -- 
+
+    public void testValidateTBeans_AssertionFailure_InAssertValid()
+        throws Throwable {
+
+        ValidationFailTBean tbeanOne = new ValidationFailTBean();
+        ValidationFailTBean tbeanTwo = new ValidationFailTBean();
+
+        DoubleTBeanCase testCase = new DoubleTBeanCase( tbeanOne,
+                                                        tbeanTwo);
+
+        testCase.initializeFactories();
+
+        LocalTBeanManager manager = new LocalTBeanManager();
+
+        TestResult testResult = new TestResult();
+
+        manager.startTBeans( testCase,
+                             testResult );
+
+        manager.waitForTBeans( testCase,
+                               0 );
+
+        assertTrue( tbeanOne.hasRun() );
+        assertTrue( tbeanTwo.hasRun() );
+
+        assertEquals( 0,
+                      testResult.failureCount() );
+
+        assertEquals( 0,
+                      testResult.errorCount() );
+
+        manager.validateTBeans( testCase,
+                                testResult );
+
+        assertEquals( 2,
+                      testResult.failureCount() );
+
+        assertEquals( 0,
+                      testResult.errorCount() );
+    }
+
+    public void testValidateTBeans_Error_InAssertValid()
+        throws Throwable {
+
+        Exception exceptionOne = new Exception();
+        Exception exceptionTwo = new Exception();
+
+        ValidationErrorTBean tbeanOne = new ValidationErrorTBean( exceptionOne );
+        ValidationErrorTBean tbeanTwo = new ValidationErrorTBean( exceptionTwo );
+
+        DoubleTBeanCase testCase = new DoubleTBeanCase( tbeanOne,
+                                                        tbeanTwo);
+
+        testCase.initializeFactories();
+
+        LocalTBeanManager manager = new LocalTBeanManager();
+
+        TestResult testResult = new TestResult();
+
+        manager.startTBeans( testCase,
+                             testResult );
+
+        manager.waitForTBeans( testCase,
+                               0 );
+
+        assertTrue( tbeanOne.hasRun() );
+        assertTrue( tbeanTwo.hasRun() );
+
+        assertEquals( 0,
+                      testResult.failureCount() );
+
+        assertEquals( 0,
+                      testResult.errorCount() );
+
+        manager.validateTBeans( testCase,
+                                testResult );
+
+        assertEquals( 0,
+                      testResult.failureCount() );
+
+        assertEquals( 2,
+                      testResult.errorCount() );
+
+        assertContainsThrowable( exceptionOne,
+                                 testResult.errors() );
+
+        assertContainsThrowable( exceptionTwo,
+                                 testResult.errors() );
+    }
+
+    public void testValidateTBeans_ErrorAndFailure_InAssertValid()
+        throws Throwable {
+
+        Exception exceptionOne = new Exception();
+
+        ValidationErrorTBean tbeanOne = new ValidationErrorTBean( exceptionOne );
+        ValidationFailTBean tbeanTwo = new ValidationFailTBean();
 
         DoubleTBeanCase testCase = new DoubleTBeanCase( tbeanOne,
                                                         tbeanTwo);

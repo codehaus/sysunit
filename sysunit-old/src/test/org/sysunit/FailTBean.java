@@ -4,7 +4,7 @@ public class FailTBean
     extends MockTBean {
 
     public void run()
-        throws Exception {
+        throws Throwable {
         super.run();
         fail( "supposed to fail" );
     }

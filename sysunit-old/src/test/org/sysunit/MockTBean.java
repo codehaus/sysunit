@@ -10,7 +10,7 @@ public class MockTBean
     }
 
     public void run()
-        throws Exception {
+        throws Throwable {
         this.hasRun = true;
     }
 

@@ -1,17 +1,16 @@
 package org.sysunit;
 
-public class ErrorTBean
+public class ValidationErrorTBean
     extends MockTBean {
 
     private Throwable error;
 
-    public ErrorTBean(Throwable error) {
+    public ValidationErrorTBean(Throwable error) {
         this.error = error;
     }
 
-    public void run()
+    public void assertValid()
         throws Throwable {
-        super.run();
         throw this.error;
     }
 }
