@@ -64,7 +64,7 @@ public class SystemTestCase
      */
     public int countTestCases()
     {
-        return 2;
+        return 1;
     }
 
     /**
