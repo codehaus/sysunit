@@ -74,4 +74,9 @@ public class DistributedTestCase
             testResult.endTest( this );
         }
     }
+
+    public String toString()
+    {
+        return getName();
+    }
 }

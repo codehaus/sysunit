@@ -37,7 +37,7 @@ public abstract class Command
         {
             execute( thisNode );
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
             if ( ! ( this instanceof ReportExceptionCommand
                      ||
@@ -46,18 +46,18 @@ public abstract class Command
                 try
                 { 
                     getOrigin().reportException( getUid(),
-                                                 e );
+                                                 t );
                 }
-                catch (Exception ee)
+                catch (Exception e)
                 {
                     System.err.println( "unable to report error from " + getThisNode().getLocalNodeInfo() + " to " + getOrigin() );
-                    ee.printStackTrace();
+                    e.printStackTrace();
                 }
             }
             else
             {
                 System.err.println( "unable to report error from " + getThisNode().getLocalNodeInfo() + " to " + getOrigin() );
-                e.printStackTrace();
+                t.printStackTrace();
             }
         }
 

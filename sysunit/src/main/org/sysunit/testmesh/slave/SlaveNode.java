@@ -43,6 +43,8 @@ public class SlaveNode
     private int completed;
     private int unblockSequence;
 
+    private JvmInfo jvmInfo;
+
     public SlaveNode(int jvmId,
                      InetAddress masterAddress,
                      int masterPort)
@@ -71,7 +73,10 @@ public class SlaveNode
                        JvmInfo jvmInfo)
         throws Exception
     {
-        System.err.println( "#### initializeJvm" );
+        this.jvmInfo = jvmInfo;
+
+        System.err.println( "initialize JVM for " + jvmInfo.getName() );
+
         ClassLoader cl = initializeClassLoader( classpathServerPort,
                                                 relativeUrls );
 
@@ -112,7 +117,7 @@ public class SlaveNode
     void performSetUp()
         throws InterruptedException
     {
-        System.err.println( "performSetUp()" );
+        System.err.println( "setup() " + this.jvmInfo.getName() );
         this.completed = 0;
 
         for ( int i = 0 ; i < this.tbeanThreads.length ; ++i )
@@ -121,12 +126,13 @@ public class SlaveNode
         }
 
         waitForThreads();
+        System.err.println( "setup() complete " + this.jvmInfo.getName() );
     }
 
     void performRun()
         throws InterruptedException
     {
-        System.err.println( "performRun()" );
+        System.err.println( "run() " + this.jvmInfo.getName() );
         this.completed = 0;
 
         for ( int i = 0 ; i < this.tbeanThreads.length ; ++i )
@@ -136,13 +142,13 @@ public class SlaveNode
 
         waitForThreads();
 
-        System.err.println( System.currentTimeMillis() + " run done for slave" );
+        System.err.println( "run() complete " + this.jvmInfo.getName() );
     }
 
     void performAssertValid()
         throws InterruptedException
     {
-        System.err.println( "performAssertValid()" );
+        System.err.println( "assertValid() " + this.jvmInfo.getName() );
         this.completed = 0;
 
         for ( int i = 0 ; i < this.tbeanThreads.length ; ++i )
@@ -151,18 +157,22 @@ public class SlaveNode
         }
 
         waitForThreads();
+        System.err.println( "assertValid() done " + this.jvmInfo.getName() );
     }
 
     void performTearDown()
         throws InterruptedException
     {
-        System.err.println( "performTearDown()" );
+        System.err.println( "tearDown() " + this.jvmInfo.getName() );
         this.completed = 0;
 
         for ( int i = 0 ; i < this.tbeanThreads.length ; ++i )
         {
-            this.tbeanThreads[ i ].performSetUp();
+            this.tbeanThreads[ i ].performTearDown();
         }
+
+        waitForThreads();
+        System.err.println( "tearDown() complete " + this.jvmInfo.getName() );
     }
 
     ClassLoader initializeClassLoader(int port,
@@ -178,7 +188,7 @@ public class SlaveNode
             urls[ i ] = new URL( "http://" + host + ":" + port + relativeUrls[ i ] );
         }
 
-        return new URLClassLoader( urls );
+        return new ClasspathClassLoader( urls );
     }
 
     TBean[] initializeTBeans(ClassLoader cl,
@@ -242,14 +252,18 @@ public class SlaveNode
 
     public synchronized void notifyRun(TBeanThread thread)
     {
+        System.err.println( "notifyRun(" + thread + ") " + this.jvmInfo.getName() );
+
         if ( thread.getThrown() != null )
         {
             try
             {
+                System.err.println( "notifyRun(" + thread + ") " + this.jvmInfo.getName() + " sending error to master" );
                 waitFor( executeOn( getMasterNodeInfo(),
                                     new RunThrewCommand( getJvmId(),
                                                          thread.getName(),
                                                          thread.getThrown() ) ) );
+                System.err.println( "notifyRun(" + thread + ") " + this.jvmInfo.getName() + " sent error to master" );
             }
             catch (Exception e)
             {
@@ -258,6 +272,9 @@ public class SlaveNode
 
             this.synchronizer.setError();
         }
+
+        System.err.println( "notifyRun(" + thread + ") " + this.jvmInfo.getName() + " notify all" );
+
         this.synchronizer.reduceNumThreads();
         ++this.completed;
         notifyAll();
@@ -331,7 +348,7 @@ public class SlaveNode
 
     public synchronized void notifyFullyBlocked(Synchronizer synchronizer)
     {
-        System.err.println( "slave notifying fully blocked" );
+        System.err.println( "notifyFullyBlocked() " + this.jvmInfo.getName() );
         try
         {
             executeOn( getMasterNodeInfo(),
@@ -341,6 +358,12 @@ public class SlaveNode
         {
             e.printStackTrace();
         }
+    }
+
+    void abortTest()
+    {
+        System.err.println( "abortTest() " + this.jvmInfo.getName() );
+        this.synchronizer.setError();
     }
 
     public synchronized void notifyInconsistent(Synchronizer synchronizer)

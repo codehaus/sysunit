@@ -37,6 +37,7 @@ public class StartSlaveCommand
         node.startSlave( getJdk(),
                          getJvmId(),
                          masterAddress,
-                         masterPort );
+                         masterPort,
+                         getOrigin() );
     }
 }

@@ -36,11 +36,11 @@ public class LocalNodeInfo
     }
 
     public void reportException(int reportingUid,
-                                Exception exception)
+                                Throwable thrown)
         throws Exception
     {
         getNode().reportException( reportingUid,
-                                   exception );
+                                   thrown );
     }
 
     public void reportCompletion(int reportingUid)

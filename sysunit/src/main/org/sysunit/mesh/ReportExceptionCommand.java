@@ -4,13 +4,13 @@ public class ReportExceptionCommand
     extends Command
 {
     private int reportingUid;
-    private Exception exception;
+    private Throwable thrown;
 
     public ReportExceptionCommand(int reportingUid,
-                                  Exception exception)
+                                  Throwable thrown)
     {
-        this.reportingUid       = reportingUid;
-        this.exception = exception;
+        this.reportingUid = reportingUid;
+        this.thrown       = thrown;
     }
 
     public int getReportingUid()
@@ -18,14 +18,14 @@ public class ReportExceptionCommand
         return this.reportingUid;
     }
 
-    public Exception getException()
+    public Throwable getThrown()
     {
-        return this.exception;
+        return this.thrown;
     }
 
     public void execute(Node node)
     {
         node.reportException( getReportingUid(),
-                              getException() );
+                              getThrown() );
     }
 }

@@ -19,6 +19,7 @@ import org.sysunit.testmesh.slave.PerformRunCommand;
 import org.sysunit.testmesh.slave.PerformAssertValidCommand;
 import org.sysunit.testmesh.slave.PerformTearDownCommand;
 import org.sysunit.testmesh.slave.UnblockSynchronizerCommand;
+import org.sysunit.testmesh.slave.AbortTestCommand;
 import org.sysunit.util.ClasspathServer;
 
 import java.io.IOException;
@@ -50,6 +51,8 @@ public class MasterNode
     private int numBlocked;
 
     private int blockSequence;
+
+    private boolean jvmError;
 
     public MasterNode()
     {
@@ -131,8 +134,6 @@ public class MasterNode
                                            pingBytes.length,
                                            getPingAddress(),
                                            getPingPort() );
-
-                System.err.println( "sending mcast pings" );
             }
             catch (IOException e)
             {
@@ -148,8 +149,6 @@ public class MasterNode
                                        pingBytes.length,
                                        InetAddress.getLocalHost(),
                                        getPingPort() + 1 );
-
-            System.err.println( "sending bcast pings" );
         }
 
         pingSocket.send( ping );
@@ -166,7 +165,6 @@ public class MasterNode
     public void addSlaveHost(NodeInfo slaveHost,
                              PhysicalMachineInfo physicalMachineInfo)
     {
-        System.err.println( "add slavehost: " + slaveHost );
         getTestMeshManager().addSlaveHost( slaveHost,
                                            physicalMachineInfo );
     }
@@ -184,8 +182,6 @@ public class MasterNode
     public void addSlave(NodeInfo slave,
                          int jvmId)
     {
-        System.err.println( "add slave : " + slave );
-
         synchronized ( this.slaves )
         {
             this.slaves.add( new SlaveInfo( slave,
@@ -193,7 +189,6 @@ public class MasterNode
             
             if ( this.slaves.size() == getSystemTestInfo().getTotalJvms() )
             {
-                System.err.println( this.slaves.size() + " slaves registered" );
                 this.slaves.notifyAll();
             }
         }
@@ -217,51 +212,57 @@ public class MasterNode
     public Throwable[] runTest()
         throws Exception
     {
-        System.err.println( "a" );
         TestPlanBuilder builder = new TestPlanBuilder( getSystemTestInfo(),
                                                        getScenarioInfo(),
                                                        getTestMeshManager() );
 
-        System.err.println( "b" );
         TestPlan plan = builder.buildTestPlan();
 
         JvmBinding[] jvmBindings = plan.getJvmBindings();
 
         for ( int i = 0 ; i < jvmBindings.length ; ++i )
         {
-            System.err.println( jvmBindings[ i ].getNodeInfo() );
             executeOn( jvmBindings[ i ].getNodeInfo(),
                        new StartSlaveCommand( getScenarioInfo().getJdk( jvmBindings[ i ].getJvmInfo() ),
                                               jvmBindings[ i ].getJvmId() ) );
         }
 
-        System.err.println( "c" );
-
         waitForSlaves();
 
-        System.err.println( "d" );
-
-        initializeJvms( plan );
-
-        performSetUp();
-
-        if ( ! hasThrown() )
+        if ( ! this.jvmError )
         {
-            performRun();
-            
-            if ( ! hasThrown() )
+            initializeJvms( plan );
+
+            if ( getFundamentalErrors().length == 0 )
             {
-                performAssertValid();
+                performSetUp();
+                
+                if ( ! hasThrown() )
+                {
+                    performRun();
+                    
+                    if ( ! hasThrown() )
+                    {
+                        performAssertValid();
+                    }
+                }
+                
+                performTearDown();
             }
         }
 
-        performTearDown();
+        Throwable[] fundamentalErrors = getFundamentalErrors();
+            
+        Throwable[] thrown = new Throwable[ this.thrown.size() + fundamentalErrors.length ];
 
-        Throwable[] thrown = new Throwable[ this.thrown.size() ];
-
-        for ( int i = 0 ; i < thrown.length ; ++i )
+        for ( int i = 0 ; i < this.thrown.size() ; ++i )
         {
             thrown[ i ] = ((ThrowEntry)this.thrown.get( i )).getThrown();
+        }
+
+        for ( int i = 0; i < fundamentalErrors.length ; ++i )
+        {
+            thrown[ i + this.thrown.size() ] = fundamentalErrors[ i ];
         }
 
         return thrown;
@@ -327,10 +328,12 @@ public class MasterNode
     synchronized void runThrew(int jvmId,
                                String tbeanId,
                                Throwable thrown)
+        throws Exception
     {
         this.thrown.add( new ThrowEntry( null,
                                          tbeanId,
                                          thrown ) );
+        abortTest();
     }
 
     void performAssertValid()
@@ -374,24 +377,41 @@ public class MasterNode
     {
         synchronized ( this.slaves )
         {
-            while ( this.slaves.size() != getSystemTestInfo().getTotalJvms() )
+            while ( this.slaves.size() != getSystemTestInfo().getTotalJvms()
+                    &&
+                    ! this.jvmError )
             {
                 this.slaves.wait();
             }
         }
     }
 
+    void abortTest()
+        throws Exception
+    {
+        SlaveInfo[] slaves = getSlaves();
+
+        CommandGroup commandGroup = newCommandGroup();
+
+        AbortTestCommand command = new AbortTestCommand();
+        
+        for ( int i = 0 ; i < slaves.length ; ++i )
+        {
+            commandGroup.add( executeOn( slaves[ i ].getNodeInfo(),
+                                         command ) );
+        }
+        
+        commandGroup.waitFor();
+    }
+
     synchronized void notifyFullyBlocked(int jvmId)
     {
-        System.err.println( "block by " + jvmId );
-
         ++this.numBlocked;
 
         if ( this.numBlocked == this.slaves.size() )
         {
             this.numBlocked = 0;
 
-            System.err.println( "unblocking" );
             UnblockSynchronizerCommand unblockCommand = new UnblockSynchronizerCommand( this.blockSequence );
 
             ++this.blockSequence;
@@ -411,5 +431,11 @@ public class MasterNode
                 }
             }
         }
+    }
+
+    synchronized void jvmError()
+    {
+        this.jvmError = true;
+        notifyAll();
     }
 }

@@ -17,7 +17,7 @@ public interface NodeInfo
     */
 
     void reportException(int uid,
-                         Exception exception)
+                         Throwable thrown)
         throws Exception;
 
     void reportCompletion(int uid)

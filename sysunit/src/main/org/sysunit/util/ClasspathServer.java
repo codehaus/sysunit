@@ -127,6 +127,8 @@ public class ClasspathServer
 
         String uri = null;
 
+        boolean head = false;
+
         while ( true )
         {
             line = reader.readLine().trim();
@@ -136,13 +138,20 @@ public class ClasspathServer
                 break;
             }
 
-            if ( line.startsWith( "GET" ) )
+            if ( line.startsWith( "GET" )
+                 ||
+                 line.startsWith( "HEAD" ) )
             {
                 int firstSpace = line.indexOf( " " );
                 int secondSpace = line.indexOf( " ", firstSpace + 1 );
 
                 uri = line.substring( firstSpace + 1,
                                       secondSpace );
+
+                if ( line.startsWith( "HEAD" ) )
+                {
+                    head = true;
+                }
             }
         }
 
@@ -153,12 +162,14 @@ public class ClasspathServer
             return;
         }
 
+
         File local = getLocalFile( uri );
 
         if ( local == null )
         {
             out.write( "HTTP/1.1 404 Not Found\r\n".getBytes() );
             out.write( "\r\n".getBytes() );
+
             return;
         }
 
@@ -178,18 +189,21 @@ public class ClasspathServer
 
         out.write( "\r\n".getBytes() );
 
-        FileInputStream fileIn = new FileInputStream( local );
-
-        byte[] buf = new byte[1024];
-        int len = 0;
-
-        while ( ( len = fileIn.read( buf,
-                                     0,
-                                     1024 ) ) > 0 )
+        if ( ! head )
         {
-            out.write( buf,
-                       0,
-                       len );
+            FileInputStream fileIn = new FileInputStream( local );
+            
+            byte[] buf = new byte[1024];
+            int len = 0;
+            
+            while ( ( len = fileIn.read( buf,
+                                         0,
+                                         1024 ) ) > 0 )
+            {
+                out.write( buf,
+                           0,
+                           len );
+            }
         }
     }
 }

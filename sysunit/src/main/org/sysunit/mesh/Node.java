@@ -16,9 +16,13 @@ import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Node
 {
+    private static final Throwable[] EMPTY_THROWABLE_ARRAY = new Throwable[0];
+
     private String name;
     private LocalNodeInfo localNodeInfo;
 
@@ -28,6 +32,8 @@ public class Node
 
     private Map inFlightCommands;
 
+    private List fundamentalErrors;
+
     public Node(String name)
     {
         this.name          = name;
@@ -35,9 +41,11 @@ public class Node
                                                 this );
         this.uidCounter    = 0;
 
-        this.pool = new ThreadPool( 4 );
+        this.pool = new ThreadPool( 8 );
 
         this.inFlightCommands = new HashMap();
+
+        this.fundamentalErrors = new ArrayList();
     }
 
     public String getName()
@@ -112,17 +120,23 @@ public class Node
     
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
+
+    public Throwable[] getFundamentalErrors()
+    {
+        return (Throwable[]) this.fundamentalErrors.toArray( EMPTY_THROWABLE_ARRAY );
+    }
     
     void reportException(int uid,
-                         Exception exception)
+                         Throwable thrown)
     {
         Command command = getInFlightCommand( uid );
 
-        System.err.println( "cause: " + command );
-        System.err.println( "exception: " + exception );
+        System.err.println( "command: " + command );
+        System.err.println( "thrown: " + thrown );
 
-        exception.printStackTrace();
+        //thrown.printStackTrace();
 
+        this.fundamentalErrors.add( thrown );
         removeInFlightCommand( uid );
     }
 

@@ -70,11 +70,11 @@ public class RemoteNodeInfo
     }
 
     public void reportException(int reportingUid,
-                                Exception exception)
+                                Throwable thrown)
         throws Exception
     {
         execute( new ReportExceptionCommand( reportingUid,
-                                             exception ) );
+                                             thrown ) );
     }
 
     public void reportCompletion(int reportingUid)
