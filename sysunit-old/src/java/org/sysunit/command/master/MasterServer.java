@@ -9,7 +9,6 @@
  */
 package org.sysunit.command.master;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,6 +23,7 @@ import org.sysunit.command.MissingPropertyException;
 import org.sysunit.command.Server;
 import org.sysunit.command.slave.RequestMembersCommand;
 import org.sysunit.command.slave.StartTestNodeCommand;
+import org.sysunit.jelly.JvmNameExtractor;
 /**
  * The Server for Master nodes on the network
  * 
@@ -35,18 +35,23 @@ public class MasterServer extends Server {
 
 	private Map members = new HashMap();
 	private Map testNodes = new HashMap();
+	private String xml;
 	private long waitTime = 1000L;
 
     private Dispatcher slaveGroupDispatcher;
+	private JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
 	
     public MasterServer() {
     }
 
 	public void start() throws Exception {
-
+		if (xml == null) {
+			throw new MissingPropertyException(this, "xml");
+		}
 		if (slaveGroupDispatcher == null) {
 			throw new MissingPropertyException(this, "slaveGroupDispatcher");
 		}
+		
 		// lets send an advertisement
 		slaveGroupDispatcher.dispatch(new RequestMembersCommand());
 
@@ -54,11 +59,9 @@ public class MasterServer extends Server {
 		Thread.sleep(waitTime);
 
 		// now lets start kicking off the JVMs
-		
-		String xml = "fooSystemTest.jelly";
-		String[] jvms = { "a", "b", "c" };
+		List jvmNames = jvmNameExtractor.getJvmNames(xml);
 
-		roundRobbinJvms(xml, Arrays.asList(jvms));
+		roundRobbinJvms(xml, jvmNames);
 	}
 	
 	
@@ -115,12 +118,28 @@ public class MasterServer extends Server {
 	public void setWaitTime(long waitTime) {
 		this.waitTime = waitTime;
 	}
+	/**
+	 * @return
+	 */
+	public String getXml() {
+		return xml;
+	}
+
+	/**
+	 * @param xml
+	 */
+	public void setXml(String xml) {
+		this.xml = xml;
+	}
 
 	// Implementation methods
 	//-------------------------------------------------------------------------    
 	protected void roundRobbinJvms(String xml, List jvmNames) throws DispatchException {
 		// lets create an Array of the dispatchers
 		Collection dispatcherCollection = members.values();
+		
+		log.info("Dispatching: " + jvmNames.size() + " JVM(s) across: " + dispatcherCollection.size() + " dispatcher(s)");
+		
 		int size = dispatcherCollection.size();
 		Dispatcher[] dispatchers = new Dispatcher[size];
 		dispatcherCollection.toArray(dispatchers);
@@ -132,8 +151,12 @@ public class MasterServer extends Server {
 			if (idx >= size) {
 				idx = 0;
 			}
-			dispatchers[idx].dispatch(new StartTestNodeCommand(xml, jvmName));
+			
+			Dispatcher dispatcher = dispatchers[idx];
+			
+			log.info("Dispatching jvm: " + jvmName + " to dispatcher: " + dispatcher);
+			
+			dispatcher.dispatch(new StartTestNodeCommand(xml, jvmName));
 		}
 	}
-
 }

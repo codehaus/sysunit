@@ -69,8 +69,11 @@ public class SystemTestTag extends TagSupport {
         if (className == null) {
             throw new MissingAttributeException("className");
         }
-
+        
+        // lets register the JVM list into the context so folks can extract it from outside of Jelly
         jvms.clear();
+        context.setVariable("org.sysunit.jvmList", jvms);
+        
         systemTestClass = null;
         try {
             ClassLoader classLoader = getClassLoader();

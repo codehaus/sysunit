@@ -18,8 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import org.sysunit.remote.RemoteTBeanManager;
 
 /**
- * A helper class which will create the given JVM name of the specified 
- * systemTest XML document.
+ * A helper class which will execute the named JVM inside the system test XML document
+
  * 
  * @author James Strachan
  * @version $Revision$

@@ -4,6 +4,6 @@
     <tbean class="org.sysunit.jelly.ExampleTBean" sleepTime="200" foo="def"/> 
   </jvm> 
  
-  <jvm name="b" count="2"> 
+  <jvm name="b" count="3"> 
   </jvm> 
 </systemTest>
