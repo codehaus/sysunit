@@ -3,32 +3,6 @@
          xmlns:ant="jelly:ant"
          xmlns:test="test">
 
-  <preGoal name="site">
-    <attainGoal name="java:compile"/>
-    <attainGoal name="clover"/>
-  </preGoal>
-
-  <goal name="doc">
-    <attainGoal name="html2xdoc"/>
-    <attainGoal name="xdoc"/>
-  </goal>
-
-  <goal name="sar">
-    <attainGoal name="jar"/>
-    <mkdir dir="${maven.build.dir}/sar-assembly/"/>
-
-    <copy file="${maven.build.dir}/${maven.final.name}.jar"
-        tofile="${maven.build.dir}/sar-assembly/${maven.final.name}.jar"/>
-
-    <copy todir="${maven.build.dir}/sar-assembly/">
-      <fileset dir="src/sar/"/>
-    </copy>
-
-    <jar destfile="${maven.build.dir}/${maven.final.name}.sar"
-         basedir="${maven.build.dir}/sar-assembly/"/>
-
-  </goal>
-
   <goal name="setclasspath" prereqs="java:compile">
     <path id="s.classpath">
       <pathelement path="${maven.build.dest}"/>
