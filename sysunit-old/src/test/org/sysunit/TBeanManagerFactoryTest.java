@@ -2,7 +2,7 @@ package org.sysunit;
 
 import java.security.SecureClassLoader;
 
-public class TestTBeanManagerFactory
+public class TBeanManagerFactoryTest
     extends SysUnitTestCase {
 
     public void testNewTBeanManager_WithContextClassLoader()

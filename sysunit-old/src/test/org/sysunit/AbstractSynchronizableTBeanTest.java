@@ -1,6 +1,6 @@
 package org.sysunit;
 
-public class TestAbstractSynchronizableTBean
+public class AbstractSynchronizableTBeanTest
     extends SysUnitTestCase
 {
     public void testSynchronizer()

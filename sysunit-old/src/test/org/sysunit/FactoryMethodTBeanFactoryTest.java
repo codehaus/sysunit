@@ -2,7 +2,7 @@ package org.sysunit;
 
 import java.lang.reflect.Method;
 
-public class TestFactoryMethodTBeanFactory
+public class FactoryMethodTBeanFactoryTest
     extends SysUnitTestCase {
 
     public void testConstruct()
