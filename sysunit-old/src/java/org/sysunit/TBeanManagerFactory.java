@@ -60,7 +60,7 @@ package org.sysunit;
  *
  */
 
-import org.sysunit.local.LocalTBeanManager;
+//import org.sysunit.local.LocalTBeanManager;
 
 /**
  * Entry-point for creating a <code>TBeanMaager</code>.
@@ -89,7 +89,8 @@ public class TBeanManagerFactory {
     // ----------------------------------------------------------------------
 
     /** Default <code>TBeanManager</code> class name. */
-    public static final String DEFAULT_CLASSNAME = LocalTBeanManager.class.getName();
+    //jpublic static final String DEFAULT_CLASSNAME = LocalTBeanManager.class.getName();
+    public static final String DEFAULT_CLASSNAME = "";
 
     // ----------------------------------------------------------------------
     //     Class Methods
@@ -112,6 +113,7 @@ public class TBeanManagerFactory {
      */
     public static TBeanManager newTBeanManager()
         throws Exception {
+        /*
         String classname = System.getProperty( TBeanManager.class.getName() );
 
         if ( classname == null
@@ -131,5 +133,7 @@ public class TBeanManagerFactory {
         TBeanManager manager = (TBeanManager) managerClass.newInstance();
 
         return manager;
+        */
+        return null;
     }
 }
