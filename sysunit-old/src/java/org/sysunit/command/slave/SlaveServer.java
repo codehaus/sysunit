@@ -119,11 +119,12 @@ public class SlaveServer extends Server {
      */
     private synchronized void launchNodeInForkedJvm(LaunchTestNodeCommand command)
         throws Exception {
+
+        String mungedId = command.getMasterID().replace( File.pathSeparatorChar,
+                                                         '@' );
         
         File dir = new File( this.tmpDir,
-                             command.getMasterID().replaceAll( File.pathSeparator,
-                                                               "@" ) );
-
+                             mungedId );
 
         LaunchWaiter waiter = new LaunchWaiter( dir,
                                                 command,
