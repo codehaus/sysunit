@@ -37,7 +37,7 @@ import org.sysunit.local.TBeanThread;
  * @author <a href="mailto:james.strachan@spiritsoft.com">James Strachan</a>
  * @version $Revision$
  */
-public class RemoteTBeanManager {
+public class RemoteTBeanManager implements Runnable {
 
     // ----------------------------------------------------------------------
     //     Constants
@@ -85,18 +85,33 @@ public class RemoteTBeanManager {
         // nothing required
     }
 
-    protected TBeanThread[] getTBeanThreads() {
-        return (TBeanThread[]) this.tbeanThreads.toArray(TBeanThread.EMPTY_ARRAY);
-    }
+	/**
+	 * @return the Map of TBeans keyed by their IDs
+	 */
+	public Map getTBeanMap() {
+		return tbeans;
+	}
+	
+	/**
+	 * Adds a new TBean to this manager via a key
+	 * @param tbeanId the ID of the TBean
+	 * @param tbean the TBean to be added
+	 */
+	public void addTBean(String tbeanId, TBean tbean) {
+		tbeans.put(tbeanId, tbean);
+	}
 
-    protected TBean[] getTBeans() {
-        return (TBean[]) this.tbeans.values().toArray(TBean.EMPTY_ARRAY);
-    }
+	/**
+	 * Adds a new TBean, generating the ID automatically
+	 * 
+	 * @param tbean is the new TBean to be added
+	 */
+	public void addTBean(TBean tbean) {
+		addTBean(tbean.toString(), tbean);
+	}
 
-    LocalSynchronizer getSynchronizer() {
-        return this.synchronizer;
-    }
-
+	
+	
     public void run() {
         try {
         	log.info("About to run tbeans: " + tbeans);
@@ -201,8 +216,20 @@ public class RemoteTBeanManager {
             }
         }
     }
+    
+	// ----------------------------------------------------------------------
+	//     Implementation methods
+	// ----------------------------------------------------------------------
+	
+	protected TBeanThread[] getTBeanThreads() {
+		return (TBeanThread[]) this.tbeanThreads.toArray(TBeanThread.EMPTY_ARRAY);
+	}
 
-    public void addTBean(String tbeanId, TBean tbean) {
-        tbeans.put(tbeanId, tbean);
-    }
+	protected TBean[] getTBeans() {
+		return (TBean[]) this.tbeans.values().toArray(TBean.EMPTY_ARRAY);
+	}
+
+	LocalSynchronizer getSynchronizer() {
+		return this.synchronizer;
+	}
 }

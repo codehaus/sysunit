@@ -62,6 +62,7 @@ public class SystemTestTag extends TagSupport {
             jvms.add(name);
         }
     }
+    
     // Tag interface
     //-------------------------------------------------------------------------                    
     public void doTag(XMLOutput output) throws MissingAttributeException, JellyTagException {
@@ -147,7 +148,7 @@ public class SystemTestTag extends TagSupport {
      */
     public RemoteTBeanManager getManager() throws JellyTagException {
         if (manager == null) {
-            manager = new RemoteTBeanManager();
+            manager = (RemoteTBeanManager) context.getVariable("org.sysunit.TBeanManager");
         }
         return manager;
     }

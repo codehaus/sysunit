@@ -14,6 +14,12 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+/**
+ * A test case of the use of JvmRunner and thread methods
+ * 
+ * @author James Strachan
+ * @version $Revision$
+ */
 public class TestJvmRunner extends TestCase {
     public static void main(String[] args) {
         TestRunner.run(suite());
@@ -53,6 +59,9 @@ public class TestJvmRunner extends TestCase {
         assertEquals("Number of clients created", 0, ExampleSystemTest.getClientCount());
         assertEquals("Number of servers created", 1, ExampleSystemTest.getServerCount());
     }
+
+	// Implementation methods
+	//-------------------------------------------------------------------------                    
 
     /**
      * Runs the given named JVM

@@ -1,19 +1,11 @@
-/* 
- * $Source$ 
- * $Revision$ 
- * $Author$ 
- * $Date$ 
+/*
+ * Copyright (C) SpiritSoft, Inc. All rights reserved.
+ *
+ * This software is published under the terms of the SpiritSoft Software License
+ * version 1.0, a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
  * 
- * Copyright 1997-2001 by SpiritSoft Ltd, 
- * www.spirit-soft.com 
- * 
- * All rights reserved. 
- * 
- * This software is the confidential and proprietary information 
- * of SpiritSoft Ltd. ("Confidential Information").  You 
- * shall not disclose such Confidential Information and shall use 
- * it only in accordance with the terms of the license agreement 
- * you entered into with SpiritSoft Ltd. 
+ * $Id$
  */
 package org.sysunit.jelly;
 

@@ -1,15 +1,17 @@
+Required Features
+=================
+
+* client/server-cluster transport & JVM launcher to allow tests to be started remotely
+
+* support distributed sync() mechanism
+
+* remote BM needs to send any exceptions to the client
+
+* need distributed watchdog
 
 
-<systemTest name="simple" class="com.foo.MySystemTestCase"> 
-  <jvm name="a" count="4"> 
-    <tbean name="reader" count="2"/> 
-  </jvm> 
- 
-  <jvm name="b" count="2"> 
-    <tbean name="writer" count="1"/> 
-  </jvm> 
-</systemTest> 
-
+Nice to Haves
+==============
 
 * support the use of a static method to create a JVM within the test case
 

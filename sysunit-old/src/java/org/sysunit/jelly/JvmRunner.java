@@ -15,6 +15,7 @@ import org.apache.commons.jelly.JellyContext;
 import org.apache.commons.jelly.XMLOutput;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sysunit.remote.RemoteTBeanManager;
 
 /**
  * A helper class which will create the given JVM name of the specified 
@@ -26,27 +27,28 @@ import org.apache.commons.logging.LogFactory;
 public class JvmRunner {
     private static final Log log = LogFactory.getLog(JvmRunner.class);
     private JellyContext context;
+	private RemoteTBeanManager manager = new RemoteTBeanManager();
+	
+	public static void main(String[] args) throws Exception {
+	   if (args.length < 2) {
+		   System.out.println("Usage: JvmRunner <systemTestXml> <jvmName>");
+	   }
+	   try {
+		   String xml = args[0];
+		   String jvmName = args[1];
+		   JvmRunner runner = new JvmRunner();
+		   runner.run(xml, jvmName);
+	   }
+	   catch (Exception e) {
+		   log.error("Caught: " + e, e);
+		   throw e;
+	   }
+   }
 
-    public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
-            System.out.println("Usage: JvmRunner <systemTestXml> <jvmName>");
-        }
-        try {
-            String xml = args[0];
-            String jvmName = args[1];
-            JvmRunner runner = new JvmRunner();
-            runner.run(xml, jvmName);
-        }
-        catch (Exception e) {
-            log.error("Caught: " + e, e);
-            throw e;
-        }
-    }
-
-    public JvmRunner() {
-        context = new JellyContext();
-        context.registerTagLibrary("", new SysUnitTagLibrary());
-    }
+   public JvmRunner() {
+	   context = new JellyContext();
+	   context.registerTagLibrary("", new SysUnitTagLibrary());
+   }
 
     /**
      * Runs the given JVM named in the XML document using the classloader
@@ -56,7 +58,8 @@ public class JvmRunner {
      * @param jvmName
      */
     public void run(String xml, String jvmName) throws Exception {
-        context.setVariable("org.sysunit.jvm", jvmName);
+		context.setVariable("org.sysunit.jvm", jvmName);
+		context.setVariable("org.sysunit.TBeanManager", getManager());
 
         // lets assume the XML is on the classpath
         URL url = getClass().getClassLoader().getResource(xml);
@@ -69,4 +72,23 @@ public class JvmRunner {
         XMLOutput output = XMLOutput.createDummyXMLOutput();
         context.runScript(url, output);
     }
+
+    
+	// Properties
+	//-------------------------------------------------------------------------    
+	                
+    /**
+     * @return
+     */
+    public RemoteTBeanManager getManager() {
+        return manager;
+    }
+
+    /**
+     * @param manager
+     */
+    public void setManager(RemoteTBeanManager manager) {
+        this.manager = manager;
+    }
+
 }
