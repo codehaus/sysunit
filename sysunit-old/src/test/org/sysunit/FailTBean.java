@@ -1,10 +1,11 @@
 package org.sysunit;
 
 public class FailTBean
-    extends AbstractTBean {
+    extends MockTBean {
 
     public void run()
         throws Exception {
+        super.run();
         fail( "supposed to fail" );
     }
 }
