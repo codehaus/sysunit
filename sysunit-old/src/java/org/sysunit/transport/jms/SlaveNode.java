@@ -9,6 +9,7 @@
  */
 package org.sysunit.transport.jms;
 
+import java.net.URL;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 
@@ -36,7 +37,9 @@ public class SlaveNode extends Node {
         }
 
         try {
-            Messenger messenger = MessengerManager.get(messengerName);
+            URL messengerUrl = ClassLoader.getSystemResource( "SysUnitMessenger.xml" );
+            MessengerManager mm = MessengerManager.load( messengerUrl.toExternalForm() );
+            Messenger messenger = mm.getMessenger(messengerName);
             if (messenger == null) {
                 System.out.println("Could not find a messenger instance called: " + messengerName);
                 return;
