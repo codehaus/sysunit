@@ -17,7 +17,8 @@ public class SlaveHostNode
     extends PingPongNode
     implements JvmExecutorCallback
 {
-    private Thread pingPongThread;
+    private Thread mcastPingPongThread;
+    private Thread bcastPingPongThread;
 
     private SlaveHostConfiguration config;
 
@@ -52,15 +53,21 @@ public class SlaveHostNode
     {
         super.start();
 
-        this.pingPongThread = new PingPongThread( this );
+        this.mcastPingPongThread = new PingPongThread( this,
+                                                       getPingAddress() );
+        this.mcastPingPongThread.start();
 
-        this.pingPongThread.start();
+        this.bcastPingPongThread = new PingPongThread( this,
+                                                       null );
+        this.bcastPingPongThread.start();
     }
 
     public synchronized void stop()
         throws InterruptedException
     {
-        this.pingPongThread.interrupt();
+        this.mcastPingPongThread.interrupt();
+        this.bcastPingPongThread.interrupt();
+
         super.stop();
 
         synchronized ( this )

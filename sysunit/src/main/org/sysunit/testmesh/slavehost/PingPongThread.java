@@ -15,13 +15,16 @@ public class PingPongThread
     extends Thread
 {
     private SlaveHostNode slaveHostNode;
+    private InetAddress pingAddress;
 
-    public PingPongThread(SlaveHostNode slaveHostNode)
+    public PingPongThread(SlaveHostNode slaveHostNode,
+                          InetAddress pingAddress)
     {
         super( "PingPongThread" );
         setDaemon( true );
 
         this.slaveHostNode = slaveHostNode;
+        this.pingAddress   = pingAddress;
     }
 
     public SlaveHostNode getSlaveHostNode()
@@ -36,7 +39,7 @@ public class PingPongThread
 
     public InetAddress getPingAddress()
     {
-        return getSlaveHostNode().getPingAddress();
+        return this.pingAddress;
     }
 
     public int getServerPort()
