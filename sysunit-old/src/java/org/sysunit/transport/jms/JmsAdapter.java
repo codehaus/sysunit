@@ -7,7 +7,7 @@
  * 
  * $Id$
  */
-package org.sysunit.command.jms;
+package org.sysunit.transport.jms;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,21 +20,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.messenger.Messenger;
 import org.sysunit.command.Dispatcher;
-import org.sysunit.command.NodeContext;
 
 /**
- * The Context on which Comamnds execute in a cluster of Nodes
+ * An Adapter class for binding JMS to the Command framework
  * 
  * @author James Strachan
  * @version $Revision$
  */
-public class JmsNodeContext extends NodeContext {
-    private static final Log log = LogFactory.getLog(JmsNodeContext.class);
+public class JmsAdapter {
+    private static final Log log = LogFactory.getLog(JmsAdapter.class);
 
 	private Map replyDispatchers = new HashMap();
 	private Messenger messenger;
 	
-    public JmsNodeContext(Messenger messenger) {
+    public JmsAdapter(Messenger messenger) {
     	this.messenger = messenger;
     }
 

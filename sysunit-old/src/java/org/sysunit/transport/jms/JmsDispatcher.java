@@ -7,7 +7,7 @@
  * 
  * $Id$
  */
-package org.sysunit.command.jms;
+package org.sysunit.transport.jms;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;

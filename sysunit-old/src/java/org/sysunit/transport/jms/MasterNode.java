@@ -7,7 +7,7 @@
  * 
  * $Id$
  */
-package org.sysunit.command.jms;
+package org.sysunit.transport.jms;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,8 +21,9 @@ import org.apache.commons.messenger.Messenger;
 import org.apache.commons.messenger.MessengerManager;
 import org.sysunit.command.DispatchException;
 import org.sysunit.command.Dispatcher;
-import org.sysunit.command.RequestMembersCommand;
-import org.sysunit.command.RunJvmCommand;
+import org.sysunit.command.master.MasterServer;
+import org.sysunit.command.slave.RequestMembersCommand;
+import org.sysunit.command.slave.StartTestNodeCommand;
 
 /**
  * A Master Node implementation via JMS which establishes a network of nodes
@@ -31,11 +32,12 @@ import org.sysunit.command.RunJvmCommand;
  * @author James Strachan
  * @version $Revision$
  */
-public class MasterController extends JmsNodeContext {
+public class MasterNode  {
 
+	private MasterServer server = new MasterServer();
     private Dispatcher groupDispatcher;
     private Destination replyToDestination;
-    private CommandMessageListener messageListener = new CommandMessageListener(this);
+    private CommandMessageListener messageListener;
     private long waitTime = 2000L;
 
     public static void main(String[] args) {
@@ -53,7 +55,7 @@ public class MasterController extends JmsNodeContext {
                 return;
             }
             Destination destination = messenger.getDestination(groupTopic);
-            MasterController controller = new MasterController(messenger, destination);
+            MasterNode controller = new MasterNode(messenger, destination);
             controller.start();
         }
         catch (Exception e) {
@@ -62,8 +64,8 @@ public class MasterController extends JmsNodeContext {
         }
     }
 
-    public MasterController(Messenger messenger, Destination destination) throws JMSException {
-    	super(messenger);
+    public MasterNode(Messenger messenger, Destination destination) throws JMSException {
+		messageListener = new CommandMessageListener(new JmsAdapter(messenger), server);
         replyToDestination = messenger.createTemporaryDestination();
         messenger.addListener(replyToDestination, messageListener);
 
@@ -92,7 +94,7 @@ public class MasterController extends JmsNodeContext {
     //-------------------------------------------------------------------------    
     protected void roundRobbinJvms(String xml, List jvmNames) throws DispatchException {
         // lets create an Array of the dispatchers
-        Collection dispatcherCollection = getMemberMap().values();
+        Collection dispatcherCollection = server.getMemberMap().values();
         int size = dispatcherCollection.size();
         Dispatcher[] dispatchers = new Dispatcher[size];
         dispatcherCollection.toArray(dispatchers);
@@ -104,7 +106,7 @@ public class MasterController extends JmsNodeContext {
             if (idx >= size) {
                 idx = 0;
             }
-            dispatchers[idx].dispatch(new RunJvmCommand(xml, jvmName));
+            dispatchers[idx].dispatch(new StartTestNodeCommand(xml, jvmName));
         }
     }
 }

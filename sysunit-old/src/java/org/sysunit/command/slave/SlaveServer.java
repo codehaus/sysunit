@@ -7,27 +7,29 @@
  * 
  * $Id$
  */
-package org.sysunit.command;
+package org.sysunit.command.slave;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sysunit.command.Server;
 
 /**
- * A notification Command when the Sync has finished.
+ * The Context for a SlaveNode
  * 
  * @author James Strachan
  * @version $Revision$
  */
-public class SyncCompletedCommand extends Command {
-    private static final Log log = LogFactory.getLog(SyncCompletedCommand.class);
+public class SlaveServer extends Server {
+    private static final Log log = LogFactory.getLog(SlaveServer.class);
 
-    private String name;
-
-    public SyncCompletedCommand(String name) {
-    	this.name = name;
+    public SlaveServer() {
     }
 
-    public void run(Server context) throws Exception {
-    	/** @todo */
+    /**
+     * @param command
+     */
+    public void startTestNode(StartTestNodeCommand command) {
+    	/** @todo bob this is where the funky JVM forker thingy should go */
     }
+
 }

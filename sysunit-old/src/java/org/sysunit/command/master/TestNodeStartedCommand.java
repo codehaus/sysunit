@@ -7,29 +7,26 @@
  * 
  * $Id$
  */
-package org.sysunit.command;
-
+package org.sysunit.command.master;
 
 /**
- * A reply to the {@link RequestMembersCommand} to indicate that 
- * this node would like to join the test network.
+ * This Command is sent when a new TestNode starts up
  * 
  * @author James Strachan
  * @version $Revision$
  */
-public class AcceptMembershipCommand extends Command {
-	private String name;
-	
-	public AcceptMembershipCommand(String name) {
+public class TestNodeStartedCommand extends MasterCommand {
+    private String name;
+
+    public TestNodeStartedCommand(String name) {
 		this.name = name;
-	}
-    
-    public void run(NodeContext context) throws Exception {
-    	context.acceptMember(this);
+   }
+
+    public void run(MasterServer context) throws Exception {
+    	context.addTestNode(this);
     }
     
     public String getName() {
         return name;
     }
-
 }

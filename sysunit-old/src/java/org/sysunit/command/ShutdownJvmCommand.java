@@ -13,22 +13,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A Command object indicating that the node should shudown the JVM
+ * A Command object indicating that the server should shudown the JVM
  * that was previously started
  * 
  * @author James Strachan
  * @version $Revision$
  */
-public class StopJvmCommand extends Command {
-    private static final Log log = LogFactory.getLog(StopJvmCommand.class);
+public class ShutdownJvmCommand extends Command {
+    private static final Log log = LogFactory.getLog(ShutdownJvmCommand.class);
 
     private String name;
 
-    public StopJvmCommand(String name) {
+    public ShutdownJvmCommand(String name) {
     	this.name = name;
     }
 
-    public void run(NodeContext context) throws Exception {
-    	/** @todo */
+    public void run(Server server) throws Exception {
+    	server.shutdown();
     }
 }

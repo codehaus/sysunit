@@ -7,29 +7,28 @@
  * 
  * $Id$
  */
-package org.sysunit.command;
+package org.sysunit.command.master;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sysunit.jelly.JvmRunner;
+import org.sysunit.command.Server;
 
 /**
- * The Context on which Comamnds execute in a cluster of Nodes
+ * The Server for Master nodes on the network
  * 
  * @author James Strachan
  * @version $Revision$
  */
-public class NodeContext {
-    private static final Log log = LogFactory.getLog(NodeContext.class);
+public class MasterServer extends Server {
+    private static final Log log = LogFactory.getLog(MasterServer.class);
 
-	private JvmRunner runner = new JvmRunner();
 	private Map members = new HashMap();
-	private String name;
+	private Map testNodes = new HashMap();
 	
-    public NodeContext() {
+    public MasterServer() {
     }
 
 	/**
@@ -38,6 +37,13 @@ public class NodeContext {
 	 * @param dispatcher
 	 */
 	public void acceptMember(AcceptMembershipCommand command) {
+		members.put(command.getName(), command.getReplyDispatcher());
+	}
+
+	/**
+	 * @param command
+	 */
+	public void addTestNode(TestNodeStartedCommand command) {
 		members.put(command.getName(), command.getReplyDispatcher());
 	}
 
@@ -50,21 +56,4 @@ public class NodeContext {
 	public Map getMemberMap() {
 		return members;
 	}
-	
-    public JvmRunner getRunner() {
-        return runner;
-    }
-
-    public void setRunner(JvmRunner runner) {
-        this.runner = runner;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 }

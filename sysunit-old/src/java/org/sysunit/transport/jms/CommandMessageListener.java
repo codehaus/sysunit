@@ -7,7 +7,7 @@
  * 
  * $Id$
  */
-package org.sysunit.command.jms;
+package org.sysunit.transport.jms;
 
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -16,6 +16,7 @@ import javax.jms.ObjectMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.command.Command;
+import org.sysunit.command.Server;
 
 /**
  * A JMS MessageListener which will consume Command objects and execute them against
@@ -28,10 +29,12 @@ public class CommandMessageListener implements MessageListener {
 
     private static final Log log = LogFactory.getLog(CommandMessageListener.class);
 
-    private JmsNodeContext context;
+    private JmsAdapter adapter;
+	private Server server;
 
-	public CommandMessageListener(JmsNodeContext context) {
-		this.context = context;
+	public CommandMessageListener(JmsAdapter adapter, Server server) {
+		this.adapter = adapter;
+		this.server = server;
 	}
 	
     public void onMessage(Message message) {
@@ -62,8 +65,8 @@ public class CommandMessageListener implements MessageListener {
      * @param command
      */
     protected void onCommand(Message message, Command command) throws Exception {
-    	command.setReplyDispatcher(context.getReplyDispatcher(message));
-    	command.run(context);
+    	command.setReplyDispatcher(adapter.getReplyDispatcher(message));
+    	command.run(server);
     }
 
 }

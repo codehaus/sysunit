@@ -28,7 +28,7 @@ public class WaitingForSyncCommand extends Command {
     	this.name = name;
     }
 
-    public void run(NodeContext context) throws Exception {
+    public void run(Server context) throws Exception {
     	/** @todo */
     }
 }

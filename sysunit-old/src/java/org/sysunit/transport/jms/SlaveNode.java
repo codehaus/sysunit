@@ -7,7 +7,7 @@
  * 
  * $Id$
  */
-package org.sysunit.command.jms;
+package org.sysunit.transport.jms;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -15,6 +15,7 @@ import javax.jms.JMSException;
 import org.apache.commons.messenger.Messenger;
 import org.apache.commons.messenger.MessengerManager;
 import org.sysunit.command.Dispatcher;
+import org.sysunit.command.slave.SlaveServer;
 
 /**
  * A Slave Node implementation via JMS which waits to be asked to do things
@@ -22,11 +23,12 @@ import org.sysunit.command.Dispatcher;
  * @author James Strachan
  * @version $Revision$
  */
-public class SlaveController extends JmsNodeContext {
+public class SlaveNode {
 
+    private SlaveServer server = new SlaveServer();
     private Dispatcher groupDispatcher;
     private Destination replyToDestination;
-    private CommandMessageListener messageListener = new CommandMessageListener(this);
+    private CommandMessageListener messageListener;
     private long waitTime = 2000L;
 
     public static void main(String[] args) {
@@ -44,7 +46,7 @@ public class SlaveController extends JmsNodeContext {
                 return;
             }
             Destination destination = messenger.getDestination(groupTopic);
-            SlaveController controller = new SlaveController(messenger, destination);
+            SlaveNode controller = new SlaveNode(messenger, destination);
             controller.start();
         }
         catch (Exception e) {
@@ -53,10 +55,11 @@ public class SlaveController extends JmsNodeContext {
         }
     }
 
-    public SlaveController(Messenger messenger, Destination destination) throws JMSException {
-        super(messenger);
+    public SlaveNode(Messenger messenger, Destination destination) throws JMSException {
+        messageListener = new CommandMessageListener(new JmsAdapter(messenger), server);
         replyToDestination = messenger.createTemporaryDestination();
-        messenger.addListener(replyToDestination, messageListener);
+		messenger.addListener(destination, messageListener);
+		messenger.addListener(replyToDestination, messageListener);
     }
 
     public void start() throws Exception {

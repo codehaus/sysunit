@@ -17,12 +17,27 @@ package org.sysunit.command;
  */
 public class DispatchException extends Exception {
 
-	private Command command;
-	private Throwable cause;
+    private Command command;
+    private Throwable cause;
 
-	public DispatchException(Command command, Throwable cause) {
-		super("Could not dispatch command: " + command + ". Reason: " + cause);
-			this.command = command;
-	}
+    public DispatchException(Command command, Throwable cause) {
+        super("Could not dispatch command: " + command + ". Reason: " + cause);
+        this.command = command;
+        this.cause = cause;
+    }
+
+    /**
+     * @return the underlying cause of the exception
+     */
+    public Throwable getCause() {
+        return cause;
+    }
+
+    /**
+     * @return the command which failed
+     */
+    public Command getCommand() {
+        return command;
+    }
 
 }

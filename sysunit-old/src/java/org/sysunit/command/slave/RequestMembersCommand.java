@@ -7,7 +7,11 @@
  * 
  * $Id$
  */
-package org.sysunit.command;
+package org.sysunit.command.slave;
+
+import org.sysunit.command.Command;
+import org.sysunit.command.Server;
+import org.sysunit.command.master.AcceptMembershipCommand;
 
 
 /**
@@ -19,7 +23,7 @@ package org.sysunit.command;
  * @version $Revision$
  */
 public class RequestMembersCommand extends Command {
-    public void run(NodeContext context) throws Exception {
+    public void run(Server context) throws Exception {
     	getReplyDispatcher().dispatch(new AcceptMembershipCommand(context.getName()));
     }
 }

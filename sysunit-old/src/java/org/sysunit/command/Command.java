@@ -27,7 +27,7 @@ public abstract class Command implements Serializable {
 	 * @param context
 	 * @throws Exception
 	 */
-    public abstract void run(NodeContext context) throws Exception;
+    public abstract void run(Server context) throws Exception;
     
     /**
      * @return the dispatcher which can be used to dispatch replies to this command
