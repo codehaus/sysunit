@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class MockTBeanSynchronizer
-    implements TBeanSynchronizer {
+    extends TBeanSynchronizer {
 
     private List syncPoints;
 
     public MockTBeanSynchronizer() {
+        super( null,
+               null );
         this.syncPoints = new ArrayList();
     }
 

@@ -396,6 +396,17 @@ public class TestSystemTestCase
                       testCase.getAdjustedTimeout() );
     }
 
+    public void testAssertValid()
+        throws Exception {
+
+        SystemTestCase testCase = new SystemTestCase();
+
+        // shouldn't do anything bad by default
+
+        testCase.assertValid();
+                                                           
+    }
+
     public TBean methodFish() {
         return null;
     }

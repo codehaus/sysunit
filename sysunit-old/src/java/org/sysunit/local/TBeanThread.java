@@ -76,6 +76,8 @@ import java.util.Iterator;
 public class TBeanThread
     extends Thread {
 
+    public static final TBeanThread[] EMPTY_ARRAY = new TBeanThread[0];
+
     private String tbeanId;
     private TBean tbean;
     private LocalSynchronizer synchronizer;
@@ -114,7 +116,7 @@ public class TBeanThread
             getBarrier().block();
             tbean.run();
         } catch (Throwable e) {
-            this.error = e;
+            setError( e );
         }
     }
 
@@ -126,15 +128,14 @@ public class TBeanThread
         return this.error;
     }
 
+    protected void setError(Throwable error) {
+        this.error = error;
+    }
+
     protected void setUpSynchronizer() {
         if ( getTBean() instanceof SynchronizableTBean ) {
-            ((SynchronizableTBean)getTBean()).setSynchronizer( new TBeanSynchronizer() {
-                    public void sync(String syncPoint)
-                        throws SynchronizationException, InterruptedException {
-                        getSynchronizer().sync( getTBeanId(),
-                                                syncPoint );
-                    }
-                } );
+            ((SynchronizableTBean)getTBean()).setSynchronizer( new TBeanSynchronizer( getTBeanId(),
+                                                                                      getSynchronizer() ) );
         }
     }
 }

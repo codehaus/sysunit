@@ -126,8 +126,16 @@ public class LocalTBeanManager
     /**
      * @see TBeanManager
      */
-    public void init() {
+    public void initialize() {
         // nothing required
+    }
+
+    protected TBeanThread[] getTBeanThreads() {
+        return (TBeanThread[]) this.tbeanThreads.toArray( TBeanThread.EMPTY_ARRAY );
+    }
+
+    protected TBean[] getTBeans() {
+        return (TBean[]) this.tbeans.values().toArray( TBean.EMPTY_ARRAY );
     }
 
     /**
@@ -180,22 +188,28 @@ public class LocalTBeanManager
 
         long timeLeft = timeout;
 
-        for ( Iterator threadIter = this.tbeanThreads.iterator();
-              threadIter.hasNext(); ) {
-            TBeanThread thread = (TBeanThread) threadIter.next();
-            thread.join( timeLeft );
+        //for ( Iterator threadIter = this.tbeanThreads.iterator();
+              //threadIter.hasNext(); ) {
+            //TBeanThread thread = (TBeanThread) threadIter.next();
+
+        TBeanThread[] threads = getTBeanThreads();
+
+        for ( int i = 0 ; i < threads.length ; ++i ) {
+            threads[i].join( timeLeft );
             if ( timeout > 0 ) {
                 long now = new Date().getTime();
                 timeLeft = timeout - (now - start);
             }
 
             if ( timeLeft <= 0 ) {
-                while ( threadIter.hasNext() ) {
-                    thread = (TBeanThread) threadIter.next();
-                    if ( thread.isAlive() ) {
+                ++i;
+                while ( i < (threads.length-1) ) {
+                    if ( threads[i].isAlive() ) {
                         throw new WatchdogException( timeout );
                     }
+                    ++i;
                 }
+                break;
             }
         }
     }

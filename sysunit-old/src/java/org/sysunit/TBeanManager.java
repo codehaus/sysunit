@@ -81,7 +81,7 @@ public interface TBeanManager {
      * @throws Exception If an error occurs while attempting
      *         to perform initialization.
      */
-    void init()
+    void initialize()
         throws Exception;
 
     void startTBeans(SystemTestCase testCase,

@@ -17,7 +17,7 @@ public class MockTBeanManager
 
     }
 
-    public void init()
+    public void initialize()
         throws Exception {
         this.inited = true;
     }

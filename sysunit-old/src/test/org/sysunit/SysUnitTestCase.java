@@ -7,6 +7,11 @@ import java.util.Arrays;
 public class SysUnitTestCase
     extends TestCase {
 
+    public void assertEmpty(Object[] array) {
+        assertLength( 0,
+                      array );
+    }
+
     public void assertLength(int length,
                              Object[] array) {
         assertEquals( length,
