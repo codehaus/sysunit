@@ -4,13 +4,13 @@
 
 When using the base JUnit framework, each unit test
 is represented by a single method of the form 
-\indexmethod{TestCase}{textXXX()} on a subclass of \indexclass{TestCase}.
+\indexmethod{TestCase}{testXXX()} on a subclass of \indexclass{TestCase}.
 In this way, each subclass of \class{TestCase} may actually
 contain several tests.
 
 Unlike the base JUnit framework, a SysUnit test class creates
 only a single test.  A system test is created by subclassing
-the \class{SystemTestCase} class.  JUnit's \method{textXXX()}
+the \class{SystemTestCase} class.  JUnit's \method{testXXX()}
 idiom is \emph{not} used when creating tests, since SysUnit
 creates a test-per-class, instead of a test-per-method.
 
@@ -48,14 +48,14 @@ the set of \class{TBean} instances used for the test.
 public class MySystemTest
   extends SystemTestCase
 \{
-    public TBean tbeanOrderAcceptor()
+    public TBean tbeanLockManagerServer()
     \{
-        return new OrderAcceptorTBean();
+        return new LockManagerServerTBean();
     \}
 
-    public TBean tbeanInventoryVerifier()
+    public TBean tbeanClientOne()
     \{
-        return new InventoryVerifierTBean();
+        return new LockClientTBean();
     \}
 \}
 \end{codelisting}
@@ -80,16 +80,39 @@ implemented using the \class{Thread} class under the covers.
 public class MySystemTest
   extends SystemTestCase
 \{
-    public void threadOrderAcceptor()
+    public void threadLockManagerServer()
         throws Exception
     \{
-         // the logic for running the order acceptor
+        LockManagerServer server = new LockManagerServer( "jndi:..." );
+        server.start();
+        // other logic
     \}
 
-    public void threadInventoryVerifier()
+    public void threadClientOne()
         throws Exception
     \{
-         // the logic for running the inventory verifier
+        LockManagerClient client = new LockManagerClient( "jndi:..." );
+    \}
+\}
+\end{codelisting}
+
+\section{Test Suites}
+
+Since SysUnit does not use the \class{TestCase} utility class
+from JUnit but rather simply implements \class{Test}, each system
+test must include a \indexmethod{Test}{suite()} method in order
+to set up the runnable test suite.  \class{SystemTestCase} contains
+the \indexmethod{SystemTestCase}{suite(Class testClass)} utility
+method to assist in the creation of the \indexclass{TestSuite}.
+
+
+\begin{codelisting}
+public class MySystemTest
+  extends SystemTestCase
+\{
+    public TestSuite suite() 
+    \{
+        return suite( MySystemTest.class );
     \}
 \}
 \end{codelisting}

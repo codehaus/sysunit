@@ -81,18 +81,23 @@ public class TBeanThread
     private String tbeanId;
     private TBean tbean;
     private LocalSynchronizer synchronizer;
-    private Barrier barrier;
+    private Barrier beginBarrier;
+    private Barrier endBarrier;
     private Throwable error;
+    private boolean isDone;
 
     public TBeanThread(String tbeanId,
                        TBean tbean,
                        LocalSynchronizer synchronizer,
-                       Barrier barrier) {
+                       Barrier beginBarrier,
+                       Barrier endBarrier) {
         super( "tbean-thread." + tbeanId );
         this.tbeanId      = tbeanId;
         this.tbean        = tbean;
         this.synchronizer = synchronizer;
-        this.barrier      = barrier;
+        this.beginBarrier = beginBarrier;
+        this.endBarrier   = endBarrier;
+        this.isDone       = false;
     }
 
     public String getTBeanId() {
@@ -107,19 +112,46 @@ public class TBeanThread
         return this.synchronizer;
     }
 
-    public Barrier getBarrier() {
-        return this.barrier;
+    public Barrier getBeginBarrier() {
+        return this.beginBarrier;
+    }
+
+    public Barrier getEndBarrier() {
+        return this.endBarrier;
     }
     
     public void run() {
+        setUpSynchronizer();
+
         try {
-            setUpSynchronizer();
-            getBarrier().block();
+            getBeginBarrier().block();
+        } catch (InterruptedException e) {
+            return;
+        }
+
+        try {
             tbean.run();
         } catch (Throwable e) {
             setError( e );
             getSynchronizer().error( getTBeanId() );
+        } finally {
+            synchronized ( this ) {
+                this.isDone = true;
+            }
+            try {
+                getEndBarrier().block();
+            } catch (InterruptedException e) {
+                // swallow and exit
+            }
         }
+    }
+
+    public synchronized boolean isDone() {
+        if ( ! isAlive() ) {
+            return false;
+        }
+
+        return this.isDone;
     }
 
     public boolean hasError() {

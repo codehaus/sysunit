@@ -13,7 +13,30 @@ testing requires concurrently executing several bits of code,
 synchronizing their execution, and verifying the results
 across the entire environment.
 
-\begin{ednote}
-More description about how to write good system-tests is 
-needed here.  Examples, etc.
-\end{ednote}
+For example, the code being tested may be a distributed
+lock manager which maybe control the read and write access
+to a particular piece of data from multiple threads. The
+test would require at least three threads to robustly
+perform the tests.  
+
+\begin{enumerate}
+	\item \emph{The server.}  The server thread starts
+		the lock manager and allows other threads/clients
+		to work with it.
+	\item \emph{Client \#1.} One client interacting
+		with the lock-manager server.
+	\item \emph{Client \#2.} Another client interacting
+		with the lock-manager server.
+\end{enumerate}
+
+When multiple independent threads are executing a test-case,
+many times it's convenient for some to pause until others
+have reached a particular state.  For example, the client
+threads should not attempt to run their test code until
+after the lock-manager server is fully configured and
+initialized.
+
+%\begin{ednote}
+%More description about how to write good system-tests is 
+%needed here.  Examples, etc.
+%\end{ednote}

@@ -19,12 +19,14 @@ public class TestTBeanThread
 
         LocalSynchronizer synchronizer = new LocalSynchronizer();
 
-        Barrier barrier = new Barrier( 1 );
+        Barrier beginBarrier = new Barrier( 1 );
+        Barrier endBarrier   = new Barrier( 1 );
 
         TBeanThread thread = new TBeanThread( "one",
                                               tbean,
                                               synchronizer,
-                                              barrier );
+                                              beginBarrier,
+                                              endBarrier );
 
         assertEquals( "one",
                       thread.getTBeanId() );
@@ -35,8 +37,11 @@ public class TestTBeanThread
         assertSame( synchronizer,
                     thread.getSynchronizer() );
 
-        assertSame( barrier,
-                    thread.getBarrier() );
+        assertSame( beginBarrier,
+                    thread.getBeginBarrier() );
+
+        assertSame( endBarrier,
+                    thread.getEndBarrier() );
     }
 
     public void testSetUpSynchronizer() {
@@ -44,12 +49,14 @@ public class TestTBeanThread
 
         LocalSynchronizer synchronizer = new LocalSynchronizer();
 
-        Barrier barrier = new Barrier( 1 );
+        Barrier beginBarrier = new Barrier( 1 );
+        Barrier endBarrier   = new Barrier( 1 );
 
         TBeanThread thread = new TBeanThread( "one",
                                               tbean,
                                               synchronizer,
-                                              barrier );
+                                              beginBarrier,
+                                              endBarrier );
         assertEquals( "one",
                       thread.getTBeanId() );
 
@@ -59,8 +66,11 @@ public class TestTBeanThread
         assertSame( synchronizer,
                     thread.getSynchronizer() );
 
-        assertSame( barrier,
-                    thread.getBarrier() );
+        assertSame( beginBarrier,
+                    thread.getBeginBarrier() );
+
+        assertSame( endBarrier,
+                    thread.getEndBarrier() );
 
         TBeanSynchronizer tbeanSynchronizer = tbean.getSynchronizer();
 
@@ -75,6 +85,7 @@ public class TestTBeanThread
 
     public void testErrors() {
         TBeanThread thread = new TBeanThread( "one",
+                                              null,
                                               null,
                                               null,
                                               null );
@@ -97,12 +108,14 @@ public class TestTBeanThread
 
         LocalSynchronizer synchronizer = new LocalSynchronizer();
 
-        Barrier barrier = new Barrier( 1 );
+        Barrier beginBarrier = new Barrier( 1 );
+        Barrier endBarrier   = new Barrier( 1 );
 
         TBeanThread thread = new TBeanThread( "one",
                                               tbean,
                                               synchronizer,
-                                              barrier );
+                                              beginBarrier,
+                                              endBarrier );
 
         thread.run();
 
@@ -114,12 +127,14 @@ public class TestTBeanThread
 
         LocalSynchronizer synchronizer = new LocalSynchronizer();
 
-        Barrier barrier = new Barrier( 1 );
+        Barrier beginBarrier = new Barrier( 1 );
+        Barrier endBarrier   = new Barrier( 1 );
 
         TBeanThread thread = new TBeanThread( "one",
                                               tbean,
                                               synchronizer,
-                                              barrier );
+                                              beginBarrier,
+                                              endBarrier );
 
         thread.run();
 
@@ -141,12 +156,14 @@ public class TestTBeanThread
 
         LocalSynchronizer synchronizer = new LocalSynchronizer();
 
-        Barrier barrier = new Barrier( 1 );
+        Barrier beginBarrier = new Barrier( 1 );
+        Barrier endBarrier   = new Barrier( 1 );
 
         TBeanThread thread = new TBeanThread( "one",
                                               tbean,
                                               synchronizer,
-                                              barrier );
+                                              beginBarrier,
+                                              endBarrier );
 
         thread.run();
 

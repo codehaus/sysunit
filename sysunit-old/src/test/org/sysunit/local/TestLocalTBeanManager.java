@@ -60,7 +60,7 @@ public class TestLocalTBeanManager
     public void testStartTBeans_Synchronizable()
         throws Throwable {
 
-        MockSynchronizableTBean tbean = new MockSynchronizableTBean();
+        SleepTBean tbean = new SleepTBean( 3000 );
 
         SingleTBeanCase testCase = new SingleTBeanCase( tbean );
 
@@ -73,15 +73,18 @@ public class TestLocalTBeanManager
         manager.startTBeans( testCase,
                              testResult );
 
-        Thread.sleep( 2000 );
-
-        assertTrue( tbean.hasRun() );
-
         assertLength( 1,
                       manager.getSynchronizer().getRegisteredTBeans() );
 
         assertContainsEquals( "One",
                               manager.getSynchronizer().getRegisteredTBeans() );
+
+        Thread.sleep( 5000 );
+
+        assertTrue( tbean.hasRun() );
+
+        //assertLength( 0,
+                      //manager.getSynchronizer().getRegisteredTBeans() );
     }
 
     public void testWaitForTBeans_Single_NoTimeout()

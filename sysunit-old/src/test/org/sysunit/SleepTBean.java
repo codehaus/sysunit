@@ -1,7 +1,7 @@
 package org.sysunit;
 
 public class SleepTBean
-    extends AbstractTBean {
+    extends AbstractSynchronizableTBean {
 
     private long sleepTime;
     private boolean hasRun;

@@ -167,7 +167,8 @@ public class LocalTBeanManager
             }
         }
 
-        Barrier barrier = new Barrier( this.tbeans.size() );
+        Barrier beginBarrier = new Barrier( this.tbeans.size() );
+        Barrier endBarrier   = new Barrier( this.tbeans.size() );
 
         for ( Iterator tbeanIdIter = this.tbeans.keySet().iterator();
               tbeanIdIter.hasNext(); ) {
@@ -178,7 +179,8 @@ public class LocalTBeanManager
             TBeanThread thread = new TBeanThread( tbeanId,
                                                   tbean,
                                                   this.synchronizer,
-                                                  barrier );
+                                                  beginBarrier,
+                                                  endBarrier );
 
             this.tbeanThreads.add( thread );
 
@@ -209,7 +211,7 @@ public class LocalTBeanManager
                 ++i;
                 Set longTBeanIds = new HashSet();
                 for ( int j = 0 ; j < threads.length ; ++j ) {
-                    if ( threads[j].isAlive() ) {
+                    if ( ! threads[j].isDone() ) {
                         longTBeanIds.add( threads[j].getTBeanId() );
                     }
                 }
