@@ -12,24 +12,16 @@ import junit.framework.AssertionFailedError;
 public class DistributedTestCase
     implements Test {
 
-    private DistributedSystemTestInfo systemTestInfo;
     private ScenarioInfo scenarioInfo;
 
-    public DistributedTestCase(DistributedSystemTestInfo systemTestInfo,
-                               ScenarioInfo scenarioInfo)
+    public DistributedTestCase(ScenarioInfo scenarioInfo)
     {
-        this.systemTestInfo = systemTestInfo;
         this.scenarioInfo   = scenarioInfo;
     }
 
     public int countTestCases()
     {
         return 1;
-    }
-
-    public DistributedSystemTestInfo getSystemTestInfo()
-    {
-        return this.systemTestInfo;
     }
 
     public ScenarioInfo getScenarioInfo()
@@ -39,7 +31,7 @@ public class DistributedTestCase
 
     public String getName()
     {
-        return getSystemTestInfo().getName();
+        return getScenarioInfo().getName() + "(" + getScenarioInfo().getSystemTestInfo().getName() + ")";
     }
 
     public void run(TestResult testResult)
@@ -48,8 +40,7 @@ public class DistributedTestCase
 
         try
         {
-            MasterNode master = new MasterNode( getSystemTestInfo(),
-                                                getScenarioInfo() );
+            MasterNode master = new MasterNode( getScenarioInfo() );
 
             master.start();
 

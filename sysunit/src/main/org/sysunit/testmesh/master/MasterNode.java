@@ -41,7 +41,6 @@ public class MasterNode
     private TestMeshManager testMeshManager;
     private List slaves;
 
-    private DistributedSystemTestInfo systemTestInfo;
     private ScenarioInfo scenarioInfo;
 
     private ClasspathServer classpathServer;
@@ -54,19 +53,23 @@ public class MasterNode
 
     public MasterNode()
     {
-        this( new DistributedSystemTestInfo( "none" ),
-              new ScenarioInfo( "none" ) );
+        this( new ScenarioInfo( "none",
+                                new DistributedSystemTestInfo( "none" ) ) );
     }
-    
-    public MasterNode(DistributedSystemTestInfo systemTestInfo,
-                      ScenarioInfo scenarioInfo)
+
+    public MasterNode(DistributedSystemTestInfo systemTestInfo)
+    {
+        this( new ScenarioInfo( "none",
+                                systemTestInfo ) );
+    }
+
+    public MasterNode(ScenarioInfo scenarioInfo)
     {
         super( "master" );
 
         this.testMeshManager = new TestMeshManager();
         this.slaves          = new ArrayList();
 
-        this.systemTestInfo  = systemTestInfo;
         this.scenarioInfo    = scenarioInfo;
 
         this.classpathServer = new ClasspathServer( 2 );
@@ -200,10 +203,10 @@ public class MasterNode
     {
         return (SlaveInfo[]) this.slaves.toArray( EMPTY_SLAVEINFO_ARRAY );
     }
-
+    
     public DistributedSystemTestInfo getSystemTestInfo()
     {
-        return this.systemTestInfo;
+        return getScenarioInfo().getSystemTestInfo();
     }
 
     public ScenarioInfo getScenarioInfo()

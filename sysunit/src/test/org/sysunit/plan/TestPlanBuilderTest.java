@@ -20,7 +20,8 @@ public class TestPlanBuilderTest
     public void setUp()
     {
         this.systemTest = new DistributedSystemTestInfo( "system.test" );
-        this.scenario   = new ScenarioInfo( "scenario" );
+        this.scenario   = new ScenarioInfo( "scenario",
+                                            this.systemTest );
         this.master     = new MasterNode();
     }
 

@@ -63,7 +63,6 @@ public class DistributedTestCaseTest
         //assertFailures( 0 );
     }
 
-    /*
     public void testNoOpWithSyncSuccessful()
         throws Exception
     {
@@ -75,6 +74,7 @@ public class DistributedTestCaseTest
         assertFailures( 0 );
     }
 
+    /*
     public void testSimpleSyncSuccessful()
         throws Exception
     {
@@ -85,6 +85,7 @@ public class DistributedTestCaseTest
         assertErrors( 0 );
         assertFailures( 0 );
     }
+    */
 
     public void testThrowInRun()
         throws Exception
@@ -98,7 +99,6 @@ public class DistributedTestCaseTest
 
         dump();
     }
-    */
 
     void dump()
     {
@@ -129,10 +129,10 @@ public class DistributedTestCaseTest
 
         DistributedSystemTestInfo testInfo = DistributedSystemTestInfoBuilder.build( in );
 
-        ScenarioInfo scenarioInfo = new ScenarioInfo( "none" );
+        ScenarioInfo scenarioInfo = new ScenarioInfo( "none",
+                                                      testInfo );
 
-        DistributedTestCase test = new DistributedTestCase( testInfo,
-                                                            scenarioInfo );
+        DistributedTestCase test = new DistributedTestCase( scenarioInfo );
 
         runTest( test );
     }

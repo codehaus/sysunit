@@ -10,8 +10,7 @@ public class MasterNodeTest
     public void testStartStop()
         throws Exception
     {
-        MasterNode node = new MasterNode( null,
-                                          null );
+        MasterNode node = new MasterNode();
 
         node.start();
         node.stop();

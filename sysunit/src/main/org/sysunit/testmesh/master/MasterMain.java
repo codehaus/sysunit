@@ -13,8 +13,7 @@ public class MasterMain
 
         String systest = args[0];
 
-        final MasterNode master = new MasterNode( null,
-                                                  null );
+        final MasterNode master = new MasterNode();
         
         Runtime.getRuntime().addShutdownHook( new Thread()
             {

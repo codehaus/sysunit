@@ -6,14 +6,22 @@ import java.util.HashMap;
 public class ScenarioInfo
 {
     private String name;
+    private DistributedSystemTestInfo testInfo;
     private Map tags;
     private Map jdks;
 
-    public ScenarioInfo(String name)
+    public ScenarioInfo(String name,
+                        DistributedSystemTestInfo testInfo)
     {
-        this.name = name;
+        this.name     = name;
+        this.testInfo = testInfo;
         this.tags = new HashMap();
         this.jdks = new HashMap();
+    }
+
+    public DistributedSystemTestInfo getSystemTestInfo()
+    {
+        return this.testInfo;
     }
 
     public String getName()
