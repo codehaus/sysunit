@@ -42,8 +42,6 @@ public abstract class ClassGenerator
         {
             File curDir = (File) dirStack.removeFirst();
 
-            System.err.println( "checking dir: " + curDir );
-
             String dirPrefix = curDir.getPath().substring( this.baseDir.length() );
             if ( dirPrefix.startsWith( "/" )
                  ||
@@ -66,21 +64,30 @@ public abstract class ClassGenerator
                     {
                         String fileName  = contents[ i ].getName();
                         String className = fileName.substring( 0, fileName.lastIndexOf( '.' ) );
-                        className = className.replace( '.', '_' );
-                        className = className.replace( '-', '_' );
+
+                        String realClassName = className.replace( '.', '_' );
+                        realClassName = realClassName.replace( '-', '_' );
 
                         File destination = new File ( new File( this.outputDir,
                                                                 dirPrefix ),
-                                                      className + ".java" );
+                                                      realClassName + ".java" );
+
+                        String packageName = dirPrefix.replace( File.separatorChar,
+                                                                '.' );
+
+                        if ( ! realClassName.equals( className ) )
+                        {
+                            System.err.println( "    [sysunit] warning: " + contents[ i ].getPath() + " generated to class " + packageName + "." + realClassName );
+                        }
+
 
                         if ( ! destination.exists()
                              ||
                              destination.lastModified() > contents[ i ].lastModified() )
                         {
                             destination.getParentFile().mkdirs();
-                            generateClass( dirPrefix.replace( File.separatorChar,
-                                                              '.' ),
-                                           className,
+                            generateClass( packageName,
+                                           realClassName,
                                            contents[ i ],
                                            destination );
                         }

@@ -68,7 +68,7 @@ public class DistributedTestCaseTest
     {
         startSlaveHosts( 2 );
 
-        runTest( "no-op-sync" );
+        runTest( "NoOpSyncTest" );
 
         assertErrors( 0 );
         assertFailures( 0 );
@@ -92,7 +92,7 @@ public class DistributedTestCaseTest
     {
         startSlaveHosts( 3 );
 
-        runTest( "throwing" );
+        runTest( "ThrowingTest" );
 
         assertErrors( 1 );
         assertFailures( 0 );

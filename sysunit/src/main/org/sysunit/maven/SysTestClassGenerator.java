@@ -33,9 +33,14 @@ public class SysTestClassGenerator
         text.append( "    public static Object suite() throws Exception\n" );
         text.append( "    {\n" );
         text.append( "        TestSuite suite = new TestSuite();\n");
-        text.append( "        DistributedSystemTestInfo testInfo = DistributedSystemTestInfoBuilder.build( new File( \"" + source.getPath() + "\" ) );\n" );
-        text.append( "        suite.addTest( new DistributedTestCase( testInfo, new ScenarioInfo( \"default\" ) ) );\n" );
+        text.append( "        DistributedSystemTestInfo testInfo = getTestInfo();\n" );
+        text.append( "        suite.addTest( new DistributedTestCase( new ScenarioInfo( \"default\", testInfo ) ) );\n" );
         text.append( "        return suite;\n");
+        text.append( "    }\n" );
+        text.append( "\n" );
+        text.append( "    public static DistributedSystemTestInfo getTestInfo() throws Exception\n" );
+        text.append( "    {\n" );
+        text.append( "        return DistributedSystemTestInfoBuilder.build( new File( \"" + source.getPath() + "\" ) );\n" );
         text.append( "    }\n" );
         text.append( "}" );
 
