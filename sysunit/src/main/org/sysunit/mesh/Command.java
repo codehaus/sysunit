@@ -39,14 +39,14 @@ public abstract class Command
         }
         catch (Throwable t)
         {
-            if ( ! ( this instanceof ReportExceptionCommand
+            if ( ! ( this instanceof ReportErrorCommand
                      ||
                      this instanceof ReportCompletionCommand ) )
             {
                 try
                 { 
-                    getOrigin().reportException( getUid(),
-                                                 t );
+                    getOrigin().reportError( getUid(),
+                                             t );
                 }
                 catch (Exception e)
                 {
@@ -61,7 +61,7 @@ public abstract class Command
             }
         }
 
-        if ( ! ( this instanceof ReportExceptionCommand
+        if ( ! ( this instanceof ReportErrorCommand
                  ||
                  this instanceof ReportCompletionCommand ) )
         {

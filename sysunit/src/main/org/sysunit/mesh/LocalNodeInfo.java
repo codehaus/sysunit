@@ -35,12 +35,12 @@ public class LocalNodeInfo
                            command );
     }
 
-    public void reportException(int reportingUid,
-                                Throwable thrown)
+    public void reportError(int reportingUid,
+                            Throwable thrown)
         throws Exception
     {
-        getNode().reportException( reportingUid,
-                                   thrown );
+        getNode().reportError( reportingUid,
+                               thrown );
     }
 
     public void reportCompletion(int reportingUid)

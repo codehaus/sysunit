@@ -1,13 +1,13 @@
 package org.sysunit.mesh;
 
-public class ReportExceptionCommand
+public class ReportErrorCommand
     extends Command
 {
     private int reportingUid;
     private Throwable thrown;
 
-    public ReportExceptionCommand(int reportingUid,
-                                  Throwable thrown)
+    public ReportErrorCommand(int reportingUid,
+                              Throwable thrown)
     {
         this.reportingUid = reportingUid;
         this.thrown       = thrown;
@@ -25,7 +25,7 @@ public class ReportExceptionCommand
 
     public void execute(Node node)
     {
-        node.reportException( getReportingUid(),
-                              getThrown() );
+        node.reportError( getReportingUid(),
+                          getThrown() );
     }
 }

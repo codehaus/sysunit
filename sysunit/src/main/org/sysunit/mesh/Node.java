@@ -126,15 +126,13 @@ public class Node
         return (Throwable[]) this.fundamentalErrors.toArray( EMPTY_THROWABLE_ARRAY );
     }
     
-    void reportException(int uid,
-                         Throwable thrown)
+    void reportError(int uid,
+                     Throwable thrown)
     {
         Command command = getInFlightCommand( uid );
 
-        System.err.println( "command: " + command );
-        System.err.println( "thrown: " + thrown );
-
-        //thrown.printStackTrace();
+        //System.err.println( "command: " + command );
+        //System.err.println( "thrown: " + thrown );
 
         this.fundamentalErrors.add( thrown );
         removeInFlightCommand( uid );
