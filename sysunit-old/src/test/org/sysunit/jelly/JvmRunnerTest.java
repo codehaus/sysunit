@@ -20,13 +20,13 @@ import junit.textui.TestRunner;
  * @author James Strachan
  * @version $Revision$
  */
-public class TestJvmRunner extends TestCase {
+public class JvmRunnerTest extends TestCase {
     public static void main(String[] args) {
         TestRunner.run(suite());
     }
 
     public static Test suite() {
-        return new TestSuite(TestJvmRunner.class);
+        return new TestSuite(JvmRunnerTest.class);
     }
 
     public void testSomeInvalidXML() throws Exception {

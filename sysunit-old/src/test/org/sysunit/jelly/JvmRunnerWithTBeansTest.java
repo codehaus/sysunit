@@ -26,7 +26,7 @@ import org.sysunit.remote.RemoteTBeanManager;
  * @author James Strachan
  * @version $Revision$
  */
-public class TestJvmRunnerWithTBeans extends TestCase {
+public class JvmRunnerWithTBeansTest extends TestCase {
 	private JvmRunner runner = new JvmRunner();
 	
     public static void main(String[] args) {
@@ -34,7 +34,7 @@ public class TestJvmRunnerWithTBeans extends TestCase {
     }
 
     public static Test suite() {
-        return new TestSuite(TestJvmRunnerWithTBeans.class);
+        return new TestSuite(JvmRunnerWithTBeansTest.class);
     }
 
     public void testRunSimpleBean() throws Exception {
