@@ -13,7 +13,7 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 
 import org.apache.commons.messenger.Messenger;
-import org.sysunit.Lifecycle;
+import org.sysunit.command.Lifecycle;
 import org.sysunit.command.Server;
 
 /**
@@ -49,8 +49,10 @@ public class Node implements Lifecycle {
 		// and to the group messages
 		messenger.addListener(replyToDestination, messageListener);
 		messenger.addListener(groupDestination, messageListener);
+
+		server.start();
     }
-    
+   
     public void stop() throws Exception {
 		messenger.removeListener(replyToDestination, messageListener);
 		messenger.removeListener(groupDestination, messageListener);

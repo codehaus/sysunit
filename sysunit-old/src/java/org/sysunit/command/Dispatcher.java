@@ -9,7 +9,6 @@
  */
 package org.sysunit.command;
 
-import org.sysunit.Lifecycle;
 
 
 /**

@@ -7,14 +7,20 @@
  * 
  * $Id$
  */
-package org.sysunit.transport.jms;
-
-import org.sysunit.command.test.TestServer;
+package org.sysunit.command;
 
 /**
+ * <p>A <code>TBean.java</code></b> is a simple lifecycle interface used
+ * by services within the SysUnit framework
+ * 
  * @author James Strachan
+ * @author Bob McWhirter
  * @version $Revision$
  */
-public class MockTestServer extends TestServer {
+public interface Lifecycle {
+
+	public void start() throws Exception;
+	
+	public void stop() throws Exception;
 
 }

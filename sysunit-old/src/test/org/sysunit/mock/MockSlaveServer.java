@@ -7,20 +7,14 @@
  * 
  * $Id$
  */
-package org.sysunit;
+package org.sysunit.mock;
+
+import org.sysunit.command.slave.SlaveServer;
 
 /**
- * <p>A <code>TBean.java</code></b> is a simple lifecycle interface used
- * by services within the SysUnit framework
- * 
  * @author James Strachan
- * @author Bob McWhirter
  * @version $Revision$
  */
-public interface Lifecycle {
-
-	public void start() throws Exception;
-	
-	public void stop() throws Exception;
+public class MockSlaveServer extends SlaveServer {
 
 }

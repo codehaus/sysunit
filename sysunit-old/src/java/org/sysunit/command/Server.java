@@ -18,13 +18,19 @@ import org.apache.commons.logging.LogFactory;
  * @author James Strachan
  * @version $Revision$
  */
-public class Server {
+public class Server implements Lifecycle {
     private static final Log log = LogFactory.getLog(Server.class);
 
 	private String name;
 	
     public Server() {
     }
+
+	public void start() throws Exception {
+	}
+
+	public void stop() throws Exception {
+	}
 
 	/**
 	 * 
@@ -44,5 +50,4 @@ public class Server {
     public void setName(String name) {
         this.name = name;
     }
-
 }

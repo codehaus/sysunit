@@ -18,6 +18,9 @@ import junit.textui.TestRunner;
 
 import org.apache.commons.messenger.Messenger;
 import org.apache.commons.messenger.MessengerManager;
+import org.sysunit.mock.MockMasterServer;
+import org.sysunit.mock.MockSlaveServer;
+import org.sysunit.mock.MockTestServer;
 
 /**
  * A test case 

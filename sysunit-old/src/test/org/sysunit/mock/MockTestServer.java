@@ -7,14 +7,14 @@
  * 
  * $Id$
  */
-package org.sysunit.transport.jms;
+package org.sysunit.mock;
 
-import org.sysunit.command.master.MasterServer;
+import org.sysunit.command.test.TestServer;
 
 /**
  * @author James Strachan
  * @version $Revision$
  */
-public class MockMasterServer extends MasterServer {
+public class MockTestServer extends TestServer {
 
 }
