@@ -54,14 +54,19 @@ public class ExampleSystemTest extends SystemTestCase {
 		clientCount++;
         log.info("client thread started: " + clientCount);
 
+        log.info( "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5 CLIENT before A" );
         sync( "a" );
+        log.info( "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5 CLIENT before B" );
         sync( "b" );
+        log.info( "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5 CLIENT DONE" );
     }
 
     public void threadServer() throws Exception {
 		serverCount++;
         log.info("server thread started: " + serverCount);
 
+        log.info( "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5 SERVER before A" );
         sync( "a" );
+        log.info( "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5 SERVER DONE" );
     }
 }

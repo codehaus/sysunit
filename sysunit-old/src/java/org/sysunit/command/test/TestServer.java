@@ -112,7 +112,6 @@ public class TestServer
 
     public void unblockAll() {
         log.info( "unblocking all on " + getName() );
-        //getRunner().getSynchronizer().unblockAll();
         this.synchronizer.unblockAll();
     }
 
@@ -120,7 +119,8 @@ public class TestServer
         throws SynchronizationException {
         log.info( "registering synchronizable tbean " + tbeanId + " with " + getName() );
         try {
-            getMasterDispatcher().dispatch( new RegisterSynchronizableTBeanCommand( tbeanId ) );
+            getMasterDispatcher().dispatch( new RegisterSynchronizableTBeanCommand( getName(),
+                                                                                    tbeanId ) );
         } catch (DispatchException e) {
             throw new SynchronizationException( e );
         }
@@ -130,7 +130,8 @@ public class TestServer
         throws SynchronizationException {
         log.info( "unregistering synchronizable tbean " + tbeanId + " with " + getName() );
         try {
-            getMasterDispatcher().dispatch( new UnregisterSynchronizableTBeanCommand( tbeanId ) );
+            getMasterDispatcher().dispatch( new UnregisterSynchronizableTBeanCommand( getName(),
+                                                                                      tbeanId ) );
         } catch (DispatchException e) {
             throw new SynchronizationException( e );
         }

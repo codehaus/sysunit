@@ -96,7 +96,7 @@ public class MasterServer
         getSynchronizer().addTestNode( testNodeInfo );
 
         try {
-            if ( jvmNames.size() > testNodes.size() ) {
+            if ( jvmNames.size() == testNodes.size() ) {
                 runTest();
             }
         } catch (Exception e) {
@@ -217,14 +217,18 @@ public class MasterServer
 		}
 	}
 
-    public void registerSynchronizableTBean(String tbeanId)
+    public void registerSynchronizableTBean(RegisterSynchronizableTBeanCommand command)
         throws DispatchException {
-        this.synchronizer.registerSynchronizableTBean( tbeanId );
+        String beanName = command.getTestServerName() + ":" + command.getTBeanId();
+        log.info( "registering: " + beanName );
+        this.synchronizer.registerSynchronizableTBean( beanName );
     }
 
-    public void unregisterSynchronizableTBean(String tbeanId)
+    public void unregisterSynchronizableTBean(UnregisterSynchronizableTBeanCommand command)
         throws DispatchException {
-        this.synchronizer.unregisterSynchronizableTBean( tbeanId );
+        String beanName = command.getTestServerName() + ":" + command.getTBeanId();
+        log.info( "unregistering: " + beanName );
+        this.synchronizer.unregisterSynchronizableTBean( beanName );
     }
 
     public void error(String tbeanId)

@@ -3,10 +3,17 @@ package org.sysunit.command.master;
 public class RegisterSynchronizableTBeanCommand
     extends MasterCommand {
 
+    private String testServerName;
     private String tbeanId;
 
-    public RegisterSynchronizableTBeanCommand(String tbeanId) {
+    public RegisterSynchronizableTBeanCommand(String testServerName,
+                                              String tbeanId) {
+        this.testServerName = testServerName;
         this.tbeanId = tbeanId;
+    }
+
+    public String getTestServerName() {
+        return this.testServerName;
     }
 
     public String getTBeanId() {
@@ -15,6 +22,6 @@ public class RegisterSynchronizableTBeanCommand
 
     public void run(MasterServer masterServer)
         throws Exception {
-        masterServer.registerSynchronizableTBean( getTBeanId() );
+        masterServer.registerSynchronizableTBean( this );
     }
 }

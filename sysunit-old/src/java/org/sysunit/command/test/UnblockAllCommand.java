@@ -11,7 +11,7 @@ public class UnblockAllCommand
     public void run(TestServer testServer)
         throws Exception {
         
-        log.debug( "unblock all " + this + " on " + testServer.getName() );
+        log.info( "* * * * * * unblock all " + this + " on " + testServer.getName() );
         testServer.unblockAll();
     }
 }

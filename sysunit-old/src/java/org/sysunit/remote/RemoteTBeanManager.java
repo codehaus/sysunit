@@ -134,7 +134,7 @@ public class RemoteTBeanManager implements Runnable {
         	log.info("About to run tbeans: " + tbeans);
         	
             startTBeans();
-            waitForTBeans(10000);
+            //  waitForTBeans(10000);
             // validateTBeans(case, result);
 
 			log.info("Completed");
