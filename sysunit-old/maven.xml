@@ -1,4 +1,4 @@
-<project default="jar:jar" xmlns:j="jelly:core">
+<project default="jar:jar" xmlns:j="jelly:core" xmlns:test="test">
 
   <preGoal name="site">
     <attainGoal name="java:compile"/>
@@ -46,6 +46,27 @@
     <java classname="org.sysunit.transport.jms.SlaveNode" fork="yes">
       <classpath refid="test.classpath"/>
     </java>
+  </goal>
+
+  <goal name="sysunit:generate-test-list" prereqs="test:test-resources">
+    <test:dependency-handle/>
+    <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
+    <j:set var="testDir">${testPlugin.findVariable('maven.test.dest')}</j:set>
+    <j:set var="testDirLen" value="${size(testDir)}"/>
+    <fileScanner var="xmlTests">
+      <fileset dir="${testDir}">
+        <patternset>
+          <include name="**/*.systest"/>
+        </patternset>
+      </fileset>
+    </fileScanner>
+
+    <j:file name="${testDir}/sysunit-tests.properties" omitXmlDeclaration="true">
+        <j:forEach var="xmlTest" items="${xmlTests.iterator()}">
+            ${xmlTest.getPath().toString().substring(testDirLen)} = on
+        </j:forEach>
+    </j:file>
+
   </goal>
  
 </project>

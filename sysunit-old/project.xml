@@ -256,6 +256,7 @@
             <include>**/*.properties</include>
             <include>**/*.jelly</include>
             <include>**/*.xml</include>
+            <include>**/*.systest</include>
           </includes>
         </resource>
       </resources>
