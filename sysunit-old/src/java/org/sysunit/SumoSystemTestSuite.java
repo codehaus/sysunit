@@ -13,7 +13,7 @@ import java.util.Iterator;
 public class SumoSystemTestSuite
     extends TestSuite {
 
-    public static final String SYSTEM_TESTS_LIST_PROPERTY = "org.sysunit.sumo.test-list";
+    public static final String SYSTEM_TESTS_LIST_PROPERTY = "org.sysunit.sumo.list";
     public static final String DEFAULT_SYSTEM_TESTS_LIST = "sysunit-tests.properties";
 
     public static SumoSystemTestSuite newSuite(String testListPath)
@@ -94,14 +94,14 @@ public class SumoSystemTestSuite
     public static TestSuite suite()
         throws Exception {
         String testsList = System.getProperty( SYSTEM_TESTS_LIST_PROPERTY );
-        
+
         if ( testsList == null
              ||
              testsList.trim().equals( "" ) ) {
             testsList = DEFAULT_SYSTEM_TESTS_LIST;
         }
 
-        return newSuite( DEFAULT_SYSTEM_TESTS_LIST );
+        return newSuite( testsList );
     }
 
     public SumoSystemTestSuite() {
