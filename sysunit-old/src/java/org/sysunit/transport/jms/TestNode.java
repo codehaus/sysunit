@@ -55,7 +55,7 @@ public class TestNode extends Node {
             }
 			Destination masterDestination = messenger.getDestination(masterSubject);
 			Destination groupDestination = messenger.getDestination(groupSubject);
-            TestNode controller = new TestNode(messenger, masterDestination, groupDestination, xml, jvmName);
+            TestNode controller = new TestNode(new TestServer(), messenger, masterDestination, groupDestination, xml, jvmName);
             controller.start();
         }
         catch (Exception e) {
@@ -64,9 +64,9 @@ public class TestNode extends Node {
         }
     }
 
-    public TestNode(Messenger messenger, Destination masterDestination, Destination testGroupDestination, String xml, String jvmName) throws JMSException {
-    	super(new TestServer(), messenger, testGroupDestination);
-		this.server = (TestServer) getServer();    	
+    public TestNode(TestServer server, Messenger messenger, Destination masterDestination, Destination testGroupDestination, String xml, String jvmName) throws JMSException {
+    	super(server, messenger, testGroupDestination);
+		this.server = server;    	
     	this.xml = xml;
     	this.jvmName = jvmName;
     	

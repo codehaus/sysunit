@@ -32,7 +32,7 @@ public class SlaveNode extends Node {
         String messengerName = "topicConnection";
         String groupSubject = "SYSUNIT.SLAVES";
         if (args.length > 0) {
-            groupSubject = args[0];
+			groupSubject = args[0];
         }
 
         try {
@@ -42,7 +42,7 @@ public class SlaveNode extends Node {
                 return;
             }
             Destination groupDestination = messenger.getDestination(groupSubject);
-            SlaveNode controller = new SlaveNode(messenger, groupDestination);
+            SlaveNode controller = new SlaveNode(new SlaveServer(), messenger, groupDestination);
             controller.start();
         }
         catch (Exception e) {
@@ -51,8 +51,8 @@ public class SlaveNode extends Node {
         }
     }
 
-    public SlaveNode(Messenger messenger, Destination groupDestination) throws JMSException {
-    	super(new SlaveServer(), messenger, groupDestination);
-    	this.server = (SlaveServer) getServer();
+    public SlaveNode(SlaveServer server, Messenger messenger, Destination groupDestination) throws JMSException {
+    	super(server, messenger, groupDestination);
+    	this.server = server;
     }
 }

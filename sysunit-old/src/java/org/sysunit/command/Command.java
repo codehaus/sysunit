@@ -12,7 +12,7 @@ package org.sysunit.command;
 import java.io.Serializable;
 
 /**
- * A Command pattern for inter-node commands
+ * A Command pattern for inter-server commands
  * 
  * @author James Strachan
  * @version $Revision$
@@ -22,12 +22,12 @@ public abstract class Command implements Serializable {
 	private transient Dispatcher replyDispatcher;
 	
 	/**
-	 * Executes this command on the given node context
+	 * Executes this command on the given server
 	 * 
-	 * @param context
+	 * @param server
 	 * @throws Exception
 	 */
-    public abstract void run(Server context) throws Exception;
+    public abstract void run(Server server) throws Exception;
     
     /**
      * @return the dispatcher which can be used to dispatch replies to this command

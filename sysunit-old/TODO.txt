@@ -1,3 +1,8 @@
+Various Housekeeping Chores
+===========================
+
+* add a simple Lifecycle interface at least for start() stop()
+
 Required Features
 =================
 

@@ -7,19 +7,14 @@
  * 
  * $Id$
  */
-package org.sysunit.command;
+package org.sysunit.transport.jms;
 
-import org.sysunit.Lifecycle;
-
+import org.sysunit.command.master.MasterServer;
 
 /**
- * A dispatcher of commands. Typically this would make remote messaging
- * calls such as JMS, JavaGroups or even HTTP requests.
- * 
  * @author James Strachan
  * @version $Revision$
  */
-public interface Dispatcher extends Lifecycle {
-	
-	public void dispatch(Command command) throws DispatchException;
+public class MockMasterServer extends MasterServer {
+
 }

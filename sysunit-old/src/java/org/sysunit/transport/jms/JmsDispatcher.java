@@ -58,6 +58,13 @@ public class JmsDispatcher implements Dispatcher {
         	throw new DispatchException(command, e);
         }
     }
+
+	public void start() throws Exception {
+	}
+
+	public void stop() throws Exception {
+	}
+
     
 	// Properties
 	//-------------------------------------------------------------------------    
@@ -103,5 +110,4 @@ public class JmsDispatcher implements Dispatcher {
     public void setReplyToDestination(Destination replyToDestination) {
         this.replyToDestination = replyToDestination;
     }
-
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  || Sample Connection file for working with Exolab's OpenJMS server using 
+  || the default rmi_jms.xml configuration file.  
+  || You will most likely need to modify the connection information if you use one of 
+  || the other configuraiton files.  I've had
+  || troubles with using the call() statements with OpenJMS, but other messages
+  || seem to work well.
+  -->
+<manager>
+	<messenger name="topicConnection">
+		<jndi lookupName="JmsTopicConnectionFactory">
+			<property>
+				<name>java.naming.factory.initial</name>
+				<value>org.exolab.jms.jndi.rmi.RmiJndiInitialContextFactory</value>
+			</property>
+			<property>
+				<name>java.naming.provider.url</name>
+				<value>rmi://localhost:1099/JndiServer</value>
+			</property>
+		</jndi>
+	</messenger>
+	<messenger name="queueConnection">
+		<jndi lookupName="JmsQueueConnectionFactory">
+			<property>
+				<name>java.naming.factory.initial</name>
+				<value>org.exolab.jms.jndi.rmi.RmiJndiInitialContextFactory</value>
+			</property>
+			<property>
+				<name>java.naming.provider.url</name>
+				<value>rmi://localhost:1099/JndiServer</value>
+			</property>
+		</jndi>
+	</messenger>
+</manager>

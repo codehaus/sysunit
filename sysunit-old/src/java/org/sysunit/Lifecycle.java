@@ -7,19 +7,20 @@
  * 
  * $Id$
  */
-package org.sysunit.command;
-
-import org.sysunit.Lifecycle;
-
+package org.sysunit;
 
 /**
- * A dispatcher of commands. Typically this would make remote messaging
- * calls such as JMS, JavaGroups or even HTTP requests.
+ * <p>A <code>TBean.java</code></b> is a simple lifecycle interface used
+ * by services within the SysUnit framework
  * 
  * @author James Strachan
+ * @author Bob McWhirter
  * @version $Revision$
  */
-public interface Dispatcher extends Lifecycle {
+public interface Lifecycle {
+
+	public void start() throws Exception;
 	
-	public void dispatch(Command command) throws DispatchException;
+	public void stop() throws Exception;
+
 }

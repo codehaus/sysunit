@@ -145,9 +145,23 @@
     </dependency>
 
 
+	<!-- a sample JMS to use -->
+	<dependency>
+      <id>openjms</id>
+      <version>0.7.5</version>
+    </dependency>
+    <dependency>
+      <id>exolabcore</id>
+      <version>0.3.5</version>
+    </dependency>
+    <dependency>
+      <id>jta</id>
+      <version>1.0.1</version>
+    </dependency>
+	
+	
 
-
-		<!-- used by the JMX connectors -->
+	<!-- used by the JMX connectors -->
     <dependency>
       <id>mx4j+jmx</id>
       <version>1.1.1</version>
@@ -241,6 +255,7 @@
           <includes>
             <include>**/*.properties</include>
             <include>**/*.jelly</include>
+            <include>**/*.xml</include>
           </includes>
         </resource>
       </resources>

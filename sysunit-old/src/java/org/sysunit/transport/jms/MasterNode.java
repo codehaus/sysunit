@@ -55,7 +55,7 @@ public class MasterNode extends Node  {
             }
 			Destination groupDestination = messenger.getDestination(groupSubject);
 			Destination slaveGroupDestination = messenger.getDestination(slaveGroupSubject);
-            MasterNode controller = new MasterNode(messenger, groupDestination, slaveGroupDestination);
+            MasterNode controller = new MasterNode(new MasterServer(), messenger, groupDestination, slaveGroupDestination);
             controller.start();
         }
         catch (Exception e) {
@@ -64,9 +64,9 @@ public class MasterNode extends Node  {
         }
     }
 
-    public MasterNode(Messenger messenger, Destination groupDestination, Destination slaveGroupDestination) throws JMSException {
-    	super(new MasterServer(), messenger, groupDestination);
-    	this.server = (MasterServer) getServer();
+    public MasterNode(MasterServer server, Messenger messenger, Destination groupDestination, Destination slaveGroupDestination) throws JMSException {
+    	super(server, messenger, groupDestination);
+    	this.server = server;
     	
         slaveGroupDispatcher = new JmsDispatcher(messenger, slaveGroupDestination, getReplyToDestination());
     }

@@ -31,6 +31,7 @@ public class Node {
     
     
     public Node(Server server, Messenger messenger, Destination groupDestination) throws JMSException {
+    	this.server = server;
     	this.messenger = messenger;
     	this.groupDestination = groupDestination;
     	

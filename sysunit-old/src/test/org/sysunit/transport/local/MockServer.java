@@ -7,19 +7,25 @@
  * 
  * $Id$
  */
-package org.sysunit.command;
+package org.sysunit.transport.local;
 
-import org.sysunit.Lifecycle;
-
+import org.sysunit.command.Server;
 
 /**
- * A dispatcher of commands. Typically this would make remote messaging
- * calls such as JMS, JavaGroups or even HTTP requests.
+ * A mock server for testing
  * 
  * @author James Strachan
  * @version $Revision$
  */
-public interface Dispatcher extends Lifecycle {
+public class MockServer extends Server {
+
+	private int fooCount;
 	
-	public void dispatch(Command command) throws DispatchException;
+	public void foo() {
+		fooCount++;
+	}
+	
+	public int getFooCount() {
+		return fooCount;
+	}
 }
