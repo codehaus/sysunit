@@ -79,7 +79,7 @@ public class JvmRunnerWithTBeansTest extends TestCase {
      * @param jvmName
      */
     protected void runJvm(String jvmName) throws Exception {
-        runner.run("org/sysunit/jelly/tbeanStyleSystemTest.jelly", jvmName);
+        runner.run("org/sysunit/jelly/tbeanStyleSystemTest.systest", jvmName);
     }
 
 	/**

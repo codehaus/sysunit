@@ -5,6 +5,7 @@ public class KillCommand
 
     public void run(TestServer server) 
         throws Exception {
+        System.err.println( "EXIT EXIT EXIT EXIT EXIT EXIT EXIT EXIT EXIT EXIT EXIT EXIT EXIT ");
         System.exit( 1 );
     }
 }

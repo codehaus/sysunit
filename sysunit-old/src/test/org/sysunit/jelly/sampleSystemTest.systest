@@ -1,4 +1,4 @@
-<systemTest name="simple" className="org.sysunit.jelly.ExampleSystemTest" timeout="200"> 
+<systemTest name="simple" className="org.sysunit.jelly.ExampleSystemTest" timeout="20000"> 
   <jvm name="a" count="4"> 
     <thread method="threadClient" count="2"/> 
   </jvm> 

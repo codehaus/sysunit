@@ -32,13 +32,13 @@ public class JvmRunnerTest extends TestCase {
     public void testSomeInvalidXML() throws Exception {
         try {
         	JvmRunner runner = new JvmRunner();
-            runner.run("doesNotExist.jelly", "unknownJvmName");
+            runner.run("doesNotExist.systest", "unknownJvmName");
             
             fail("Should have thrown ResourceNotFoundException");
         }
         catch (ResourceNotFoundException e) {
         	// worked
-        	assertEquals("Resource", "doesNotExist.jelly", e.getResource());
+        	assertEquals("Resource", "doesNotExist.systest", e.getResource());
         }
     }
 
@@ -69,7 +69,7 @@ public class JvmRunnerTest extends TestCase {
      * @param jvmName
      */
     protected void runJvm(String jvmName) throws Exception {
-        String[] args = { "org/sysunit/jelly/sampleSystemTest.jelly", jvmName };
+        String[] args = { "org/sysunit/jelly/sampleSystemTest.systest", jvmName };
         JvmRunner.main(args);
         Thread.sleep( 3000 );
     }

@@ -32,6 +32,7 @@ import org.sysunit.command.slave.LaunchTestNodeCommand;
 import org.sysunit.command.test.SetUpTBeansCommand;
 import org.sysunit.command.test.TearDownTBeansCommand;
 import org.sysunit.command.test.RunTestCommand;
+import org.sysunit.command.test.KillCommand;
 import org.sysunit.jelly.JvmNameExtractor;
 import org.sysunit.jelly.TimeoutExtractor;
 import org.sysunit.SysUnitException;
@@ -60,6 +61,9 @@ public class MasterServer
 	private JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
 	private TimeoutExtractor timeoutExtractor = new TimeoutExtractor();
     private MasterSynchronizer synchronizer = new MasterSynchronizer();
+
+    private Object isStartedUpLock = new Object();
+    private boolean isStartedUp;
 
     private Object isDoneLock = new Object();
     private boolean isDone;
@@ -156,6 +160,10 @@ public class MasterServer
         ++this.setUpServers;
 
         if ( this.setUpServers == jvmNames.size() ) {
+            synchronized ( this.isStartedUpLock ) {
+                this.isStartedUp = true;
+                this.isStartedUpLock.notifyAll();
+            }
             runTest();
         }
     }
@@ -191,6 +199,22 @@ public class MasterServer
 
     public Throwable[] waitFor()
         throws Exception {
+        waitForStartUp();
+        return waitForCompletion();
+    }
+
+    public void waitForStartUp()
+        throws Exception {
+
+        synchronized ( this.isStartedUpLock ) {
+            while ( ! this.isStartedUp ) {
+                this.isStartedUpLock.wait();
+            }
+        }
+    }
+
+    public Throwable[] waitForCompletion()
+        throws Exception {
 
         long start = new Date().getTime();
 
@@ -224,6 +248,12 @@ public class MasterServer
     public void killAll()
         throws DispatchException {
 
+        for ( Iterator testNodeInfoIter = this.testNodes.values().iterator();
+              testNodeInfoIter.hasNext(); ) {
+            TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
+
+            testNodeInfo.getDispatcher().dispatch( new KillCommand() );
+        }
     }
 
     public void addErrors(Throwable[] errors) {
