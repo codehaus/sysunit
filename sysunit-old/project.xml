@@ -133,28 +133,12 @@
       <id>dom4j</id>
       <version>1.4-dev-8</version>
     </dependency>
-    
-    <dependency>
-      <id>xml-apis</id>
-      <version>1.0.b2</version>
-    </dependency>
-    
-    <dependency>
-      <id>xerces</id>
-      <version>2.2.1</version>
-    </dependency>
 
-<!--
     <dependency>
-      <id>exolabcore</id>
-      <version>0.3.5</version>
+      <id>junit</id>
+      <version>3.8.1</version>
     </dependency>
-    <dependency>
-      <id>jta</id>
-      <version>1.0.1</version>
-    </dependency>
--->
-
+    
     <dependency>
       <id>mx4j+jmx</id>
       <version>1.1.1</version>
@@ -163,17 +147,6 @@
       <id>mx4j+tools</id>
       <version>1.1.1</version>
     </dependency>
-
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jbossall-client</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-
-    <dependency>
-      <id>junit</id>
-      <version>3.8.1</version>
-    </dependency>    
 
   </dependencies>
   
