@@ -146,8 +146,8 @@ public class FactoryMethodTBeanFactory
             return (TBean) getFactoryMethod().invoke( getTestCase(),
                                                       EMPTY_OBJECT_ARRAY );
         } catch (InvocationTargetException e) {
-            if ( e.getCause() != null ) {
-                throw e.getCause();
+            if ( e.getTargetException() != null ) {
+                throw e.getTargetException();
             } else {
                 throw e;
             }
