@@ -135,6 +135,9 @@ public class TBeanThread
             setError( e );
             getSynchronizer().error( getTBeanId() );
         } finally {
+            if ( getTBean() instanceof SynchronizableTBean ) {
+                getSynchronizer().unregisterSynchronizableTBean( getTBeanId() );
+            }
             synchronized ( this ) {
                 this.isDone = true;
             }
