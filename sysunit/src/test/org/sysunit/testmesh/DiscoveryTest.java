@@ -29,12 +29,21 @@ public class DiscoveryTest
         slaveHost2.stop();
         slaveHost3.stop();
         
-        assertLength( "3 slaves discovered",
-                      3,
-                      master.getSlaveHosts() );
-
-        assertUnique( "all slaves are different",
-                      master.getSlaveHosts() );
+        if ( master.isMulticastEnabled() )
+        {
+            assertLength( "3 slaves discovered",
+                          3,
+                          master.getSlaveHosts() );
+            
+            assertUnique( "all slaves are different",
+                          master.getSlaveHosts() );
+        }
+        else
+        {
+            assertLength( "1 slave discovered",
+                          1,
+                          master.getSlaveHosts() );
+        }
     }
 
     public void testDiscovery_OverBCast()

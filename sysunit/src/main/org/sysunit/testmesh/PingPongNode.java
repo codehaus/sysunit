@@ -23,6 +23,11 @@ public class PingPongNode
         this.multicast = false;
     }
 
+    public boolean isMulticastEnabled()
+    {
+        return this.multicast;
+    }
+
     public InetAddress getPingAddress()
     {
         if ( ! this.multicast )
