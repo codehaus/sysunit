@@ -143,7 +143,7 @@ public class LocalSynchronizer
      *
      * @param tbeanId The identifier of the synchronizable TBean.
      */
-    synchronized void unregisterSynchronizableTBean(String tbeanId) {
+    public synchronized void unregisterSynchronizableTBean(String tbeanId) {
         this.tbeanIds.remove( tbeanId );
         this.waitingTBeanIds.remove( tbeanId );
         if ( this.waitingTBeanIds.size() == tbeanIds.size() ) {
@@ -151,16 +151,24 @@ public class LocalSynchronizer
         }
     }
 
-    String[] getRegisteredTBeans() {
+    protected String[] getRegisteredTBeans() {
         return (String[]) this.tbeanIds.toArray( EMPTY_STRING_ARRAY );
     }
 
-    String[] getWaitingTBeans() {
+    protected String[] getWaitingTBeans() {
         return (String[]) this.waitingTBeanIds.toArray( EMPTY_STRING_ARRAY );
     }
 
     LocalSyncPoint[] getSyncPoints() {
         return (LocalSyncPoint[]) this.syncPoints.values().toArray( LocalSyncPoint.EMPTY_ARRAY );
+    }
+
+    protected synchronized boolean isWaitingTBean(String tbeanId) {
+        return this.waitingTBeanIds.contains( tbeanId );
+    }
+
+    protected synchronized void addWaitingTBean(String tbeanId) {
+        this.waitingTBeanIds.add( tbeanId );
     }
 
 
@@ -174,14 +182,14 @@ public class LocalSynchronizer
         LocalSyncPoint syncPoint = null;
 
         synchronized ( this ) {
-            if ( this.waitingTBeanIds.contains( tbeanId ) ) {
+            if ( isWaitingTBean( tbeanId ) ) {
                 throw new AlreadySynchronizedException( tbeanId,
                                                         syncPointName );
             }
             
-            this.waitingTBeanIds.add( tbeanId );
+            addWaitingTBean( tbeanId );
             
-            if ( this.waitingTBeanIds.size() == tbeanIds.size() ) {
+            if ( shouldUnblock() ) {
                 unblockAll();
             } else {
                 syncPoint = getSyncPoint( syncPointName );
@@ -191,6 +199,10 @@ public class LocalSynchronizer
         if ( syncPoint != null ) {
             syncPoint.sync( tbeanId );
         }
+    }
+
+    protected synchronized boolean shouldUnblock() {
+        return this.waitingTBeanIds.size() == tbeanIds.size();
     }
 
     /**
@@ -215,9 +227,9 @@ public class LocalSynchronizer
     }
 
     /**
-     * Unblock all waiters.
+     * @see Synchronizer
      */
-    void unblockAll() {
+    public void unblockAll() {
         for ( Iterator syncPointIter = this.syncPoints.values().iterator();
               syncPointIter.hasNext(); ) {
             LocalSyncPoint syncPoint = (LocalSyncPoint) syncPointIter.next();
@@ -228,7 +240,7 @@ public class LocalSynchronizer
         this.waitingTBeanIds.clear();
     }
 
-    void error(String tbeanId) {
+    public void error(String tbeanId) {
         unregisterSynchronizableTBean( tbeanId );
     }
 }

@@ -15,6 +15,10 @@ import org.apache.commons.jelly.JellyContext;
 import org.apache.commons.jelly.XMLOutput;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sysunit.Synchronizer;
+import org.sysunit.SynchronizationException;
+import org.sysunit.local.LocalSynchronizer;
+import org.sysunit.command.test.TestSynchronizer;
 import org.sysunit.remote.RemoteTBeanManager;
 
 /**
@@ -28,7 +32,8 @@ public class JvmRunner {
     private static final Log log = LogFactory.getLog(JvmRunner.class);
     
     private JellyContext context;
-    private RemoteTBeanManager manager = new RemoteTBeanManager();
+    private RemoteTBeanManager manager;
+    private Synchronizer synchronizer;
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
@@ -39,6 +44,7 @@ public class JvmRunner {
             String jvmName = args[1];
             JvmRunner runner = new JvmRunner();
             runner.run(xml, jvmName);
+            runner.getManager().run();
         }
         catch (Exception e) {
             log.error("Caught: " + e, e);
@@ -47,8 +53,15 @@ public class JvmRunner {
     }
 
     public JvmRunner() {
-        context = new JellyContext();
-        context.registerTagLibrary("", new SysUnitTagLibrary());
+        //this.synchronizer = new TestSynchronizer();
+        this( new LocalSynchronizer() );
+    }
+
+    public JvmRunner(Synchronizer synchronizer) {
+        this.context = new JellyContext();
+        this.context.registerTagLibrary("", new SysUnitTagLibrary());
+        this.synchronizer = synchronizer;
+        this.manager = new RemoteTBeanManager( this.synchronizer );
     }
 
     /**
@@ -61,6 +74,7 @@ public class JvmRunner {
     public void run(String xml, String jvmName) throws Exception {
         context.setVariable("org.sysunit.jvm", jvmName);
         context.setVariable("org.sysunit.TBeanManager", getManager());
+        context.setVariable("org.sysunit.Synchronizer", getSynchronizer());
 
         // lets assume the XML is on the classpath
         URL url = getClass().getClassLoader().getResource(xml);
@@ -89,6 +103,10 @@ public class JvmRunner {
      */
     public void setManager(RemoteTBeanManager manager) {
         this.manager = manager;
+    }
+
+    public Synchronizer getSynchronizer() {
+        return this.synchronizer;
     }
 
 }

@@ -93,4 +93,13 @@ public interface Synchronizer {
     void sync(String tbeanId,
               String syncPointName)
         throws SynchronizationException, InterruptedException;
+
+    void unblockAll();
+
+    void registerSynchronizableTBean(String tbeanId);
+
+    void unregisterSynchronizableTBean(String tbeanId);
+
+    void error(String tbeanId);
+
 }

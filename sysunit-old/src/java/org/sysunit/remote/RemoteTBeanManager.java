@@ -24,9 +24,11 @@ import org.apache.commons.logging.LogFactory;
 import org.sysunit.SynchronizableTBean;
 import org.sysunit.SystemTestCase;
 import org.sysunit.TBean;
+import org.sysunit.TBeanSynchronizer;
+import org.sysunit.Synchronizer;
 import org.sysunit.WatchdogException;
 import org.sysunit.local.Barrier;
-import org.sysunit.local.LocalSynchronizer;
+//import org.sysunit.local.LocalSynchronizer;
 import org.sysunit.local.TBeanThread;
 
 /**
@@ -59,7 +61,7 @@ public class RemoteTBeanManager implements Runnable {
     /** <code>Thread</code>s for each <code>TBean</code>. */
     private Set tbeanThreads;
 
-    private LocalSynchronizer synchronizer;
+    private Synchronizer synchronizer;
 
     // ----------------------------------------------------------------------
     //     Constructors
@@ -68,10 +70,10 @@ public class RemoteTBeanManager implements Runnable {
     /**
      * Construct.
      */
-    public RemoteTBeanManager() {
+    public RemoteTBeanManager(Synchronizer synchronizer) {
         this.tbeans = new HashMap();
         this.tbeanThreads = new HashSet();
-        this.synchronizer = new LocalSynchronizer();
+        this.synchronizer = synchronizer;
     }
 
     // ----------------------------------------------------------------------
@@ -91,6 +93,19 @@ public class RemoteTBeanManager implements Runnable {
 	public Map getTBeanMap() {
 		return tbeans;
 	}
+
+    public int getNumSynchronizableTBeans() {
+        int numSynchronizable = 0;
+
+        for ( Iterator tbeanIter = this.tbeans.values().iterator() ;
+              tbeanIter.hasNext(); ) {
+            if ( tbeanIter.next() instanceof SynchronizableTBean ) {
+                ++numSynchronizable;
+            }
+        }
+
+        return numSynchronizable;
+    }
 	
 	/**
 	 * Adds a new TBean to this manager via a key
@@ -99,6 +114,10 @@ public class RemoteTBeanManager implements Runnable {
 	 */
 	public void addTBean(String tbeanId, TBean tbean) {
 		tbeans.put(tbeanId, tbean);
+        if ( tbean instanceof SynchronizableTBean ) {
+            ((SynchronizableTBean)tbean).setSynchronizer( new TBeanSynchronizer( tbeanId,
+                                                                                 this.synchronizer ) );
+        }
 	}
 
 	/**
@@ -110,8 +129,6 @@ public class RemoteTBeanManager implements Runnable {
 		addTBean(tbean.toString(), tbean);
 	}
 
-	
-	
     public void run() {
         try {
         	log.info("About to run tbeans: " + tbeans);
@@ -229,7 +246,7 @@ public class RemoteTBeanManager implements Runnable {
 		return (TBean[]) this.tbeans.values().toArray(TBean.EMPTY_ARRAY);
 	}
 
-	LocalSynchronizer getSynchronizer() {
+	Synchronizer getSynchronizer() {
 		return this.synchronizer;
 	}
 }

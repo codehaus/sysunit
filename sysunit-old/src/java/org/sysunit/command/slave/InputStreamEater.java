@@ -29,6 +29,7 @@ public class InputStreamEater
                                                0,
                                                read ) );
                 }
+                System.err.print( new String( buf, 0, read ) );
             }
         } catch (IOException e) {
             // swallow

@@ -63,6 +63,7 @@ package org.sysunit.local;
 import org.sysunit.SynchronizableTBean;
 import org.sysunit.TBean;
 import org.sysunit.TBeanSynchronizer;
+import org.sysunit.Synchronizer;
 
 
 public class TBeanThread
@@ -72,7 +73,7 @@ public class TBeanThread
 
     private String tbeanId;
     private TBean tbean;
-    private LocalSynchronizer synchronizer;
+    private Synchronizer synchronizer;
     private Barrier beginBarrier;
     private Barrier endBarrier;
     private Throwable error;
@@ -80,7 +81,7 @@ public class TBeanThread
 
     public TBeanThread(String tbeanId,
                        TBean tbean,
-                       LocalSynchronizer synchronizer,
+                       Synchronizer synchronizer,
                        Barrier beginBarrier,
                        Barrier endBarrier) {
         super( "tbean-thread." + tbeanId );
@@ -100,7 +101,7 @@ public class TBeanThread
         return this.tbean;
     }
 
-    public LocalSynchronizer getSynchronizer() {
+    public Synchronizer getSynchronizer() {
         return this.synchronizer;
     }
 

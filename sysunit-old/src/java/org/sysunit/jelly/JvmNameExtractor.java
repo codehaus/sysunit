@@ -30,11 +30,12 @@ public class JvmNameExtractor {
     private static final Log log = LogFactory.getLog(JvmNameExtractor.class);
     
     private JellyContext context;
-    private RemoteTBeanManager manager = new RemoteTBeanManager();
+    private RemoteTBeanManager manager;// = new RemoteTBeanManager();
 
     public JvmNameExtractor() {
         context = new JellyContext();
         context.registerTagLibrary("", new SysUnitTagLibrary());
+        manager = new RemoteTBeanManager( null );
     }
 
     /**

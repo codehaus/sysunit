@@ -24,6 +24,8 @@ import org.sysunit.command.Server;
 import org.sysunit.command.slave.RequestMembersCommand;
 import org.sysunit.command.slave.StartTestNodeCommand;
 import org.sysunit.jelly.JvmNameExtractor;
+import org.sysunit.SynchronizationException;
+
 /**
  * The Server for Master nodes on the network
  * 
@@ -40,6 +42,7 @@ public class MasterServer extends Server {
 
     private Dispatcher slaveGroupDispatcher;
 	private JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
+    private MasterSynchronizer synchronizer = new MasterSynchronizer();
 	
     public MasterServer(String xml) {
     	this.xml = xml;
@@ -79,8 +82,17 @@ public class MasterServer extends Server {
 	 * @param command
 	 */
 	public void addTestNode(TestNodeStartedCommand command) {
-		members.put(command.getName(), command.getReplyDispatcher());
+        TestNodeInfo testNodeInfo = new TestNodeInfo( command.getName(),
+                                                      command.getNumSynchronizableTBeans(),
+                                                      command.getReplyDispatcher() );
+        log.info( "adding test node: " + testNodeInfo );
+		testNodes.put(command.getName(), testNodeInfo );
+        getSynchronizer().addTestNode( testNodeInfo );
 	}
+
+    public TestNodeInfo getTestNodeInfo(String name) {
+        return (TestNodeInfo) testNodes.get( name );
+    }
 
 	// Properties
 	//-------------------------------------------------------------------------    
@@ -91,6 +103,10 @@ public class MasterServer extends Server {
 	public Map getMemberMap() {
 		return members;
 	}
+
+    public Map getTestNodesMap() {
+        return testNodes;
+    }
 
 	/**
 	 * @return
@@ -132,6 +148,16 @@ public class MasterServer extends Server {
 	public void setXml(String xml) {
 		this.xml = xml;
 	}
+
+    public MasterSynchronizer getSynchronizer() {
+        return this.synchronizer;
+    }
+
+    public void sync(SyncCommand syncCommand)
+        throws SynchronizationException, DispatchException {
+        getSynchronizer().sync( syncCommand.getTBeanId(),
+                                syncCommand.getSyncPointName() );
+    }
 
 	// Implementation methods
 	//-------------------------------------------------------------------------    

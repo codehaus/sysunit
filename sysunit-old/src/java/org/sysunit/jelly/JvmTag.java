@@ -55,7 +55,7 @@ public class JvmTag extends TagSupport {
             invokeBody(output);
             
             // now lets run the TBeanManager
-			tag.getManager().run();            
+			//tag.getManager().run();            
         }
         else {
 			// lets register the JVM name & count with the system test object

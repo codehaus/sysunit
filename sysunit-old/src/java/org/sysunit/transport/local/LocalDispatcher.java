@@ -42,5 +42,4 @@ public class LocalDispatcher implements Dispatcher {
     public void stop() {
     	thread.stopRunning();
     }
-
 }

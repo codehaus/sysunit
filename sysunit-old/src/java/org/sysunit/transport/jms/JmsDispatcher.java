@@ -13,6 +13,8 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.messenger.Messenger;
 import org.sysunit.command.Command;
 import org.sysunit.command.DispatchException;
@@ -27,6 +29,8 @@ import org.sysunit.command.Dispatcher;
  */
 public class JmsDispatcher implements Dispatcher {
 	
+    private static final Log log = LogFactory.getLog(JmsDispatcher.class);
+
 	private Messenger messenger;
 	private Destination destination;
 	private Destination replyToDestination;
@@ -47,6 +51,7 @@ public class JmsDispatcher implements Dispatcher {
 	}
 
     public void dispatch(Command command) throws DispatchException {
+        log.info( "dispatching " + command.getClass().getName() + " to " + destination );
     	try {
             Message message = messenger.createObjectMessage(command);
             if (replyToDestination != null) {
