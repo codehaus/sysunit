@@ -27,9 +27,6 @@ public class TBeanTag extends UseBeanTag {
     /** The Log to which logging calls will be made. */
     private static final Log log = LogFactory.getLog(TBeanTag.class);
 
-    private String name;
-    private int count;
-
     public TBeanTag() {
     }
 
