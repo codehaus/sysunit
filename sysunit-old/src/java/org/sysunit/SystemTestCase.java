@@ -318,8 +318,23 @@ public class SystemTestCase
         setUpTBeans();
         try { 
             super.runBare();
+
             Throwable[] errors = validateTBeans();
-            throw new Exception( errors.toString() );
+
+            if ( errors.length > 0 )
+            {
+                StringBuffer buf = new StringBuffer();
+                
+                for ( int i = 0 ; i < errors.length ; ++i )
+                {
+                    buf.append( errors[i].getMessage() );
+                    buf.append( '\n' );
+                    
+                    errors[i].printStackTrace();
+                }
+                
+                throw new Exception( buf.toString() );
+            }
         } finally {
             tearDownTBeans();
         }
@@ -406,7 +421,6 @@ public class SystemTestCase
      */
     protected void sync(String syncPoint)
         throws SynchronizationException, InterruptedException {
-        // System.err.println( "syncing: " + syncPoint );
         getSynchronizer().sync( syncPoint );
     }
 

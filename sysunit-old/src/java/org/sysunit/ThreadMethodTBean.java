@@ -148,7 +148,15 @@ public class ThreadMethodTBean
      */
     public void run()
         throws Exception {
-        getThreadMethod().invoke( getTestCase(),
-                                  EMPTY_OBJECT_ARRAY );
+        try
+        {
+            getThreadMethod().invoke( getTestCase(),
+                                      EMPTY_OBJECT_ARRAY );
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

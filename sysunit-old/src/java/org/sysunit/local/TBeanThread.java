@@ -103,6 +103,7 @@ public class TBeanThread
     
     public void run() {
         try {
+            setUpSynchronizer();
             tbean.run();
         } catch (Throwable e) {
             this.error = e;

@@ -6,9 +6,9 @@
 
   <body>
 		<links>
-			<item name="SysUnit@sourceforge"	href="http://sourceforge.net/projects/sysunit"/>
-			<item name="JUnit" 								href="http://www.junit.org/"/>
-			<item name="SpiritSoft" 					href="http://www.spiritsoft.com/"/>
+			<item name="The Codehaus"	href="http://codehaus.org/"/>
+			<item name="JUnit"		href="http://www.junit.org/"/>
+			<item name="SpiritSoft"		href="http://www.spiritsoft.com/"/>
 		</links>
 		
     <menu name="SysUnit">

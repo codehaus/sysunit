@@ -4,14 +4,14 @@
   <pomVersion>3</pomVersion>
   <name>SysUnit</name>
   <id>sysunit</id>
-  <currentVersion>1.0</currentVersion>
+  <currentVersion>1.0-beta-1</currentVersion>
   
   <organization>
     <name>SpritSoft, Inc.</name>
     <url>http://www.spiritsoft.com</url>
     <logo>/images/group-logo.gif</logo>
   </organization>
-  <logo>http://sourceforge.net/sflogo.php?group_id=76653&amp;type=5</logo>
+  <logo>http://images.werken.com/codehaus_small.gif</logo>
 
 
   <inceptionYear>2003</inceptionYear>
@@ -25,17 +25,21 @@
   	SysUnit is a JUnit framework for system testing
   </description>
   
-  <url>http://sysunit.sourceforge.net/</url>
+  <url>http://sysunit.codehaus.org/</url>
+<!--
   <issueTrackingUrl>http://sourceforge.net/tracker/?group_id=76653</issueTrackingUrl>
+-->
   
-  <siteAddress>sysunit.sourceforge.net</siteAddress>
-  <siteDirectory>/home/groups/s/sy/sysunit/htdocs</siteDirectory>
+  <siteAddress>sysunit.codehaus.org</siteAddress>
+  <siteDirectory>/www/sysunit.codehaus.org</siteDirectory>
+<!--
   <distributionDirectory>/home/groups/s/sy/sysunit/htdocs/dist</distributionDirectory>
+-->
   
   <repository>
-    <connection>scm:cvs:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sysunit:sysunit</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.sourceforge.net:/cvsroot/sysunit:sysunit</developerConnection>
-    <url>http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/sysunit/sysunit/</url>
+    <connection>scm:cvs:pserver:anonymous@cvs.codehaus.org:/cvsroot/sysunit:sysunit</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.codehaus.org:/cvsroot/sysunit:sysunit</developerConnection>
+    <url>http://cvs.codehaus.org/viewcvs.cgi/?cvsroot=sysunit</url>
   </repository>
   
   <mailingLists>
@@ -73,14 +77,12 @@
       <email>jstrachan@apache.org</email>
       <organization>SpiritSoft, Inc.</organization>
     </developer>
-  </developers>
 
-  <developers>
     <developer>
-      <name>Bob McWhirter</name>
-      <id>werken</id>
-      <email>bob@werken.com</email>
-      <organization>The Werken Company</organization>
+      <name>bob mcwhirter</name>
+      <id>bob</id>
+      <email>bob@codehaus.org</email>
+      <organization>SpiritSoft, Inc.</organization>
     </developer>
   </developers>
 

@@ -130,8 +130,6 @@ public class LocalTBeanManager
     public void setUpTBeans(SystemTestCase testCase)
         throws Exception {
 
-        System.err.println( "set up tbeans" );
-
         String[] factoryNames = testCase.getTBeanFactoryNames();
         
         final LocalSynchronizer synchronizer = new LocalSynchronizer();
