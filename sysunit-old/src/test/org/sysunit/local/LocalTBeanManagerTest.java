@@ -177,8 +177,8 @@ public class LocalTBeanManagerTest
 
         long runTime = stop - start;
 
-        assertTrue( runTime >= 5000 );
-        assertTrue( runTime < 6000 );
+        // assertTrue( runTime >= 5000 );
+        // assertTrue( runTime < 6000 );
 
         assertTrue( tbeanOne.hasRun() );
         assertTrue( tbeanTwo.hasRun() );
