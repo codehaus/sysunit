@@ -17,6 +17,23 @@ import java.util.Arrays;
 
 public class Java
 {
+    public static Process execJava(Class mainClass,
+                                   String[] args)
+        throws IOException
+    {
+        return execJava( mainClass.getName(),
+                         args );
+    }
+
+    public static Process execJava(String className,
+                                   String[] args)
+        throws IOException
+    {
+        return execJava( new File( System.getProperty( "java.home" ) ),
+                         className,
+                         args );
+    }
+
     public static Process execJava(File javaHome,
                                    String className,
                                    String[] args)
