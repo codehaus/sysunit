@@ -70,6 +70,9 @@ import org.sysunit.AlreadySynchronizedException;
 import org.sysunit.SynchronizationException;
 import org.sysunit.Synchronizer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Single-JVM <code>Synchronizer</code> implementation.
  *
@@ -83,6 +86,8 @@ public class LocalSynchronizer
     // ----------------------------------------------------------------------
     //     Constants
     // ----------------------------------------------------------------------
+
+    private static final Log log = LogFactory.getLog(LocalSynchronizer.class);
 
     /** Empty <code>String</code> array. */
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
@@ -146,7 +151,7 @@ public class LocalSynchronizer
     public synchronized void unregisterSynchronizableTBean(String tbeanId) {
         this.tbeanIds.remove( tbeanId );
         this.waitingTBeanIds.remove( tbeanId );
-        if ( this.waitingTBeanIds.size() == tbeanIds.size() ) {
+        if ( shouldUnblock() ) {
             unblockAll();
         }
     }
@@ -178,6 +183,8 @@ public class LocalSynchronizer
     public void sync(String tbeanId,
                      String syncPointName)
         throws SynchronizationException, InterruptedException {
+
+        log.info( "sync " + tbeanId + " on " + syncPointName );
 
         LocalSyncPoint syncPoint = null;
 
@@ -230,6 +237,7 @@ public class LocalSynchronizer
      * @see Synchronizer
      */
     public void unblockAll() {
+        log.info( "unblocking all " + this.waitingTBeanIds );
         for ( Iterator syncPointIter = this.syncPoints.values().iterator();
               syncPointIter.hasNext(); ) {
             LocalSyncPoint syncPoint = (LocalSyncPoint) syncPointIter.next();

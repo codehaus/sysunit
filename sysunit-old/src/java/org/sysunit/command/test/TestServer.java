@@ -67,7 +67,11 @@ public class TestServer
     }
 
     public void runTest() throws Exception {
-        getRunner().getManager().run();
+        getRunner().getManager().runTest();
+    }
+
+    public void setUpTBeans() throws Exception {
+        getRunner().getManager().setUpTBeans();
     }
 
     // Properties
@@ -98,7 +102,9 @@ public class TestServer
     public void sync(String tbeanId,
                      String syncPointName)
         throws InterruptedException, SynchronizationException {
+
         log.info( "sync " + tbeanId + " on " + syncPointName + " on test server " + getName() );
+
         try {
             getMasterDispatcher().dispatch( new SyncCommand( getName(),
                                                              tbeanId,
@@ -106,6 +112,7 @@ public class TestServer
         } catch (Exception e) {
             throw new SynchronizationException( e );
         }
+
         this.synchronizer.sync( tbeanId,
                                 syncPointName );
     }

@@ -23,6 +23,7 @@ import org.sysunit.command.MissingPropertyException;
 import org.sysunit.command.Server;
 import org.sysunit.command.slave.RequestMembersCommand;
 import org.sysunit.command.slave.LaunchTestNodeCommand;
+import org.sysunit.command.test.SetUpTBeansCommand;
 import org.sysunit.command.test.RunTestCommand;
 import org.sysunit.jelly.JvmNameExtractor;
 import org.sysunit.SynchronizationException;
@@ -47,6 +48,7 @@ public class MasterServer
     private MasterSynchronizer synchronizer = new MasterSynchronizer();
 
     private List jvmNames;
+    private int setUpServers;
 	
     public MasterServer(String xml) {
     	this.xml = xml;
@@ -87,7 +89,8 @@ public class MasterServer
 	/**
 	 * @param command
 	 */
-	public void addTestNode(TestNodeLaunchedCommand command) {
+	public void addTestNode(TestNodeLaunchedCommand command)
+        throws Exception {
         TestNodeInfo testNodeInfo = new TestNodeInfo( command.getName(),
                                                       command.getNumSynchronizableTBeans(),
                                                       command.getReplyDispatcher() );
@@ -95,14 +98,31 @@ public class MasterServer
 		testNodes.put(command.getName(), testNodeInfo );
         getSynchronizer().addTestNode( testNodeInfo );
 
-        try {
-            if ( jvmNames.size() == testNodes.size() ) {
-                runTest();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if ( jvmNames.size() == testNodes.size() ) {
+            setUpTBeans();
         }
 	}
+
+    protected void setUpTBeans()
+        throws Exception {
+        for ( Iterator testNodeInfoIter = this.testNodes.values().iterator();
+              testNodeInfoIter.hasNext(); ) {
+            TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
+
+            log.info( "starting test on " + testNodeInfo.getName() );
+            testNodeInfo.getDispatcher().dispatch( new SetUpTBeansCommand() );
+            log.info( "started test on " + testNodeInfo.getName() );
+        }
+    }
+
+    public void tbeansSetUp(String testServerName)
+        throws Exception {
+        ++this.setUpServers;
+
+        if ( this.setUpServers == jvmNames.size() ) {
+            runTest();
+        }
+    }
 
     protected void runTest()
         throws Exception {

@@ -114,7 +114,9 @@ public class SystemTestCase
     // ----------------------------------------------------------------------
 
     /** Thread-local <code>TBeanSynchronizer</code>. */
-    private static ThreadLocal synchronizer = new ThreadLocal();
+    // private static ThreadLocal synchronizer = new ThreadLocal();
+
+    private TBeanSynchronizer synchronizer;
 
     // ----------------------------------------------------------------------
     //     Instance members
@@ -470,7 +472,8 @@ public class SystemTestCase
      * @param synchronizer The synchronizer for the calling thread.
      */
     void setSynchronizer(TBeanSynchronizer synchronizer) {
-        SystemTestCase.synchronizer.set( synchronizer );
+        //SystemTestCase.synchronizer.set( synchronizer );
+        this.synchronizer = synchronizer;
     }
 
     /**
@@ -490,7 +493,8 @@ public class SystemTestCase
      * @return The synchronizer for the calling thread.
      */
     TBeanSynchronizer getSynchronizer() {
-        return (TBeanSynchronizer) SystemTestCase.synchronizer.get();
+        // return (TBeanSynchronizer) SystemTestCase.synchronizer.get();
+        return this.synchronizer;
     }
 
     /**

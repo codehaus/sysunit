@@ -44,7 +44,8 @@ public class JvmRunner {
             String jvmName = args[1];
             JvmRunner runner = new JvmRunner();
             runner.run(xml, jvmName);
-            runner.getManager().run();
+            runner.getManager().setUpTBeans();
+            runner.getManager().runTest();
         }
         catch (Exception e) {
             log.error("Caught: " + e, e);

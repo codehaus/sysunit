@@ -27,9 +27,10 @@ import org.sysunit.TBean;
 import org.sysunit.TBeanSynchronizer;
 import org.sysunit.Synchronizer;
 import org.sysunit.WatchdogException;
-import org.sysunit.local.Barrier;
+import org.sysunit.util.Barrier;
+import org.sysunit.util.Blocker;
 //import org.sysunit.local.LocalSynchronizer;
-import org.sysunit.local.TBeanThread;
+import org.sysunit.util.TBeanThread;
 
 /**
  * Remote, server side <code>TBeanManager</code> implementation.
@@ -39,7 +40,7 @@ import org.sysunit.local.TBeanThread;
  * @author <a href="mailto:james.strachan@spiritsoft.com">James Strachan</a>
  * @version $Revision$
  */
-public class RemoteTBeanManager implements Runnable {
+public class RemoteTBeanManager { // implements Runnable {
 
     // ----------------------------------------------------------------------
     //     Constants
@@ -63,6 +64,8 @@ public class RemoteTBeanManager implements Runnable {
 
     private Synchronizer synchronizer;
 
+    private Blocker blocker;
+
     // ----------------------------------------------------------------------
     //     Constructors
     // ----------------------------------------------------------------------
@@ -74,6 +77,7 @@ public class RemoteTBeanManager implements Runnable {
         this.tbeans = new HashMap();
         this.tbeanThreads = new HashSet();
         this.synchronizer = synchronizer;
+        this.blocker = new Blocker();
     }
 
     // ----------------------------------------------------------------------
@@ -129,7 +133,7 @@ public class RemoteTBeanManager implements Runnable {
 		addTBean(tbean.toString(), tbean);
 	}
 
-    public void run() {
+    public void setUpTBeans() {
         try {
         	log.info("About to run tbeans: " + tbeans);
         	
@@ -143,6 +147,14 @@ public class RemoteTBeanManager implements Runnable {
         catch (Throwable e) {
             log.error("Caught: " + e, e);
         }
+    }
+
+    public void runTest() {
+        getBlocker().unblock();
+    }
+
+    public Blocker getBlocker() {
+        return this.blocker;
     }
 
     public void startTBeans() throws Throwable {
@@ -159,7 +171,7 @@ public class RemoteTBeanManager implements Runnable {
                 synchronizer.registerSynchronizableTBean(tbeanId);
             }
 
-            TBeanThread thread = new TBeanThread(tbeanId, tbean, this.synchronizer, beginBarrier, endBarrier);
+            TBeanThread thread = new TBeanThread(tbeanId, tbean, this.synchronizer, beginBarrier, this.blocker, endBarrier);
 
             this.tbeanThreads.add(thread);
 
