@@ -52,12 +52,12 @@ public class DistributedTestCaseTest
     public void testNoOpNoSyncSuccessful()
         throws Exception
     {
-        Systm.err.println( "foo" );
+        System.err.println( "foo" );
         startSlaveHosts( 2 );
-        Systm.err.println( "bar" );
+        System.err.println( "bar" );
 
         runTest( "no-op" );
-        Systm.err.println( "baz" );
+        System.err.println( "baz" );
 
         assertErrors( 0 );
         assertFailures( 0 );
