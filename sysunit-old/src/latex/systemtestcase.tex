@@ -1,0 +1,35 @@
+\chapter{The \indexclass{SystemTestCase} Class}
+
+When using the base JUnit framework, each unit test
+is represented by a single method of the form 
+\indexmethod{TestCase}{textXXX()} on a subclass of \indexclass{TestCase}.
+In this way, each subclass of \class{TestCase} may actually
+contain several tests.
+
+Unlike the base JUnit framework, a SysUnit test class creates
+only a single test.  A system test is created by subclassing
+the \class{SystemTestCase} class.  JUnit's \method{textXXX()}
+idiom is \emph{not} used when creating tests, since SysUnit
+creates a test-per-class, instead of a test-per-method.
+
+Each portion of the system that interacts within a test
+is a \indexclass{TBean}, which may be interpreted as either
+a \emph{test bean} or a \emph{thread bean}.  A
+\class{TBean} is similar to the standard \class{Runnable}
+interface, with a few modifications to assist with testing.
+When a system test is executed, all of the test's \class{TBean}
+instances are executed in parallel.  The SysUnit framework
+handles the spawning of the threads necessarily for 
+concurrently executing the code.
+
+There are two different ways to create \class{TBean} instances
+for a test:  
+
+\begin{enumerate}
+	\item \class{TBean} factory method, using
+\indexmethod{SystemTestCase}{tbeanXXX()}.
+	\item Thread factory method, using
+\indexmethod{SystemTestCase}{threadXXX()}.
+\end{enumerate}
+
+
