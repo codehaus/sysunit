@@ -30,7 +30,7 @@ public class TaskThread
             return;
         }
 
-      LOOP:
+      //LOOP:
         while ( true )
         {
             try
@@ -40,7 +40,8 @@ public class TaskThread
             }
             catch (InterruptedException e)
             {
-                break LOOP;
+                //break LOOP; 
+            	break;
             }
         }
 
