@@ -75,6 +75,8 @@ public class SocketDispatcher
                 dest.close();
             }
         } catch (Exception e) {
+            log.error( "error dispatching to " + this.addr + ":" + this.port,
+                       e );
             throw new DispatchException( command,
                                          e );
         }
