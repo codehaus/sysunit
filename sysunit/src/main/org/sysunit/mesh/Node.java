@@ -67,7 +67,9 @@ public class Node
     public void stop()
         throws InterruptedException
     {
+        System.err.println( "Node::stop()" );
         this.pool.stop();
+        System.err.println( "Node::stop() complete" );
     }
     
     public void executeOnSelf(Command command)

@@ -33,8 +33,10 @@ public class NetworkedNode
     public void stop()
         throws InterruptedException
     {
+        System.err.println( "NetworkedNode::stop()" );
         super.stop();
         this.server.stop();
+        System.err.println( "NetworkedNode::complete()" );
     }
 
     protected Server getServer()

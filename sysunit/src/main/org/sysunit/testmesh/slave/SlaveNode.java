@@ -58,6 +58,14 @@ public class SlaveNode
                                                   masterPort );
     }
 
+    public void stop()
+        throws InterruptedException
+    {
+        System.err.println( "SlaveNode::stop()" );
+        super.stop();
+        System.err.println( "SlaveNode::stop() complete" );
+    }
+
     public RemoteNodeInfo getMasterNodeInfo()
     {
         return this.masterNodeInfo;

@@ -71,10 +71,13 @@ public class SlaveHostNode
     public synchronized void stop()
         throws InterruptedException
     {
+        System.err.println( "SlaveHostNode::stop()" );
         this.mcastPingPongThread.interrupt();
         this.bcastPingPongThread.interrupt();
 
         super.stop();
+
+        this.jvmManager.destroyAll();
 
         /*
         synchronized ( this )
@@ -88,6 +91,7 @@ public class SlaveHostNode
             }
         }
         */
+        System.err.println( "SlaveHostNode::stop() complete" );
     }
 
     void startSlave(int jvmId,

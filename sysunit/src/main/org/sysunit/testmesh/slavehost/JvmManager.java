@@ -144,6 +144,25 @@ class JvmManager
         return outputs;
     }
 
+    synchronized void destroyAll()
+    {
+        JvmExecutor[] executors = (JvmExecutor[]) this.threads.keySet().toArray( EMPTY_JVMEXECUTOR_ARRAY );
+
+        for ( int i = 0 ; i < executors.length ; ++i )
+        {
+            try
+            {
+                Thread thr = getThread( executors[ i ] );
+                thr.interrupt();
+                executors[ i ].destroy();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
     synchronized void destroyAll(NodeInfo master)
     {
         JvmExecutor[] executors = getJvmExecutors( master );

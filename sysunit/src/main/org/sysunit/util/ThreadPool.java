@@ -42,12 +42,14 @@ public class ThreadPool
     public synchronized void stop()
         throws InterruptedException
     {
+        System.err.println( "ThreadPool::stop()" );
         for ( int i = 0 ; i < this.threads.length ; ++i )
         {
             threads[ i ].interrupt();
         }
 
         this.stopBarrier.block();
+        System.err.println( "ThreadPool::complete()" );
     }
 
     public int getQueueSize()

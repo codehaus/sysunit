@@ -41,7 +41,11 @@ public class StartSlaveTest
                       1001,
                       master.getSlaves()[0].getJvmId() );
 
+        System.err.println( "--- Stopping slave-host" );
         slaveHost.stop();
+        System.err.println( "--- Stopped slave-host" );
+        System.err.println( "--- Stopping master" );
         master.stop();
+        System.err.println( "--- Stopped master" );
     }
 }
