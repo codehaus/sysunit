@@ -78,7 +78,7 @@ public class PingPongThread
             }
             catch (SocketException e)
             {
-                //e.printStackTrace();
+                e.printStackTrace();
                 return;
             }
         }
