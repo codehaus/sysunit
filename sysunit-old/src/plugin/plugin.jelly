@@ -45,7 +45,8 @@
              ${maven.final.name}.jar = ${maven.build.dir}/${maven.final.name}.jar
              test-${maven.final.name}.jar = ${maven.build.dir}/test-${maven.final.name}.jar
         <j:forEach var="lib" items="${pom.artifacts}">
-              ${lib.name} = ${lib.path}
+              <util:replace var="libPath" value="${lib.path}" oldChar="\" newChar="@"/>
+              ${lib.name} = ${libPath}
         </j:forEach>
       </j:whitespace>
     </j:file>

@@ -25,7 +25,7 @@ public class RequestJarCommand
     public void run(MasterServer server)
         throws Exception {
         byte[] bytes = server.requestJar( getJarName(),
-                                          getPath() );
+                                          getPath().replace('@', '\\' ) );
 
         getReplyDispatcher().dispatch( new StoreJarCommand( getJarName(),
                                                             bytes,
