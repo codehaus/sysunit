@@ -128,6 +128,8 @@ public class MasterNode
                                            pingBytes.length,
                                            getPingAddress(),
                                            getPingPort() );
+
+                System.err.println( "sending mcast pings" );
             }
             catch (IOException e)
             {
@@ -143,6 +145,8 @@ public class MasterNode
                                        pingBytes.length,
                                        InetAddress.getLocalHost(),
                                        getPingPort() + 1 );
+
+            System.err.println( "sending bcast pings" );
         }
 
         pingSocket.send( ping );
@@ -159,6 +163,7 @@ public class MasterNode
     public void addSlaveHost(NodeInfo slaveHost,
                              PhysicalMachineInfo physicalMachineInfo)
     {
+        System.err.println( "add slavehost: " + slaveHost );
         getTestMeshManager().addSlaveHost( slaveHost,
                                            physicalMachineInfo );
     }

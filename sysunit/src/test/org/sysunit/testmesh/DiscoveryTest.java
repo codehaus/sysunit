@@ -22,13 +22,9 @@ public class DiscoveryTest
 
         master.start();
 
-        
-        master.stop();
+        //Thread.sleep( 5000 );
 
-        slaveHost1.stop();
-        slaveHost2.stop();
-        slaveHost3.stop();
-        
+
         if ( master.isMulticastEnabled() )
         {
             assertLength( "3 slaves discovered",
@@ -44,6 +40,13 @@ public class DiscoveryTest
                           1,
                           master.getSlaveHosts() );
         }
+
+        master.stop();
+
+        slaveHost1.stop();
+        slaveHost2.stop();
+        slaveHost3.stop();
+        
     }
 
     public void testDiscovery_OverBCast()
@@ -58,6 +61,8 @@ public class DiscoveryTest
 
         slaveHost1.start();
         master.start();
+
+        Thread.sleep( 5000 );
 
         
         master.stop();
