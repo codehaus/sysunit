@@ -71,6 +71,7 @@ public class JvmRunnerTest extends TestCase {
     protected void runJvm(String jvmName) throws Exception {
         String[] args = { "org/sysunit/jelly/sampleSystemTest.jelly", jvmName };
         JvmRunner.main(args);
+        Thread.sleep( 3000 );
     }
 
 }
