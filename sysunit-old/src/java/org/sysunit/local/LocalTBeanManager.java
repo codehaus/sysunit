@@ -66,7 +66,9 @@ import org.sysunit.SynchronizableTBean;
 import org.sysunit.TBeanSynchronizer;
 import org.sysunit.SystemTestCase;
 import org.sysunit.SynchronizationException;
+import org.sysunit.TBeanThrowable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
@@ -173,12 +175,19 @@ public class LocalTBeanManager
             thread.join();
 
             if ( thread.hasError() ) {
-                errors.add( thread.getError() );
+                Throwable t = thread.getError();
+
+                if ( t instanceof InvocationTargetException ) {
+                    t = ((InvocationTargetException)t).getTargetException();
+                }
+                errors.add( new TBeanThrowable( thread.getTBeanId(),
+                                                t ) );
             } else {
                 try {
                     thread.getTBean().assertValid();
                 } catch (Throwable t) {
-                    errors.add( t );
+                    errors.add( new TBeanThrowable( thread.getTBeanId(),
+                                                    t ) );
                 }
             }
         }

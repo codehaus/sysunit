@@ -64,6 +64,7 @@ import junit.framework.TestCase;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -323,17 +324,14 @@ public class SystemTestCase
 
             if ( errors.length > 0 )
             {
-                StringBuffer buf = new StringBuffer();
-                
                 for ( int i = 0 ; i < errors.length ; ++i )
                 {
-                    buf.append( errors[i].getMessage() );
-                    buf.append( '\n' );
-                    
-                    errors[i].printStackTrace();
+                    if ( errors[i] instanceof InvocationTargetException )
+                    {
+                        errors[i] = ((InvocationTargetException)errors[i]).getTargetException();
+                    }
                 }
-                
-                throw new Exception( buf.toString() );
+                throw new MultiThrowable( errors );
             }
         } finally {
             tearDownTBeans();
