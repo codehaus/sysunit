@@ -9,7 +9,7 @@
  */
 package org.sysunit.command.slave;
 
-
+import java.util.Map;
 
 /**
  * This Command starts a new TestNode JVM, either as an entirely new fork
@@ -22,11 +22,16 @@ public class LaunchTestNodeCommand extends SlaveCommand {
     private String xml;
     private String jvmName;
     private String masterID;
+    private Map jarMap;
 
-    public LaunchTestNodeCommand(String xml, String jvmName, String masterID) {
+    public LaunchTestNodeCommand(String xml,
+                                 String jvmName,
+                                 String masterID,
+                                 Map jarMap) {
 		this.xml = xml;
 		this.jvmName = jvmName;
 		this.masterID = masterID;
+        this.jarMap = jarMap;
    }
 
     public void run(SlaveServer context) throws Exception {
@@ -43,6 +48,10 @@ public class LaunchTestNodeCommand extends SlaveCommand {
     
     public String getMasterID() {
         return masterID;
+    }
+
+    public Map getJarMap() {
+        return this.jarMap;
     }
 
 }

@@ -9,9 +9,16 @@
  */
 package org.sysunit.command.slave;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.command.Server;
+import org.sysunit.command.master.RequestJarCommand;
 import org.sysunit.transport.jms.TestNode;
 
 /**
@@ -23,22 +30,28 @@ import org.sysunit.transport.jms.TestNode;
 public class SlaveServer extends Server {
     private static final Log log = LogFactory.getLog(SlaveServer.class);
 
-    private boolean forkJvm = false;
+    private boolean forkJvm = true;
+
+    private File tmpDir;
+
+    private Map waiters;
 
     public SlaveServer() {
+        this.waiters = new HashMap();
     }
 
     /**
      * @param command
      */
-    public void launchTestNode(LaunchTestNodeCommand command) {
+    public void launchTestNode(LaunchTestNodeCommand command)
+        throws Exception {
         log.info(
             "About to start xml: "
-                + command.getXml()
-                + " with logical machine: "
-                + command.getJvmName()
-                + " from Master: "
-                + command.getMasterID());
+            + command.getXml()
+            + " with logical machine: "
+            + command.getJvmName()
+            + " from Master: "
+            + command.getMasterID());
 
         if (isForkJvm()) {
             launchNodeInForkedJvm(command);
@@ -46,6 +59,21 @@ public class SlaveServer extends Server {
         else {
             launchNodeLocally(command);
         }
+    }
+
+    public void start()
+        throws Exception {
+
+        this.tmpDir = File.createTempFile( "sysunit-",
+                                           ".jars" );
+
+        this.tmpDir.delete();
+
+        this.tmpDir.mkdir();
+
+        this.tmpDir.deleteOnExit();
+        
+        super.start();
     }
 
     // Properties
@@ -86,15 +114,40 @@ public class SlaveServer extends Server {
     }
 
     /**
-      * Runs the Test logical machine in a new forked JVM
-      * @param command
-      */
-    private void launchNodeInForkedJvm(LaunchTestNodeCommand command) {
-        String[] args = getTestArguments(command);
+     * Runs the Test logical machine in a new forked JVM
+     * @param command
+     */
+    private synchronized void launchNodeInForkedJvm(LaunchTestNodeCommand command)
+        throws Exception {
+        
+        File dir = new File( this.tmpDir,
+                             command.getMasterID().replaceAll( File.pathSeparator,
+                                                               "@" ) );
 
-        ProcessRunner runner = ProcessRunner.newJavaProcess(TestNode.class, args);
-        Thread thread = new Thread(runner);
-        thread.start();
+
+        LaunchWaiter waiter = new LaunchWaiter( dir,
+                                                command,
+                                                getTestArguments( command ) );
+
+        log.info( "PUT " + command.getMasterID() );
+
+        this.waiters.put( command.getMasterID() + "-false",
+                          waiter );
+
+        waiter.start();
+    }
+
+    public synchronized void storeJar(String jarName,
+                                      byte[] bytes,
+                                      String masterId)
+        throws Exception {
+
+        LaunchWaiter waiter = (LaunchWaiter) this.waiters.get( masterId );
+
+        log.info( "GET " + masterId + " // " + waiter );
+
+        waiter.storeJar( jarName,
+                         bytes );
     }
 
     /**

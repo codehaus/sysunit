@@ -1,4 +1,7 @@
-<project default="jar:jar" xmlns:j="jelly:core" xmlns:test="test">
+<project default="jar:jar" 
+         xmlns:j="jelly:core" 
+         xmlns:ant="jelly:ant"
+         xmlns:test="test">
 
   <preGoal name="site">
     <attainGoal name="java:compile"/>
@@ -35,7 +38,7 @@
 		</path>
   </goal>
 
-  <goal name="sysunit:a" prereqs="setclasspath" description="Runs system test A on a bunch of slave nodes">
+  <goal name="sysunit:a" prereqs="setclasspath,sysunit:generate-jar-list,jar:jar,sysunit:jar-test-classes" description="Runs system test A on a bunch of slave nodes">
     <java classname="org.sysunit.transport.jms.MasterNode" fork="yes">
       <classpath refid="test.classpath"/>
       <arg value="org/sysunit/jelly/sampleSystemTest.jelly"/>
@@ -62,14 +65,39 @@
     </fileScanner>
 
     <j:file name="${testDir}/sysunit-tests.properties" omitXmlDeclaration="true">
+      <j:whitespace trim="false">
         <j:forEach var="xmlTest" items="${xmlTests.iterator()}">
             ${xmlTest.getPath().toString().substring(testDirLen)} = on
         </j:forEach>
+      </j:whitespace>
     </j:file>
-
   </goal>
 
-  <goal name="sysunit:test">
+  <goal name="sysunit:generate-jar-list">
+    <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
+    <j:set var="testDir">${testPlugin.findVariable('maven.test.dest')}</j:set>
+    <j:file name="${testDir}/sysunit-jars.properties" omitXmlDeclaration="true">
+      <j:whitespace trim="false">
+             ${maven.final.name}.jar = ${maven.build.dir}/${maven.final.name}.jar
+             test-${maven.final.name}.jar = ${maven.build.dir}/test-${maven.final.name}.jar
+        <j:forEach var="lib" items="${pom.artifacts}">
+              ${lib.name} = ${lib.path}
+        </j:forEach>
+      </j:whitespace>
+    </j:file>
+ 
+  </goal>
+
+  <goal name="sysunit:jar-test-classes" prereqs="test:compile,sysunit:generate-jar-list">
+    <test:dependency-handle/>
+    <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
+    <ant:jar
+        jarfile="${maven.build.dir}/test-${maven.final.name}.jar"
+        basedir="${testPlugin.findVariable('maven.test.dest')}"
+        index="true"/>
+  </goal>
+
+  <goal name="sysunit:test" prereqs="jar:jar,sysunit:jar-test-classes">
     <test:dependency-handle/>
     <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
     ${testPlugin.setVariable('testcase', 'org.sysunit.SumoSystemTestSuite')}
@@ -79,16 +107,7 @@
   <goal name="sysunit:register">
     <test:dependency-handle/>
     <postGoal name="test:test">
-       <j:if test="${context.findVariable('sysunit.test.skip') != 'true'}">
-         <echo>NOT SKIPPING SYSUNIT TESTS</echo>
-         <attainGoal name="sysunit:test"/>
-       </j:if>
-    </postGoal>
-    <preGoal name="clover:test">
-       <j:set var="sysunit.test.skip" value="true"/>
-    </preGoal>
-    <postGoal name="clover:test">
-       <j:set var="sysunit.test.skip" value="false"/>
+       <attainGoal name="sysunit:test"/>
     </postGoal>
   </goal>
  

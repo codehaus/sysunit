@@ -146,7 +146,7 @@
 
 
 	<!-- a sample JMS to use -->
-	<dependency>
+    <dependency>
       <id>openjms</id>
       <version>0.7.5</version>
     </dependency>
@@ -158,6 +158,8 @@
       <id>jta</id>
       <version>1.0.1</version>
     </dependency>
+<!--
+-->
 	
 	
 
@@ -170,6 +172,8 @@
       <id>mx4j+tools</id>
       <version>1.1.1</version>
     </dependency>
+<!--
+-->
 
 		<!-- jars for jboss -->
 <!--
@@ -178,7 +182,6 @@
       <artifactId>jboss</artifactId>
       <version>3.2.1</version>
     </dependency>
--->
 
     <dependency>
       <groupId>jboss</groupId>
@@ -186,13 +189,11 @@
       <version>3.2.1</version>
     </dependency>
 
-<!--
     <dependency>
       <groupId>jboss</groupId>
       <artifactId>jboss-common</artifactId>
       <version>3.2.1</version>
     </dependency>
--->
 
     <dependency>
       <groupId>jboss</groupId>
@@ -217,6 +218,7 @@
       <artifactId>jnet</artifactId>
       <version>3.2.1</version>
     </dependency>
+-->
 
     <dependency>
       <groupId>jboss</groupId>

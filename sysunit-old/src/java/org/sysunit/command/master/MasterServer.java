@@ -9,12 +9,16 @@
  */
 package org.sysunit.command.master;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -292,11 +296,29 @@ public class MasterServer
 
 	// Implementation methods
 	//-------------------------------------------------------------------------    
-	protected void roundRobbinJvms(String xml) throws DispatchException {
+	protected void roundRobbinJvms(String xml) throws Exception {
 		// lets create an Array of the dispatchers
 		Collection dispatcherCollection = members.values();
 		
 		log.info("Dispatching: " + jvmNames.size() + " JVM(s) across: " + dispatcherCollection.size() + " dispatcher(s)");
+
+        Properties jarMap = new Properties();
+
+        InputStream jarsIn = getClass().getClassLoader().getResourceAsStream( "sysunit-jars.properties" );
+        
+        if ( jarsIn != null ) {
+            try {
+                jarMap.load( jarsIn );
+            } finally {
+                jarsIn.close();
+            }
+        }
+
+        log.info( jarMap );
+
+        //if ( 1 == 1 ) {
+            //throw new Error( "foo" );
+        //}
 		
 		int size = dispatcherCollection.size();
 		Dispatcher[] dispatchers = new Dispatcher[size];
@@ -316,10 +338,34 @@ public class MasterServer
 
             String mungedName = getName().substring( 0,
                                                      getName().lastIndexOf( "-false" ) );
+
+            // String mungedName = getName();
 			
-			dispatcher.dispatch(new LaunchTestNodeCommand(xml, jvmName, mungedName ));
+			dispatcher.dispatch(new LaunchTestNodeCommand(xml,
+                                                          jvmName,
+                                                          mungedName,
+                                                          jarMap));
 		}
 	}
+
+    public byte[] requestJar(String jarName,
+                             String path)
+        throws Exception {
+
+        File file = new File( path );
+
+        FileInputStream in = new FileInputStream( file );
+
+        try {
+            byte bytes[] = new byte[ (int) file.length() ];
+            
+            in.read( bytes );
+            
+            return bytes;
+        } finally {
+            in.close();
+        }
+    }
 
     public void registerSynchronizableTBean(RegisterSynchronizableTBeanCommand command)
         throws DispatchException {
