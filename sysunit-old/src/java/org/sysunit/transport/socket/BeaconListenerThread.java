@@ -103,7 +103,7 @@ public class BeaconListenerThread
                                      0,
                                      packet.getLength() );
 
-        log.debug( "received beacon [" + message + "] from " + packet.getAddress().getHostAddress() );
+        //System.err.println( "received beacon [" + message + "] from " + packet.getAddress().getHostAddress() );
 
         if ( message.startsWith( "slave|" ) ) {
             String portStr = message.substring( message.indexOf( "|" )+1 );

@@ -53,6 +53,8 @@ public class BeaconTransmitterThread
 
     public void run() {
 
+        //System.err.println( "starting beacon transmitter" );
+
         DatagramSocket beaconSocket = null;
         DatagramPacket beacon       = null;
 
@@ -95,7 +97,7 @@ public class BeaconTransmitterThread
         try
         {
             while ( true ) {
-                log.debug( "sending beacon [" + message + "]" );
+                //System.err.println( "sending beacon [" + message + "]" );
                 beaconSocket.send( beacon );
                 try {
                     Thread.sleep( 1000 );

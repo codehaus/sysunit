@@ -21,7 +21,7 @@
 
     <dependency>
       <id>sysunit</id>
-      <version>1.0-beta-8-dev</version>
+      <version>1.0-beta-9-dev</version>
     </dependency>
 
     <dependency>

@@ -23,6 +23,8 @@ public class JarFetcher
     private int numStored;
     private SlaveServer slaveServer;
     private boolean failed;
+
+    private int inProgress;
     
     public JarFetcher(Dispatcher dispatcher,
                       File dir,
@@ -64,7 +66,7 @@ public class JarFetcher
     }
 
     public void fetchJars()
-        throws DispatchException {
+        throws DispatchException, InterruptedException {
         if ( ! this.dir.exists() ) {
             this.dir.mkdirs();
         }
@@ -73,13 +75,22 @@ public class JarFetcher
 
         for ( Iterator nameIter = this.jarMap.keySet().iterator();
               nameIter.hasNext(); ) {
-            String name = (String) nameIter.next();
-            String path = (String) this.jarMap.get( name );
 
-            System.err.println( "REQUEST: " + name + " // " + this );
-            this.dispatcher.dispatch( new RequestJarCommand( name,
-                                                             path,
-                                                             this.slaveServer.getName() + " #" + (++i) ) );
+            synchronized ( this )
+            {
+                while ( this.inProgress >= 1 ) {
+                        this.wait();
+                }
+
+                String name = (String) nameIter.next();
+                String path = (String) this.jarMap.get( name );
+                
+                this.dispatcher.dispatch( new RequestJarCommand( name,
+                                                                 path,
+                                                                 this.slaveServer.getName() + " #" + (++i) ) );
+                
+                ++this.inProgress;
+            }
         }
     }
 
@@ -93,9 +104,6 @@ public class JarFetcher
         File jarFile = new File( this.dir,
                                  jarName );
 
-        
-        System.err.println( "CHEESE: " + jarFile );
-
         jarFile.deleteOnExit();
 
         FileOutputStream out = new FileOutputStream( jarFile );
@@ -107,9 +115,8 @@ public class JarFetcher
         }
 
         ++this.numStored;
+        --this.inProgress;
 
-        if ( this.numStored == this.jarMap.size() ) {
-            notifyAll();
-        }
+        notifyAll();
     }
 }

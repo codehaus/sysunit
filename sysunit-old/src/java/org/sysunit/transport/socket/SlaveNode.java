@@ -39,6 +39,7 @@ public class SlaveNode
 
     public void start()
         throws Exception {
+        System.err.println( "STARTING SLAVE" );
         log.debug( "start()" );
 
         SlaveServer server = new SlaveServer();
