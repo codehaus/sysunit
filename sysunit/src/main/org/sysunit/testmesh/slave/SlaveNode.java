@@ -194,6 +194,21 @@ public class SlaveNode
             urls[ i ] = new URL( "http://" + host + ":" + port + relativeUrls[ i ] );
         }
 
+        StringBuffer classpath = new StringBuffer();
+
+        for ( int i = 0 ; i < urls.length ; ++i )
+        {
+            if ( i > 0 )
+            {
+                classpath.append( "|" );
+            }
+
+            classpath.append( urls[i].toExternalForm() );
+        }
+
+        System.setProperty( "sysunit.classpath",
+                            classpath.toString() );
+
         return new ClasspathClassLoader( urls );
     }
 

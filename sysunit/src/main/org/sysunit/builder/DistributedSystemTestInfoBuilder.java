@@ -97,9 +97,9 @@ public class DistributedSystemTestInfoBuilder
     public void startSystemTest(Attributes attrs)
         throws SAXException
     {
-        String name = requiredAttribute( "systemTest",
-                                         "name",
-                                         attrs );
+        String name = optionalAttribute( "name",
+                                         attrs,
+                                         "default" );
 
         this.testInfo = new DistributedSystemTestInfo( name );
 
@@ -263,6 +263,20 @@ public class DistributedSystemTestInfoBuilder
              value.trim().equals( "" ) )
         {
             return null;
+        }
+
+        return value.trim();
+    }
+
+    protected String optionalAttribute(String name,
+                                       Attributes attrs,
+                                       String defaultValue)
+    {
+        String value = attrs.getValue( name );
+
+        if ( value == null )
+        {
+            return defaultValue;
         }
 
         return value.trim();

@@ -24,4 +24,9 @@ public class InvalidPropertyException
     {
         return this.propertyName;
     }
+
+    public String getMessage()
+    {
+        return "Unable to set property <" + getPropertyName() + "> upon object of class <" + getBeanClass().getName() + ">";
+    }
 }

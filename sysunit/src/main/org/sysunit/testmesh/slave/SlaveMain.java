@@ -26,7 +26,7 @@ public class SlaveMain
         final SlaveNode slave = new SlaveNode( jvmId,
                                                masterAddress,
                                                masterPort );
-        
+
         Runtime.getRuntime().addShutdownHook( new Thread()
             {
                 public void run()
