@@ -56,48 +56,50 @@ public abstract class ClassGenerator
             }
 
             File[] contents = curDir.listFiles();
-
-            for ( int i = 0 ; i < contents.length ; ++i )
+            if (contents!=null) 
             {
-                if ( contents[ i ].isDirectory() )
-                {
-                    dirStack.addLast( contents[ i ] );
-                }
-                else
-                {
-                    if ( contents[ i ].getName().endsWith( "." + this.extension ) )
-                    {
-                        String fileName  = contents[ i ].getName();
-                        String className = fileName.substring( 0, fileName.lastIndexOf( '.' ) );
-
-                        String realClassName = className.replace( '.', '_' );
-                        realClassName = realClassName.replace( '-', '_' );
-
-                        File destination = new File ( new File( this.outputDir,
-                                                                dirPrefix ),
-                                                      realClassName + ".java" );
-
-                        String packageName = dirPrefix.replace( File.separatorChar,
-                                                                '.' );
-
-                        if ( ! realClassName.equals( className ) )
-                        {
-                            System.err.println( "    [sysunit] warning: " + contents[ i ].getPath() + " generated to class " + packageName + "." + realClassName );
-                        }
-
-
-                        if ( ! destination.exists()
-                             ||
-                             destination.lastModified() > contents[ i ].lastModified() )
-                        {
-                            destination.getParentFile().mkdirs();
-                            generateClass( packageName,
-                                           realClassName,
-                                           contents[ i ],
-                                           destination );
-                        }
-                    }
-                }
+	            for ( int i = 0 ; i < contents.length ; ++i )
+	            {
+	                if ( contents[ i ].isDirectory() )
+	                {
+	                    dirStack.addLast( contents[ i ] );
+	                }
+	                else
+	                {
+	                    if ( contents[ i ].getName().endsWith( "." + this.extension ) )
+	                    {
+	                        String fileName  = contents[ i ].getName();
+	                        String className = fileName.substring( 0, fileName.lastIndexOf( '.' ) );
+	
+	                        String realClassName = className.replace( '.', '_' );
+	                        realClassName = realClassName.replace( '-', '_' );
+	
+	                        File destination = new File ( new File( this.outputDir,
+	                                                                dirPrefix ),
+	                                                      realClassName + ".java" );
+	
+	                        String packageName = dirPrefix.replace( File.separatorChar,
+	                                                                '.' );
+	
+	                        if ( ! realClassName.equals( className ) )
+	                        {
+	                            System.err.println( "    [sysunit] warning: " + contents[ i ].getPath() + " generated to class " + packageName + "." + realClassName );
+	                        }
+	
+	
+	                        if ( ! destination.exists()
+	                             ||
+	                             destination.lastModified() > contents[ i ].lastModified() )
+	                        {
+	                            destination.getParentFile().mkdirs();
+	                            generateClass( packageName,
+	                                           realClassName,
+	                                           contents[ i ],
+	                                           destination );
+	                        }
+	                    }
+	                }
+	            }
             }
         }
     }
