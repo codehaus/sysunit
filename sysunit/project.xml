@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <pomVersion>3</pomVersion>
+  <name>SysUnit</name>
+  <id>sysunit</id>
+  <currentVersion>1.0-beta-10</currentVersion>
+  
+  <organization>
+    <name>SpritSoft, Inc.</name>
+    <url>http://www.spiritsoft.com</url>
+    <logo>/images/group-logo.gif</logo>
+  </organization>
+  <logo>http://images.werken.com/codehaus_small.gif</logo>
+
+
+  <inceptionYear>2003</inceptionYear>
+  <package>org.sysunit</package>
+  <shortDescription>SysUnit is a JUnit framework for system testing</shortDescription>
+
+  <!-- Gump integration -->
+  <gumpRepositoryId>sysunit</gumpRepositoryId>
+  
+  <description>
+  	SysUnit is a JUnit framework for system testing
+  </description>
+  
+  <url>http://www.sysunit.org/</url>
+  <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10150</issueTrackingUrl>
+  
+  <siteAddress>sysunit.org</siteAddress>
+  <siteDirectory>/www/sysunit.codehaus.org</siteDirectory>
+<!--
+  <distributionDirectory>/home/groups/s/sy/sysunit/htdocs/dist</distributionDirectory>
+-->
+  
+  <repository>
+    <connection>scm:cvs:pserver:anonymous@cvs.codehaus.org:/scm/cvs:sysunit</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.codehaus.org:/scm/cvs:sysunit</developerConnection>
+    <url>http://cvs.codehaus.org/viewcvs.cgi/sysunit/?root=codehaus</url>
+  </repository>
+  
+  <mailingLists>
+    <mailingList>
+      <name>SysUnit Interest List</name>
+      <subscribe></subscribe>
+      <unsubscribe></unsubscribe>
+      <archive></archive>
+    </mailingList>
+  </mailingLists>
+  
+  
+  <versions>
+    <version>
+      <id>1.0-beta-1</id>
+      <name>1.0-beta-1</name>
+      <tag>1.0-beta-1</tag>
+    </version>
+  </versions>
+  <branches></branches>
+  
+  <mailingLists>
+    <mailingList>
+      <name>sysunit@spiritsoft.com</name>
+      <subscribe></subscribe>
+      <unsubscribe></unsubscribe>
+      <archive></archive>
+    </mailingList>
+  </mailingLists>
+  
+  <developers>
+    <developer>
+      <name>James Strachan</name>
+      <id>jstrachan</id>
+      <email>jstrachan@apache.org</email>
+      <organization>SpiritSoft, Inc.</organization>
+    </developer>
+
+    <developer>
+      <name>bob mcwhirter</name>
+      <id>bob</id>
+      <email>bob@codehaus.org</email>
+      <organization>SpiritSoft, Inc.</organization>
+    </developer>
+  </developers>
+
+  <contributors>
+  </contributors>
+
+  <dependencies>
+
+    <dependency>
+      <id>junit</id>
+      <version>3.8.1</version>
+    </dependency>
+    
+  </dependencies>
+  
+  <build>
+    <nagEmailAddress>scm@sysunit.codehaus.org</nagEmailAddress>
+    <sourceDirectory>src/main</sourceDirectory>
+    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+    
+    <integrationUnitTestSourceDirectory/>
+    <aspectSourceDirectory/>
+    
+    <unitTest>
+      <resources>
+        <resource>
+          <directory>src/test</directory>
+          <includes>
+            <include>**/*.properties</include>
+            <include>**/*.systest</include>
+            <include>**/*.xml</include>
+            <include>**/*.conf</include>
+          </includes>
+        </resource>
+      </resources>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <excludes>
+        <exclude>org/sysunit/tests/**/*</exclude>
+      </excludes>
+    </unitTest>
+
+    
+    <!-- J A R  R E S O U R C E S -->
+    <!-- Resources that are packaged up inside the JAR file -->
+    <resources>
+      <resource>
+        <directory>src/conf</directory>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/java</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+        </includes>
+      </resource>
+<!--
+      <includes>
+        <include>**/*.properties</include>
+      </includes>
+-->
+    </resources>
+  </build>
+</project>

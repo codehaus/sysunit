@@ -1,0 +1,8 @@
+<systemTest name="no-op">
+  <jvm count="2" name="one">
+    <tbean className="org.sysunit.tests.NoOpTBean" count="5"/>
+  </jvm>
+  <jvm count="1" name="two">
+    <tbean className="org.sysunit.tests.ThrowingTBean" count="1"/>
+  </jvm>
+</systemTest>
