@@ -28,6 +28,12 @@ public class TestServer extends Server {
     public TestServer() {
     }
 
+	public void run(String xml, String jvmName) throws Exception {
+		// now lets run the JVM test
+		getRunner().run(xml, jvmName);
+        
+	}
+
 	// Properties
 	//-------------------------------------------------------------------------    
 

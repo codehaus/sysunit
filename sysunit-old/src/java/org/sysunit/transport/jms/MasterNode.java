@@ -32,20 +32,19 @@ import org.sysunit.command.slave.StartTestNodeCommand;
  * @author James Strachan
  * @version $Revision$
  */
-public class MasterNode  {
+public class MasterNode extends Node  {
 
 	private MasterServer server = new MasterServer();
-    private Dispatcher groupDispatcher;
-    private Destination replyToDestination;
-    private CommandMessageListener messageListener;
+    private Dispatcher slaveGroupDispatcher;
     private long waitTime = 2000L;
 
     public static void main(String[] args) {
         // lets assume the messenger.xml is on the classpath
         String messengerName = "topicConnection";
-        String groupTopic = "SYSUNIT.GROUP";
+		String groupSubject = "SYSUNIT.MASTERS";
+		String slaveGroupSubject = "SYSUNIT.SLAVES";
         if (args.length > 0) {
-            groupTopic = args[0];
+            slaveGroupSubject = args[0];
         }
 
         try {
@@ -54,8 +53,9 @@ public class MasterNode  {
                 System.out.println("Could not find a messenger instance called: " + messengerName);
                 return;
             }
-            Destination destination = messenger.getDestination(groupTopic);
-            MasterNode controller = new MasterNode(messenger, destination);
+			Destination groupDestination = messenger.getDestination(groupSubject);
+			Destination slaveGroupDestination = messenger.getDestination(slaveGroupSubject);
+            MasterNode controller = new MasterNode(messenger, groupDestination, slaveGroupDestination);
             controller.start();
         }
         catch (Exception e) {
@@ -64,18 +64,17 @@ public class MasterNode  {
         }
     }
 
-    public MasterNode(Messenger messenger, Destination destination) throws JMSException {
-		messageListener = new CommandMessageListener(new JmsAdapter(messenger), server);
-        replyToDestination = messenger.createTemporaryDestination();
-        messenger.addListener(replyToDestination, messageListener);
-
-        groupDispatcher = new JmsDispatcher(messenger, destination, replyToDestination);
+    public MasterNode(Messenger messenger, Destination groupDestination, Destination slaveGroupDestination) throws JMSException {
+    	super(new MasterServer(), messenger, groupDestination);
+    	this.server = (MasterServer) getServer();
+    	
+        slaveGroupDispatcher = new JmsDispatcher(messenger, slaveGroupDestination, getReplyToDestination());
     }
 
     public void start() throws Exception {
 
         // lets send an advertisement
-        groupDispatcher.dispatch(new RequestMembersCommand());
+        slaveGroupDispatcher.dispatch(new RequestMembersCommand());
 
         // now lets wait until some people arrive...
         Thread.sleep(waitTime);

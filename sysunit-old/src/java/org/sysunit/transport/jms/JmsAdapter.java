@@ -32,9 +32,11 @@ public class JmsAdapter {
 
 	private Map replyDispatchers = new HashMap();
 	private Messenger messenger;
+	private Destination repliesToMe;
 	
-    public JmsAdapter(Messenger messenger) {
+    public JmsAdapter(Messenger messenger, Destination repliesToMe) {
     	this.messenger = messenger;
+    	this.repliesToMe = repliesToMe;
     }
 
     /**
@@ -49,8 +51,12 @@ public class JmsAdapter {
     	if (replyTo != null) {
     		answer = (Dispatcher) replyDispatchers.get(replyTo);
     		if (answer == null) {
-    			// lets set the reply dispatcher of this dispatcher to the original destination
-    			answer = new JmsDispatcher(messenger, replyTo, message.getJMSDestination());
+    			Destination replyToReply = repliesToMe;
+    			if (replyToReply == null) {
+					// lets set the reply dispatcher of this dispatcher to the original destination
+					message.getJMSDestination();
+    			}
+    			answer = new JmsDispatcher(messenger, replyTo, replyToReply);
     			replyDispatchers.put(replyTo, answer);
     		}
     	}

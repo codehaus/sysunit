@@ -14,7 +14,6 @@ import javax.jms.JMSException;
 
 import org.apache.commons.messenger.Messenger;
 import org.apache.commons.messenger.MessengerManager;
-import org.sysunit.command.Dispatcher;
 import org.sysunit.command.slave.SlaveServer;
 
 /**
@@ -23,20 +22,17 @@ import org.sysunit.command.slave.SlaveServer;
  * @author James Strachan
  * @version $Revision$
  */
-public class SlaveNode {
+public class SlaveNode extends Node {
 
-    private SlaveServer server = new SlaveServer();
-    private Dispatcher groupDispatcher;
-    private Destination replyToDestination;
-    private CommandMessageListener messageListener;
+    private SlaveServer server;
     private long waitTime = 2000L;
 
     public static void main(String[] args) {
         // lets assume the messenger.xml is on the classpath
         String messengerName = "topicConnection";
-        String groupTopic = "SYSUNIT.GROUP";
+        String groupSubject = "SYSUNIT.SLAVES";
         if (args.length > 0) {
-            groupTopic = args[0];
+            groupSubject = args[0];
         }
 
         try {
@@ -45,8 +41,8 @@ public class SlaveNode {
                 System.out.println("Could not find a messenger instance called: " + messengerName);
                 return;
             }
-            Destination destination = messenger.getDestination(groupTopic);
-            SlaveNode controller = new SlaveNode(messenger, destination);
+            Destination groupDestination = messenger.getDestination(groupSubject);
+            SlaveNode controller = new SlaveNode(messenger, groupDestination);
             controller.start();
         }
         catch (Exception e) {
@@ -55,20 +51,8 @@ public class SlaveNode {
         }
     }
 
-    public SlaveNode(Messenger messenger, Destination destination) throws JMSException {
-        messageListener = new CommandMessageListener(new JmsAdapter(messenger), server);
-        replyToDestination = messenger.createTemporaryDestination();
-		messenger.addListener(destination, messageListener);
-		messenger.addListener(replyToDestination, messageListener);
+    public SlaveNode(Messenger messenger, Destination groupDestination) throws JMSException {
+    	super(new SlaveServer(), messenger, groupDestination);
+    	this.server = (SlaveServer) getServer();
     }
-
-    public void start() throws Exception {
-    }
-
-    // Properties
-    //-------------------------------------------------------------------------    
-
-    // Implementation methods
-    //-------------------------------------------------------------------------    
-
 }
