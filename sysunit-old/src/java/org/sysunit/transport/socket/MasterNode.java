@@ -21,8 +21,20 @@ public class MasterNode
             System.exit( 1 );
         }
 
+        int port = BeaconTransmitterThread.PORT;
+
+        String sysunitPortStr = System.getProperty( "sysunit.port" );
+
+        if ( sysunitPortStr != null ) {
+            sysunitPortStr = sysunitPortStr.trim();
+
+            if ( ! sysunitPortStr.equals( "" ) ) {
+                port = Integer.parseInt( sysunitPortStr );
+            }
+        }
+
         MasterNode node = new MasterNode( InetAddress.getByName( "224.0.0.42" ),
-                                          BeaconTransmitterThread.PORT,
+                                          port,
                                           args[0] );
 
         node.start();

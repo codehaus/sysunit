@@ -7,6 +7,7 @@
   <goal name="sysunit:slave" description="Runs a slave node">
     <java classname="org.sysunit.transport.socket.SlaveNode" fork="yes">
       <classpath path="${plugin.dependencyClasspath}"/>
+      <sysproperty key="sysunit.port" value="${sysunit.port}"/>
     </java>
   </goal>
 

@@ -14,8 +14,21 @@ public class SlaveNode
 
     public static void main(String[] args)
         throws Exception {
+
+        int port = BeaconTransmitterThread.PORT;
+
+        String sysunitPortStr = System.getProperty( "sysunit.port" );
+
+        if ( sysunitPortStr != null ) {
+            sysunitPortStr = sysunitPortStr.trim();
+
+            if ( ! sysunitPortStr.equals( "" ) ) {
+                port = Integer.parseInt( sysunitPortStr );
+            }
+        }
+
         SlaveNode node = new SlaveNode( InetAddress.getByName( "224.0.0.42" ),
-                                        BeaconTransmitterThread.PORT );
+                                        port );
         node.start();
     }
 
