@@ -1,6 +1,7 @@
 package org.sysunit.mesh;
 
 import org.sysunit.util.ThreadPool;
+import org.sysunit.util.ResolvingObjectInputStream;
 
 import java.io.Serializable;
 import java.io.InputStream;
@@ -202,7 +203,8 @@ public class Node
         byte[] bytes = byteOut.toByteArray();
         
         ByteArrayInputStream byteIn = new ByteArrayInputStream( bytes );
-        ObjectInputStream objectIn = new ObjectInputStream( byteIn );
+        ObjectInputStream objectIn = new ResolvingObjectInputStream( byteIn,
+                                                                     Thread.currentThread().getContextClassLoader() );
         
         Command dupeCommand = (Command) objectIn.readObject();
         objectIn.close();
