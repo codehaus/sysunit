@@ -16,14 +16,16 @@ public class ScenarioInfoBuilder
     private static final Class[] EMPTY_CLASS_ARRAY = new Class[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Class[0];
 
-    public static ScenarioInfo build(File file)
+    public static ScenarioInfo build(DistributedSystemTestInfo testInfo,
+                                     File file)
         throws Exception
     {
         FileInputStream in = new FileInputStream( file );
 
         try
         {
-            return build( in );
+            return build( testInfo,
+                          in );
         }
         finally
         {
@@ -32,30 +34,23 @@ public class ScenarioInfoBuilder
     }
 
 
-    public static ScenarioInfo build(InputStream in)
+    public static ScenarioInfo build(DistributedSystemTestInfo testInfo,
+                                     InputStream in)
         throws Exception
     {
         Properties props = new Properties();
 
         props.load( in );
 
-        return build( props );
+        return build( testInfo,
+                      props );
     }
 
-    public static ScenarioInfo build(Properties props)
+    public static ScenarioInfo build(DistributedSystemTestInfo testInfo,
+                                     Properties props)
         throws Exception
     {
-        String testClassName = props.getProperty( "test.class" );
-
-        String scenarioName = props.getProperty( "scenario.name" );
-
-        Class testClass = Class.forName( testClassName );
-
-        Method method = testClass.getMethod( "getTestInfo",
-                                             EMPTY_CLASS_ARRAY );
-
-        DistributedSystemTestInfo testInfo = (DistributedSystemTestInfo) method.invoke( testClass,
-                                                                                        EMPTY_OBJECT_ARRAY );
+        String scenarioName = props.getProperty( "name" );
 
         ScenarioInfo scenarioInfo = new ScenarioInfo( scenarioName,
                                                       testInfo );

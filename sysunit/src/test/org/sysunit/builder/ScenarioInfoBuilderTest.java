@@ -4,47 +4,38 @@ import org.sysunit.model.ScenarioInfo;
 import org.sysunit.model.JvmInfo;
 import org.sysunit.model.DistributedSystemTestInfo;
 
+import java.io.InputStream;
 import java.util.Properties;
 
 public class ScenarioInfoBuilderTest
     extends BuilderTestBase
 {
     private Properties props;
+    private DistributedSystemTestInfo testInfo;
 
     public void setUp()
         throws Exception
     {
         super.setUp();
         this.props = new Properties();
+
+        InputStream in = getClass().getResourceAsStream( "/org/sysunit/tests/NoOpTest.systest" );
+
+        testInfo = DistributedSystemTestInfoBuilder.build( in );
     }
 
     public void tearDown()
         throws Exception
     {
         this.props = null;
+        this.testInfo = null;
         super.tearDown();
-    }
-
-    public void testTestClass()
-        throws Exception
-    {
-        setProperty( "test.class",
-                     "org.sysunit.tests.NoOpTest" );
-
-        ScenarioInfo scenarioInfo = build();
-
-        assertNotNull( "System test-info exists",
-                       scenarioInfo.getSystemTestInfo() );
-
-        assertEquals( "test is named 'no-op'",
-                      "no-op",
-                      scenarioInfo.getSystemTestInfo().getName() );
     }
 
     public void testTag()
         throws Exception
     {
-        setProperty( "test.class",
+        setProperty( "test",
                      "org.sysunit.tests.NoOpTest" );
 
         setProperty( "jvm.one.tag",
@@ -67,7 +58,7 @@ public class ScenarioInfoBuilderTest
     public void testJdk()
         throws Exception
     {
-        setProperty( "test.class",
+        setProperty( "test",
                      "org.sysunit.tests.NoOpTest" );
 
         setProperty( "jvm.one.jdk",
@@ -127,6 +118,7 @@ public class ScenarioInfoBuilderTest
     ScenarioInfo build()
         throws Exception
     {
-        return ScenarioInfoBuilder.build( this.props );
+        return ScenarioInfoBuilder.build( this.testInfo,
+                                          this.props );
     }
 }

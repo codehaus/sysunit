@@ -19,6 +19,11 @@ public abstract class ClassGenerator
         this.baseDir = baseDir;
     }
 
+    public String getBaseDir()
+    {
+        return this.baseDir;
+    }
+
     public void setOutputDir(String outputDir)
     {
         this.outputDir = outputDir;
