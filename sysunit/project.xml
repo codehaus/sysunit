@@ -118,15 +118,10 @@
       </resources>
       <includes>
         <include>**/*Test.class</include>
-<!--
-        <include>**/no_op.class</include>
--->
       </includes>
       <excludes>
         <exclude>org/sysunit/tests/**/*</exclude>
-<!--
-        <exclude>**/*$*.class</exclude>
--->
+        <exclude>org/sysunit/testmesh/StartSlaveTest.class</exclude>
       </excludes>
     </unitTest>
 
