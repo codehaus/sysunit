@@ -38,6 +38,8 @@ import org.sysunit.SynchronizationException;
  */
 public class MasterServer
     extends Server {
+    private static final Throwable[] EMPTY_THROWABLE_ARRAY = new Throwable[0];
+
     private static final Log log = LogFactory.getLog(MasterServer.class);
 
 	private Map members = new HashMap();
@@ -48,6 +50,9 @@ public class MasterServer
     private Dispatcher slaveGroupDispatcher;
 	private JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
     private MasterSynchronizer synchronizer = new MasterSynchronizer();
+
+    private Object isDoneLock = new Object();
+    private boolean isDone;
 
     private List jvmNames;
     private int setUpServers;
@@ -161,7 +166,34 @@ public class MasterServer
             } else {
                 log.info( "SUCCESSFUL" );
             }
+            
+            synchronized ( this.isDoneLock ) {
+                this.isDone = true;
+                this.isDoneLock.notifyAll();
+            }
         }
+    }
+
+    public Throwable[] waitFor()
+        throws InterruptedException {
+
+        //long waitFor = 15000;
+        //long waitSoFar = 0;
+
+        log.info( "waitForing" );
+        synchronized ( this.isDoneLock ) {
+            while ( ! this.isDone ) {
+                log.info( "this.isDone == " + this.isDone );
+                this.isDoneLock.wait( 1000 );
+                //waitSoFar += 1000;
+
+                //if ( waitSoFar >= waitFor ) {
+                    //break;
+                //}
+            }
+        }
+
+        return (Throwable[]) this.errors.toArray( EMPTY_THROWABLE_ARRAY );
     }
 
     public void addErrors(Throwable[] errors) {

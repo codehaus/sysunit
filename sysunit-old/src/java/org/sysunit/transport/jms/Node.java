@@ -64,7 +64,7 @@ public class Node implements Lifecycle {
 		messenger.removeListener(replyToDestination, messageListener);
 		messenger.removeListener(groupDestination, messageListener);
     }
-    
+
     protected Server getServer() {
     	return server;
     }

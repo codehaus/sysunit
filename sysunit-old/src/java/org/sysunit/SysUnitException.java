@@ -9,6 +9,10 @@ public class SysUnitException
 
     }
 
+    public SysUnitException(String message) {
+        super( message );
+    }
+
     public SysUnitException(Throwable rootCause) {
         this.rootCause = rootCause;
     }

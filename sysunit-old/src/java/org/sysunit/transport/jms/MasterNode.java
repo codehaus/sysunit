@@ -15,6 +15,7 @@ import javax.jms.JMSException;
 import org.apache.commons.messenger.Messenger;
 import org.apache.commons.messenger.MessengerManager;
 import org.sysunit.command.master.MasterServer;
+import org.sysunit.util.MultiThrowable;
 
 /**
  * A Master Node implementation via JMS which establishes a network of nodes
@@ -27,7 +28,8 @@ public class MasterNode extends Node {
 
 	private MasterServer server;
 	
-    public static void main(String[] args) {
+    public static void main(String[] args)
+        throws Throwable {
     	if (args.length <1)  {
     		System.out.println("Usage: <xmlURI> [<slaveTopic>]");
     		return;
@@ -42,6 +44,8 @@ public class MasterNode extends Node {
             slaveGroupSubject = args[1];
         }
 
+        Throwable[] errors = null;
+
         try {
             Messenger messenger = MessengerManager.get(messengerName);
             if (messenger == null) {
@@ -50,13 +54,25 @@ public class MasterNode extends Node {
             }
             Destination groupDestination = messenger.getDestination(groupSubject);
             Destination slaveGroupDestination = messenger.getDestination(slaveGroupSubject);
-            MasterNode controller =
-                new MasterNode(new MasterServer(xml), messenger, groupDestination, slaveGroupDestination);
+            MasterServer masterServer = new MasterServer(xml);
+            MasterNode controller = new MasterNode(masterServer,
+                                                   messenger,
+                                                   groupDestination,
+                                                   slaveGroupDestination);
             controller.start();
+
+            errors = masterServer.waitFor();
+
         }
         catch (Exception e) {
             System.out.println("Caught: " + e);
             e.printStackTrace();
+        }
+
+        if ( errors != null
+             &&
+             errors.length != 0 ) {
+            throw new MultiThrowable( errors );
         }
     }
 
