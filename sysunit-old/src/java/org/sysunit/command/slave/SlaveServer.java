@@ -13,6 +13,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.command.Server;
 
+import java.io.File;
+
 /**
  * The Context for a SlaveNode
  * 
@@ -29,7 +31,23 @@ public class SlaveServer extends Server {
      * @param command
      */
     public void startTestNode(StartTestNodeCommand command) {
-    	/** @todo bob this is where the funky JVM forker thingy should go */
-    }
+    	///** @todo bob this is where the funky JVM forker thingy should go */
 
+        String javaHome = System.getProperty( "java.home" );
+
+        String javaCmd = new File( new File( javaHome,
+                                             "bin" ),
+                                   "java" ).getPath();
+
+        ProcessRunner runner = new ProcessRunner( javaCmd,
+                                                  new String[] {
+                                                      org.sysunit.jelly.JvmRunner.class.getName(),
+                                                      command.getXml(),
+                                                      command.getJvmName()
+                                                  } );
+
+        Thread thread = new Thread( runner );
+
+        thread.start();
+    }
 }

@@ -30,4 +30,12 @@ public class StartTestNodeCommand extends SlaveCommand {
     public void run(SlaveServer context) throws Exception {
 		context.startTestNode(this);
     }
+
+    public String getXml() {
+        return this.xml;
+    }
+
+    public String getJvmName() {
+        return this.jvmName;
+    }
 }

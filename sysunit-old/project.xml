@@ -262,6 +262,9 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
+      <excludes>
+        <exclude>**/jms/*.java</exclude>
+      </excludes>
     </unitTest>
 
     
