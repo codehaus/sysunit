@@ -41,7 +41,7 @@ public class Node
                                                 this );
         this.uidCounter    = 0;
 
-        this.pool = new ThreadPool( 8 );
+        this.pool = new ThreadPool( 4 );
 
         this.inFlightCommands = new HashMap();
 
@@ -130,9 +130,6 @@ public class Node
                      Throwable thrown)
     {
         Command command = getInFlightCommand( uid );
-
-        //System.err.println( "command: " + command );
-        //System.err.println( "thrown: " + thrown );
 
         this.fundamentalErrors.add( thrown );
         removeInFlightCommand( uid );

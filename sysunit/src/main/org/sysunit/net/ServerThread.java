@@ -10,9 +10,10 @@ public class ServerThread
 {
     private Server server;
 
-    public ServerThread(Server server)
+    public ServerThread(String name,
+                        Server server)
     {
-        super( "ServerThread" );
+        super( name );
         this.server = server;
     }
 
@@ -48,25 +49,22 @@ public class ServerThread
                                                         socket.getInputStream(),
                                                         socket.getOutputStream() );
                 }
+                catch (InterruptedException e)
+                {
+                    break LOOP;
+                }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
                 finally
                 {
-                    try
-                    {
-                        socket.close();
-                    }
-                    catch (IOException e)
-                    {
-                        // swallow
-                    }
+                    socket.close();
                 }
             }
             catch (SocketTimeoutException e)
             {
-                // loop
+                // ignore
             }
             catch (Exception e)
             {

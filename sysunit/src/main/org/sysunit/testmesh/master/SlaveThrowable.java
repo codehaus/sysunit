@@ -25,12 +25,12 @@ public class SlaveThrowable
 
     public String getLocalizedMessage()
     {
-        return this.jvmInfo.getName() + "(" + this.tbeanId + "):" + this.thrown.getLocalizedMessage();
+        return this.jvmInfo.getName() + "(" + this.tbeanId + "): " + this.thrown.getClass().getName() + ": " + this.thrown.getLocalizedMessage();
     }
 
     public String getMessage()
     {
-        return this.jvmInfo.getName() + "(" + this.tbeanId + "):" + this.thrown.getMessage();
+        return this.jvmInfo.getName() + "(" + this.tbeanId + "): " + this.thrown.getClass().getName() + ": " + this.thrown.getMessage();
     }
 
     public void printStackTrace()

@@ -178,7 +178,7 @@ public class TBeanThread
             } );
     }
 
-    public void perfromStop()
+    public void performStop()
         throws InterruptedException
     {
         performTask( EXIT_TASK );
@@ -200,6 +200,9 @@ public class TBeanThread
                     
                     if ( this.task == EXIT_TASK )
                     {
+                        System.err.println( this + " exiting TBeanThread" );
+                        this.task = null;
+                        this.taskLock.notifyAll();
                         break SERVICE_LOOP;
                     }
                     

@@ -3,8 +3,10 @@ package org.sysunit.testmesh.slavehost;
 import org.sysunit.model.JvmInfo;
 import org.sysunit.model.PhysicalMachineInfo;
 import org.sysunit.mesh.NodeInfo;
+import org.sysunit.mesh.RemoteNodeInfo;
 import org.sysunit.testmesh.PingPongNode;
 import org.sysunit.testmesh.master.JvmErrorCommand;
+import org.sysunit.testmesh.master.ReportOutputsCommand;
 import org.sysunit.testmesh.slave.SlaveMain;
 import org.sysunit.util.JvmExecutor;
 import org.sysunit.util.JvmExecutorCallback;
@@ -19,21 +21,21 @@ public class SlaveHostNode
     extends PingPongNode
     implements JvmExecutorCallback
 {
+    private static final JvmInfo[] EMPTY_JVMINFO_ARRAY = new JvmInfo[0];
+
     private Thread mcastPingPongThread;
     private Thread bcastPingPongThread;
 
     private SlaveHostConfiguration config;
 
-    private Map jvms;
-    private Map masters;
+    private JvmManager jvmManager;
 
     public SlaveHostNode(String name,
                          SlaveHostConfiguration config)
     {
         super( name );
         this.config  = config;
-        this.jvms    = new HashMap();
-        this.masters = new HashMap();
+        this.jvmManager = new JvmManager( this );
     }
 
     public SlaveHostNode(SlaveHostConfiguration config)
@@ -74,6 +76,7 @@ public class SlaveHostNode
 
         super.stop();
 
+        /*
         synchronized ( this )
         {
             for ( Iterator jvmIter = this.jvms.keySet().iterator();
@@ -84,49 +87,41 @@ public class SlaveHostNode
                 jvmThread.interrupt();
             }
         }
+        */
     }
 
-    void startSlave(String jdk,
-                    int jvmId,
-                    InetAddress masterAddress,
-                    int masterPort,
+    void startSlave(int jvmId,
+                    String jdk,
                     NodeInfo master)
         throws Exception
     {
         File javaHome = getConfiguration().getJavaHome( jdk );
 
-        final JvmExecutor jvm = new JvmExecutor( javaHome,
-                                                 SlaveMain.class.getName(),
-                                                 new String[] { "" + jvmId,
-                                                                masterAddress.getHostAddress(),
-                                                                "" + masterPort },
-                                                 this );
-        
-        
-        Thread jvmThread = new Thread( jvm );
+        this.jvmManager.startJvm( jvmId,
+                                  javaHome,
+                                  (RemoteNodeInfo) master );
+    }
 
-        synchronized ( this )
-        {
-            this.jvms.put( jvm,
-                           jvmThread );
-            this.masters.put( jvm,
-                              master );
-        }
+    void killSlave(int jvmId)
+    {
+        
+    }
 
-        jvmThread.start();
+    void collectOutputs(NodeInfo master)
+        throws Exception
+    {
+        executeOn( master,
+                   new ReportOutputsCommand( this.jvmManager.getOutputs( master ) ) );
     }
 
     public synchronized void notifyJvmFinished(JvmExecutor jvm,
                                                int exitValue)
     {
-        this.jvms.remove( jvm );
-
         if ( exitValue != 0 )
         {
-            NodeInfo master = (NodeInfo) this.masters.get( jvm );
+            NodeInfo master = this.jvmManager.getMaster( jvm );
             try
             {
-                System.err.println( "JVM ERROR" );
                 executeOn( master,
                            new JvmErrorCommand() );
             }
@@ -135,21 +130,14 @@ public class SlaveHostNode
                 e.printStackTrace();
             }
         }
-
-        this.masters.remove( jvm );
     }
 
     public synchronized void notifyJvmInterrupted(JvmExecutor jvm)
     {
-        this.jvms.remove( jvm );
-        this.masters.remove( jvm );
     }
 
     public synchronized void notifyJvmException(JvmExecutor jvm,
                                                 Exception e)
     {
-        System.err.println( "JVM EXCEPTION" );
-        this.jvms.remove( jvm );
-        this.masters.remove( jvm );
     }
 }

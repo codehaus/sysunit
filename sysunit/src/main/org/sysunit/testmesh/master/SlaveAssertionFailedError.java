@@ -25,12 +25,12 @@ public class SlaveAssertionFailedError
 
     public String getLocalizedMessage()
     {
-        return this.jvmInfo.getName() + "(" + this.tbeanId + "):" + this.error.getLocalizedMessage();
+        return this.jvmInfo.getName() + "(" + this.tbeanId + "): " + this.error.getClass().getName() + ": " + this.error.getLocalizedMessage();
     }
 
     public String getMessage()
     {
-        return this.jvmInfo.getName() + "(" + this.tbeanId + "):" + this.error.getMessage();
+        return this.jvmInfo.getName() + "(" + this.tbeanId + "): " + this.error.getClass().getName() + ": " + this.error.getMessage();
     }
 
     public void printStackTrace()

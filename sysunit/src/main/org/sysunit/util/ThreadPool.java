@@ -27,10 +27,12 @@ public class ThreadPool
     {
         for ( int i = 0 ; i < this.threads.length ; ++i )
         {
-            this.threads[ i ] = new TaskThread( this.startBarrier,
+            this.threads[ i ] = new TaskThread( "TaskThread-" + i,
+                                                this.startBarrier,
                                                 this.stopBarrier,
                                                 this.taskQueue );
-
+            
+            this.threads[ i ].setDaemon( true );
             this.threads[ i ].start();
         }
 
@@ -43,15 +45,6 @@ public class ThreadPool
         for ( int i = 0 ; i < this.threads.length ; ++i )
         {
             threads[ i ].interrupt();
-
-            try
-            {
-                threads[ i ].join( 50 );
-            }
-            catch (InterruptedException e)
-            {
-                // swallow
-            }
         }
 
         this.stopBarrier.block();

@@ -80,7 +80,7 @@ public class PingPongThread
                 }
                 catch (SocketException e)
                 {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                     return;
                 }
             }
@@ -100,8 +100,6 @@ public class PingPongThread
                     String message = new String( ping.getData(),
                                                  0,
                                                  ping.getLength() );
-                    
-                    System.err.println( "got message: " + message );
                     
                     if ( message.startsWith( PingPongNode.PING_PREFIX ) )
                     {

@@ -31,13 +31,8 @@ public class StartSlaveCommand
     public void execute(SlaveHostNode node)
         throws Exception
     {
-        InetAddress masterAddress = ((RemoteNodeInfo)getOrigin()).getAddress();
-        int masterPort = ((RemoteNodeInfo)getOrigin()).getPort();
-
-        node.startSlave( getJdk(),
-                         getJvmId(),
-                         masterAddress,
-                         masterPort,
+        node.startSlave( getJvmId(),
+                         getJdk(),
                          getOrigin() );
     }
 }

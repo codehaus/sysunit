@@ -18,7 +18,7 @@ public class TBeanThreadTest
     {
         Thread.sleep( 500 );
         this.expectedThrown = null;
-        this.thr.perfromStop();
+        this.thr.performStop();
         this.thr.join();
     }
     public void testNormal()

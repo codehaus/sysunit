@@ -7,21 +7,37 @@ import java.util.Arrays;
 public class JvmExecutor
     implements Runnable {
 
+    private int jvmId;
     private File javaHome;
     private String className;
     private String[] arguments;
 
     private JvmExecutorCallback callback;
 
-    public JvmExecutor(File javaHome,
+    private Process process;
+
+    private Thread stdoutEaterThread;
+    private Thread stderrEaterThread;
+
+    private InputStreamEater stdoutEater;
+    private InputStreamEater stderrEater;
+
+    public JvmExecutor(int jvmId,
+                       File javaHome,
                        String className,
                        String[] arguments,
                        JvmExecutorCallback callback)
     {
+        this.jvmId = jvmId;
         this.javaHome  = javaHome;
         this.className = className;
         this.arguments = arguments;
         this.callback  = callback;
+    }
+
+    public int getJvmId()
+    {
+        return this.jvmId;
     }
 
     public File getJavaHome()
@@ -60,6 +76,16 @@ public class JvmExecutor
         }
     }
 
+    public String getStdout()
+    {
+        return this.stdoutEater.getOutput();
+    }
+
+    public String getStderr()
+    {
+        return this.stderrEater.getOutput();
+    }
+
     public String[] getCommandArray()
     {
         String[] commandArray = new String[ this.arguments.length + 4 ];
@@ -88,52 +114,31 @@ public class JvmExecutor
         return "CLASSPATH=" + System.getProperty( "java.class.path" );
     }
 
-    public String[] getEnvArray()
-    {
-        File javaHome = getJavaHome();
-
-        String[] envArray = null;
-        int i = 0;
-
-        if ( javaHome != null )
-        {
-            envArray = new String[ 2 ];
-            envArray[0] = getJavaHomeEnv();
-            envArray[1] = getClasspathEnv();
-        }
-        else
-        {
-            envArray = new String[ 1 ];
-            envArray[0] = getClasspathEnv();
-        }
-
-        System.err.println( "ENVIRONMENT:" );
-        System.err.println( Arrays.asList( envArray ) );
-        System.err.flush();
-        return envArray;
-    }
-
     public void run()
     {
         Runtime runtime = Runtime.getRuntime();
 
-        Process process = null;
-
         try
         {
-            process = runtime.exec( getCommandArray(),
-                                    null );
+            this.process = runtime.exec( getCommandArray(),
+                                         null );
 
-            Thread stdoutEater = new Thread( new InputStreamEater( process.getInputStream() ) );
-            Thread stderrEater = new Thread( new InputStreamEater( process.getErrorStream() ) );
+            this.stdoutEater = new InputStreamEater( process.getInputStream() );
+            this.stderrEater = new InputStreamEater( process.getErrorStream() );
+
+            this.stdoutEaterThread = new Thread( this.stdoutEater );
+            this.stderrEaterThread = new Thread( this.stderrEater );
             
-            stdoutEater.start();
-            stderrEater.start();
+            this.stdoutEaterThread.setDaemon( true );
+            this.stderrEaterThread.setDaemon( true );
+
+            this.stdoutEaterThread.start();
+            this.stderrEaterThread.start();
             
-            process.waitFor();
+            this.process.waitFor();
 
             getCallback().notifyJvmFinished( this,
-                                             process.exitValue() );
+                                             this.process.exitValue() );
         
         }
         catch (IOException e)
@@ -145,9 +150,17 @@ public class JvmExecutor
         {
             if ( process != null )
             {
-                process.destroy();
+                this.process.destroy();
                 getCallback().notifyJvmInterrupted( this );
             }
         }
+    }
+
+    public void destroy()
+        throws Exception
+    {
+        this.process.destroy();
+        this.stdoutEaterThread.interrupt();
+        this.stderrEaterThread.interrupt();
     }
 }

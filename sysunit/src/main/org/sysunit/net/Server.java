@@ -51,7 +51,8 @@ public class Server
 
         for ( int i = 0 ; i < this.threads.length ; ++i )
         {
-            this.threads[ i ] = new ServerThread( this );
+            this.threads[ i ] = new ServerThread( "ServerThread-" + i,
+                                                  this );
             this.threads[ i ].start();
         }
 
@@ -68,12 +69,7 @@ public class Server
 
         for ( int i = 0 ; i < this.threads.length ; ++i )
         {
-            this.threads[ i ].join( SO_TIMEOUT * 2 );
-
-            if ( this.threads[ i ].isAlive() )
-            {
-                this.threads[ i ].interrupt();
-            }
+            this.threads[ i ].interrupt();
         }
 
         blockOnStopBarrier();

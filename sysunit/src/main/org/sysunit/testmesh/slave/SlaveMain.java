@@ -46,6 +46,5 @@ public class SlaveMain
 
         slave.executeOn( slave.getMasterNodeInfo(),
                          new AddSlaveCommand( jvmId ) );
-                                              
     }
 }

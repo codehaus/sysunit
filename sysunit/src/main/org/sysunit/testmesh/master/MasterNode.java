@@ -2,6 +2,7 @@ package org.sysunit.testmesh.master;
 
 import org.sysunit.mesh.NodeInfo;
 import org.sysunit.mesh.CommandGroup;
+import org.sysunit.mesh.StopCommand;
 import org.sysunit.model.PhysicalMachineInfo;
 import org.sysunit.model.DistributedSystemTestInfo;
 import org.sysunit.model.ScenarioInfo;
@@ -13,15 +14,19 @@ import org.sysunit.plan.InfeasibleTestPlanException;
 import org.sysunit.testmesh.PingPongNode;
 import org.sysunit.testmesh.TestMeshManager;
 import org.sysunit.testmesh.slavehost.StartSlaveCommand;
+import org.sysunit.testmesh.slavehost.CollectOutputsCommand;
 import org.sysunit.testmesh.slave.InitializeJvmCommand;
 import org.sysunit.testmesh.slave.PerformCommand;
 import org.sysunit.testmesh.slave.PerformSetUpCommand;
 import org.sysunit.testmesh.slave.PerformRunCommand;
 import org.sysunit.testmesh.slave.PerformAssertValidCommand;
 import org.sysunit.testmesh.slave.PerformTearDownCommand;
+import org.sysunit.testmesh.slave.PerformStopCommand;
 import org.sysunit.testmesh.slave.UnblockSynchronizerCommand;
 import org.sysunit.testmesh.slave.AbortTestCommand;
+import org.sysunit.testmesh.slave.DestroyJvmCommand;
 import org.sysunit.util.ClasspathServer;
+import org.sysunit.util.Output;
 
 import junit.framework.AssertionFailedError;
 
@@ -33,8 +38,11 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class MasterNode
     extends PingPongNode
@@ -44,6 +52,7 @@ public class MasterNode
 
     private TestMeshManager testMeshManager;
     private List slaves;
+    private Set slaveHosts;
 
     private Map jvms;
 
@@ -77,6 +86,7 @@ public class MasterNode
 
         this.testMeshManager = new TestMeshManager();
         this.slaves          = new ArrayList();
+        this.slaveHosts      = new HashSet();
         this.jvms            = new HashMap();
 
         this.scenarioInfo    = scenarioInfo;
@@ -234,6 +244,8 @@ public class MasterNode
             executeOn( jvmBindings[ i ].getNodeInfo(),
                        new StartSlaveCommand( getScenarioInfo().getJdk( jvmBindings[ i ].getJvmInfo() ),
                                               jvmBindings[ i ].getJvmId() ) );
+
+            this.slaveHosts.add( jvmBindings[ i ].getNodeInfo() );
         }
 
         waitForSlaves();
@@ -259,6 +271,10 @@ public class MasterNode
                 performTearDown();
             }
         }
+
+        performStop();
+        destroyJvms();
+        collectOutputs();
 
         Throwable[] fundamentalErrors = getFundamentalErrors();
             
@@ -391,6 +407,28 @@ public class MasterNode
                                          thrown ) );
     }
 
+    void performStop()
+        throws Exception
+    {
+        perform( new PerformStopCommand() );
+
+        SlaveInfo[] slaves = getSlaves();
+        
+        CommandGroup commandGroup = newCommandGroup();
+
+        /*
+        StopCommand command = new StopCommand();
+        
+        for ( int i = 0 ; i < slaves.length ; ++i )
+        {
+            commandGroup.add( executeOn( slaves[ i ].getNodeInfo(),
+                                         command ) );
+        }
+        
+        commandGroup.waitFor();
+        */
+    }
+
     boolean hasThrown()
     {
         return ( ! this.thrown.isEmpty() );
@@ -461,5 +499,63 @@ public class MasterNode
     {
         this.jvmError = true;
         notifyAll();
+    }
+
+    void destroyJvms()
+        throws Exception
+    {
+        SlaveInfo[] slaves = getSlaves();
+        
+        DestroyJvmCommand command = new DestroyJvmCommand();
+        
+        for ( int i = 0 ; i < slaves.length ; ++i )
+        {
+            executeOn( slaves[ i ].getNodeInfo(),
+                       command  );
+        }
+    }
+
+    void collectOutputs()
+        throws Exception
+    {
+        NodeInfo[] slaveHosts = (NodeInfo[]) this.slaveHosts.toArray( EMPTY_NODEINFO_ARRAY );
+        
+        CollectOutputsCommand command = new CollectOutputsCommand();
+
+        CommandGroup commandGroup = newCommandGroup();
+
+        for ( int i = 0 ; i < slaveHosts.length ; ++i )
+        {
+            commandGroup.add( executeOn( slaveHosts[ i ],
+                                         command  ) );
+        }
+
+        commandGroup.waitFor();
+    }
+
+    void reportOutputs(Output[] outputs)
+    {
+        synchronized ( System.out )
+        {
+            for ( int i = 0 ; i < outputs.length ; ++i )
+            {
+                System.out.println( "----------------------------------------------" );
+                System.out.println( "JVM: " + ((JvmInfo)this.jvms.get( outputs[ i ].getJvmId() + "" )).getName() + "(" + outputs[ i ].getJvmId() + ")" );
+                System.out.println( "----------------------------------------------" );
+                System.out.println( outputs[ i ].getStdout() );
+            }
+            System.out.println( "----------------------------------------------" );
+        }
+        synchronized ( System.err )
+        {
+            for ( int i = 0 ; i < outputs.length ; ++i )
+            {
+                System.err.println( "----------------------------------------------" );
+                System.err.println( "JVM: " + ((JvmInfo)this.jvms.get( outputs[ i ].getJvmId() + "" )).getName() + "(" + outputs[ i ].getJvmId() + ")" );
+                System.err.println( "----------------------------------------------" );
+                System.err.println( outputs[ i ].getStderr() );
+            }
+            System.err.println( "----------------------------------------------" );
+        }
     }
 }

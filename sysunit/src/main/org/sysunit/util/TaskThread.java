@@ -7,11 +7,12 @@ public class TaskThread
     private Barrier stopBarrier;
     private TaskQueue queue;
 
-    public TaskThread(Barrier startBarrier,
+    public TaskThread(String name,
+                      Barrier startBarrier,
                       Barrier stopBarrier,
                       TaskQueue queue)
     {
-        super( "TaskThread" );
+        super( name );
         this.startBarrier = startBarrier;
         this.stopBarrier  = stopBarrier;
         this.queue        = queue;

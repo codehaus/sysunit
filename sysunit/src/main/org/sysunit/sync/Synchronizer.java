@@ -113,8 +113,6 @@ public class Synchronizer
                           String syncer)
         throws InconsistentSyncException
     {
-        System.err.println( "curent syncpoint " + this.currentSyncPoint + " vs " + syncPoint + " for " + syncer );
-
         if ( this.currentSyncPoint == null )
         {
             this.currentSyncPoint = syncPoint;

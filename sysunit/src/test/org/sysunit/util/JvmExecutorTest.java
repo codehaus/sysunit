@@ -22,7 +22,8 @@ public class JvmExecutorTest
     public void testNoJavaHomeValidClass()
         throws Exception
     {
-        JvmExecutor exec = new JvmExecutor( null,
+        JvmExecutor exec = new JvmExecutor( 0,
+                                            null,
                                             NoOpMain.class.getName(),
                                             new String[0],
                                             this );
@@ -37,7 +38,8 @@ public class JvmExecutorTest
     public void testJavaHomeValidClass()
         throws Exception
     {
-        JvmExecutor exec = new JvmExecutor( new File( System.getProperty( "java.home" ) ),
+        JvmExecutor exec = new JvmExecutor( 0,
+                                            new File( System.getProperty( "java.home" ) ),
                                             NoOpMain.class.getName(),
                                             new String[0],
                                             this );
@@ -52,7 +54,8 @@ public class JvmExecutorTest
     public void testInvalidClass()
         throws Exception
     {
-        JvmExecutor exec = new JvmExecutor( new File( System.getProperty( "java.home" ) ),
+        JvmExecutor exec = new JvmExecutor( 0,
+                                            new File( System.getProperty( "java.home" ) ),
                                             "spoon",
                                             new String[0],
                                             this );
@@ -67,7 +70,8 @@ public class JvmExecutorTest
     public void testArguments()
         throws Exception
     {
-        JvmExecutor exec = new JvmExecutor( new File( System.getProperty( "java.home" ) ),
+        JvmExecutor exec = new JvmExecutor( 0,
+                                            new File( System.getProperty( "java.home" ) ),
                                             ExitValueMain.class.getName(),
                                             new String[] { "44", "33" },
                                             this );
@@ -83,7 +87,8 @@ public class JvmExecutorTest
     public void testInterrupt()
         throws Exception
     {
-        JvmExecutor exec = new JvmExecutor( new File( System.getProperty( "java.home" ) ),
+        JvmExecutor exec = new JvmExecutor( 0,
+                                            new File( System.getProperty( "java.home" ) ),
                                             InfiniteMain.class.getName(),
                                             new String[0],
                                             this );
