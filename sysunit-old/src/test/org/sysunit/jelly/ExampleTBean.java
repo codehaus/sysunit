@@ -22,7 +22,8 @@ public class ExampleTBean extends AbstractSynchronizableTBean {
     private String foo;
     private long sleepTime;
     private boolean hasRun = false;
-
+	private List bars = new ArrayList();
+	
 	/**
 	 * @return the extent of all instances of this class
 	 */
@@ -59,7 +60,27 @@ public class ExampleTBean extends AbstractSynchronizableTBean {
         this.sleepTime = sleepTime;
     }
 
-    public String toString() {
+	/**
+	 * Ant style method to create a new nested Bar property
+	 * 
+	 */
+	public Bar createBar() {
+		return new Bar();
+	}
+	
+	public void addBar(Bar bar) {
+		bars.add(bar);
+	}
+	
+	public void removeBar(Bar bar) {
+		bars.remove(bar);
+	}
+	
+	public List getBars() {
+		return bars;
+	}
+		
+	public String toString() {
         return super.toString() + "[foo=" + foo + ";sleepTime=" + sleepTime + "]";
     }
 }

@@ -26,29 +26,30 @@ import org.sysunit.remote.RemoteTBeanManager;
  */
 public class JvmRunner {
     private static final Log log = LogFactory.getLog(JvmRunner.class);
+    
     private JellyContext context;
-	private RemoteTBeanManager manager = new RemoteTBeanManager();
-	
-	public static void main(String[] args) throws Exception {
-	   if (args.length < 2) {
-		   System.out.println("Usage: JvmRunner <systemTestXml> <jvmName>");
-	   }
-	   try {
-		   String xml = args[0];
-		   String jvmName = args[1];
-		   JvmRunner runner = new JvmRunner();
-		   runner.run(xml, jvmName);
-	   }
-	   catch (Exception e) {
-		   log.error("Caught: " + e, e);
-		   throw e;
-	   }
-   }
+    private RemoteTBeanManager manager = new RemoteTBeanManager();
 
-   public JvmRunner() {
-	   context = new JellyContext();
-	   context.registerTagLibrary("", new SysUnitTagLibrary());
-   }
+    public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            System.out.println("Usage: JvmRunner <systemTestXml> <jvmName>");
+        }
+        try {
+            String xml = args[0];
+            String jvmName = args[1];
+            JvmRunner runner = new JvmRunner();
+            runner.run(xml, jvmName);
+        }
+        catch (Exception e) {
+            log.error("Caught: " + e, e);
+            throw e;
+        }
+    }
+
+    public JvmRunner() {
+        context = new JellyContext();
+        context.registerTagLibrary("", new SysUnitTagLibrary());
+    }
 
     /**
      * Runs the given JVM named in the XML document using the classloader
@@ -58,8 +59,8 @@ public class JvmRunner {
      * @param jvmName
      */
     public void run(String xml, String jvmName) throws Exception {
-		context.setVariable("org.sysunit.jvm", jvmName);
-		context.setVariable("org.sysunit.TBeanManager", getManager());
+        context.setVariable("org.sysunit.jvm", jvmName);
+        context.setVariable("org.sysunit.TBeanManager", getManager());
 
         // lets assume the XML is on the classpath
         URL url = getClass().getClassLoader().getResource(xml);
@@ -73,10 +74,9 @@ public class JvmRunner {
         context.runScript(url, output);
     }
 
-    
-	// Properties
-	//-------------------------------------------------------------------------    
-	                
+    // Properties
+    //-------------------------------------------------------------------------    
+
     /**
      * @return
      */
