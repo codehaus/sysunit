@@ -1,9 +1,0 @@
-<systemTest name="simple" className="org.sysunit.jelly.ExampleSystemTest"> 
-  <jvm name="a" count="4"> 
-    <tbean class="org.sysunit.jelly.ExampleTBean" sleepTime="100" foo="abc"/> 
-    <tbean class="org.sysunit.jelly.ExampleTBean" sleepTime="200" foo="def"/> 
-  </jvm> 
- 
-  <jvm name="b" count="3"> 
-  </jvm> 
-</systemTest>
