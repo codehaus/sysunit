@@ -62,6 +62,8 @@ package org.sysunit;
 
 import junit.framework.Test;
 import junit.framework.TestResult;
+import junit.framework.Assert;
+import junit.framework.TestSuite;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -89,6 +91,7 @@ import java.util.HashSet;
  * @version $Id$
  */
 public class SystemTestCase
+    extends Assert
     implements Test {
 
     // ----------------------------------------------------------------------
@@ -361,6 +364,8 @@ public class SystemTestCase
      */
     public void run(TestResult testResult) {
 
+        System.err.println( "FOO" );
+        testResult.startTest( this );
         try {
             initializeFactories();
             startTBeans( testResult );
@@ -369,7 +374,14 @@ public class SystemTestCase
         } catch (Throwable t) {
             testResult.addError( this,
                                  t );
-        } /* finally {
+        } finally {
+            testResult.endTest( this );
+            System.err.println( "BAR" );
+        }
+
+
+
+/* finally {
             try {
                 tearDownTBeans();
             } catch (Throwable t) {
@@ -504,5 +516,14 @@ public class SystemTestCase
      */
     public void assertValid() throws Exception {
         // intentionally left blank
+    }
+
+    public static Test suite(Class systemTestClass)
+        throws Exception {
+        TestSuite suite = new TestSuite();
+
+        suite.addTest( (Test) systemTestClass.newInstance() );
+
+        return suite;
     }
 }
