@@ -144,10 +144,7 @@
       <version>2.2.1</version>
     </dependency>
 
-    <dependency>
-      <id>openjms</id>
-      <version>0.7.5</version>
-    </dependency>
+<!--
     <dependency>
       <id>exolabcore</id>
       <version>0.3.5</version>
@@ -156,6 +153,7 @@
       <id>jta</id>
       <version>1.0.1</version>
     </dependency>
+-->
 
     <dependency>
       <id>mx4j+jmx</id>
@@ -176,11 +174,6 @@
       <id>junit</id>
       <version>3.8.1</version>
     </dependency>    
-
-    <dependency>
-      <id>spiritwave</id>
-      <version>6.0-b94</version>
-    </dependency>
 
   </dependencies>
   
