@@ -96,7 +96,10 @@ public class JvmRunner {
         if (url == null) {
             url = Thread.currentThread().getContextClassLoader().getResource(xml);
             if (url == null) {
-                throw new ResourceNotFoundException(xml);
+                url = ClassLoader.getSystemClassLoader().getSystemResource(xml);
+                if (url == null) {
+                    throw new ResourceNotFoundException(xml);
+                }
             }
         }
         XMLOutput output = XMLOutput.createDummyXMLOutput();

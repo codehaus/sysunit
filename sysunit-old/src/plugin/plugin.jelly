@@ -40,10 +40,14 @@
   <goal name="sysunit:generate-jar-list">
     <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
     <j:set var="testDir">${testPlugin.findVariable('maven.test.dest')}</j:set>
+    <j:set var="jarPath" value="${maven.build.dir}/${maven.final.name}.jar"/>
+    <j:set var="testJarPath" value="${maven.build.dir}/test-${maven.final.name}.jar"/>
+    <util:replace var="jarPath" value="${jarPath}" oldChar="\" newChar="@"/>
+    <util:replace var="testJarPath" value="${testJarPath}" oldChar="\" newChar="@"/>
     <j:file name="${testDir}/sysunit-jars.properties" omitXmlDeclaration="true">
       <j:whitespace trim="false">
-             ${maven.final.name}.jar = ${maven.build.dir}/${maven.final.name}.jar
-             test-${maven.final.name}.jar = ${maven.build.dir}/test-${maven.final.name}.jar
+             ${maven.final.name}.jar = ${jarPath}
+             test-${maven.final.name}.jar = ${testJarPath}
         <j:forEach var="lib" items="${pom.artifacts}">
               <util:replace var="libPath" value="${lib.path}" oldChar="\" newChar="@"/>
               ${lib.name} = ${libPath}

@@ -51,10 +51,10 @@ public class Node implements Lifecycle {
     public void start() throws Exception {
 		// lets subscribe to our own messages
 		// and to the group messages
-		log.info("Subscribing to personal commands for me on: " + replyToDestination);
+		log.debug("Subscribing to personal commands for me on: " + replyToDestination);
 		messenger.addListener(replyToDestination, messageListener);
 
-		log.info("Subscribing to group commands on: " + groupDestination);
+		log.debug("Subscribing to group commands on: " + groupDestination);
 		messenger.addListener(groupDestination, messageListener);
 
 		server.start();

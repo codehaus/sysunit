@@ -22,13 +22,19 @@ public class InputStreamEater
                                           0,
                                           buf.length ) ) >= 0 ) {
                 // discard
+
+                System.err.print( new String( buf,
+                                              0,
+                                              read ) );
             }
         } catch (IOException e) {
+            e.printStackTrace();
             // swallow
         } finally {
             try {
                 in.close();
             } catch (IOException e) {
+                e.printStackTrace();
                 // swallow
             }
         }

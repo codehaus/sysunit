@@ -107,7 +107,7 @@ public class ProcessRunner
         Runtime runtime = Runtime.getRuntime();
 
         try {
-            log.debug( "commandArray: " + Arrays.asList( getCommandArray() ) );
+            log.info( "commandArray: " + Arrays.asList( getCommandArray() ) );
             Process process = runtime.exec( getCommandArray() );
 
             Thread stdoutEater = new Thread( new InputStreamEater( process.getInputStream() ) );
