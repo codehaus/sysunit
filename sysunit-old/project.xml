@@ -227,9 +227,10 @@
     <unitTest>
       <resources>
         <resource>
-          <directory>src/java</directory>
+          <directory>src/test</directory>
           <includes>
             <include>**/*.properties</include>
+            <include>**/*.jelly</include>
           </includes>
         </resource>
       </resources>
