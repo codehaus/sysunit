@@ -85,6 +85,8 @@ public class LaunchWaiter
                                          byte[] bytes)
         throws Exception {
 
+        log.info( "storing " + jarName + " in " + this.dir );
+
         File jarFile = new File( this.dir,
                                  jarName );
 

@@ -168,6 +168,8 @@ public class SlaveServer extends Server {
 
         log.debug( "GET " + masterId + " // " + waiter );
 
+        log.info( "storing " + jarName );
+
         waiter.storeJar( jarName,
                          bytes );
     }

@@ -403,6 +403,8 @@ public class MasterServer
 
         File file = new File( path );
 
+        log.info( file + " requested" );
+
         FileInputStream in = new FileInputStream( file );
 
         try {
