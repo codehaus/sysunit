@@ -24,7 +24,7 @@ public class SlaveHostMain
         else
         {
             config = new SlaveHostConfiguration();
-            config.addTag( "*" );
+            //config.addTag( "*" );
         }
 
         final SlaveHostNode slaveHost = new SlaveHostNode( config );

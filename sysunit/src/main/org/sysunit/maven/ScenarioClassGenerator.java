@@ -37,7 +37,7 @@ public class ScenarioClassGenerator
        String sysTestName = props.getProperty( "test" );
 
        String sysTestPath = sysTestName.replace( '.',
-                                                 File.separatorChar );
+                                                 File.separatorChar ) + ".systest";
 
        File sysTestFile = new File( getBaseDir(),
                                     sysTestPath );
@@ -47,7 +47,9 @@ public class ScenarioClassGenerator
        text.append( "import junit.framework.TestSuite;\n" );
        text.append( "import org.sysunit.DistributedTestCase;\n" );
        text.append( "import org.sysunit.builder.ScenarioInfoBuilder;\n" );
+       text.append( "import org.sysunit.builder.DistributedSystemTestInfoBuilder;\n" );
        text.append( "import org.sysunit.model.ScenarioInfo;\n" );
+       text.append( "import org.sysunit.model.DistributedSystemTestInfo;\n" );
        text.append( "import java.io.File;\n" );
        text.append( "\n" );
        text.append( "public class " ).append( className ).append( "\n" );
@@ -55,8 +57,8 @@ public class ScenarioClassGenerator
        text.append( "    public static Object suite() throws Exception\n" );
        text.append( "    {\n" );
        text.append( "        TestSuite suite = new TestSuite();\n");
-       text.append( "        DstributedSystemTestInfo testInfo = getSystemTestInfo();\n" );
-       text.append( "        ScenarioInfo scenarioInfo = getScenarioInfo();\n" );
+       text.append( "        DistributedSystemTestInfo testInfo = getSystemTestInfo();\n" );
+       text.append( "        ScenarioInfo scenarioInfo = getScenarioInfo( testInfo );\n" );
        text.append( "        suite.addTest( new DistributedTestCase( scenarioInfo ) );\n" );
        text.append( "        return suite;\n");
        text.append( "    }\n" );
@@ -65,11 +67,12 @@ public class ScenarioClassGenerator
        text.append( "    {\n" );
        text.append( "        return ScenarioInfoBuilder.build( testInfo, new File( \"" + source.getPath() + "\" ) );\n" );
        text.append( "    }\n" );
-       text.append( "}" );
+       text.append( "\n" );
        text.append( "    public static DistributedSystemTestInfo getSystemTestInfo() throws Exception\n" );
        text.append( "    {\n" );
        text.append( "        return DistributedSystemTestInfoBuilder.build( new File( \"" + sysTestFile.getPath() + "\" ) );\n" );
        text.append( "    }\n" );
+       text.append( "}\n" );
 
         FileWriter out = new FileWriter( destination );
 
