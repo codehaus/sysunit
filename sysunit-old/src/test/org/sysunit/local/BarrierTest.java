@@ -2,7 +2,7 @@ package org.sysunit.local;
 
 import org.sysunit.SysUnitTestCase;
 
-public class TestBarrier
+public class BarrierTest
     extends SysUnitTestCase
 {
     public void testConstruct() {

@@ -261,6 +261,7 @@
       </resources>
       <includes>
         <include>**/Test*.java</include>
+        <include>**/*Test.java</include>
       </includes>
     </unitTest>
 

@@ -19,7 +19,7 @@ import org.sysunit.ValidationErrorTBean;
 import org.sysunit.ValidationFailTBean;
 import org.sysunit.WatchdogException;
 
-public class TestLocalTBeanManager
+public class LocalTBeanManagerTest
     extends SysUnitTestCase {
 
     public void testConstruct()

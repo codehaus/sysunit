@@ -10,7 +10,7 @@ import org.sysunit.SysUnitTestCase;
 import org.sysunit.TBean;
 import org.sysunit.TBeanSynchronizer;
 
-public class TestTBeanThread
+public class TBeanThreadTest
     extends SysUnitTestCase {
 
     public void testConstruct() {

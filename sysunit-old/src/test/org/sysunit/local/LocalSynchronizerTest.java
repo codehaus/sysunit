@@ -2,7 +2,7 @@ package org.sysunit.local;
 
 import org.sysunit.SysUnitTestCase;
 
-public class TestLocalSynchronizer
+public class LocalSynchronizerTest
     extends SysUnitTestCase {
 
     public void testConstruct() {
