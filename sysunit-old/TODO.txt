@@ -1,0 +1,55 @@
+
+
+<systemTest name="simple" class="com.foo.MySystemTestCase"> 
+  <jvm name="a" count="4"> 
+    <tbean name="reader" count="2"/> 
+  </jvm> 
+ 
+  <jvm name="b" count="2"> 
+    <tbean name="writer" count="1"/> 
+  </jvm> 
+</systemTest> 
+
+
+* support the use of a static method to create a JVM within the test case
+
+<systemTest name="simple" class="com.foo.MySystemTestCase"> 
+  <jvm method="jvmA" count="2"/>
+  <jvm method="jvmB" count="1"/>
+</systemTest> 
+
+then in the Java code...
+
+public class MySystemTestCase {
+
+  /** factory method for a single JVM */
+  public static void jvmA() throws Exception {
+	TBean a = new ATBean();
+	TBean b = new ATBean();
+	...
+  }
+
+  /** factory method for a single JVM */
+  public static void jvmB() throws Exception {
+	TBean a = new ATBean();
+	TBean b = new ATBean();
+	...
+  }
+}
+ 
+
+
+
+<physicalSystemTest> 
+    <include uri="mysystest.sysunit"/>
+
+    <machine name="test-linux-1"> 
+      <jvm name="a" count="3"/> 
+      <jvm name="b" count="1"/> 
+    </machine> 
+    <machine name="test-linux-2"> 
+      <jvm name="a" count="1"/> 
+      <jvm name="b" count="1"/> 
+    </machine> 
+</physicalSystemTest> 
+ 
