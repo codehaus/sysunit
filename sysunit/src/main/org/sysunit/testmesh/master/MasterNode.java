@@ -1,5 +1,6 @@
 package org.sysunit.testmesh.master;
 
+import org.sysunit.WatchdogError;
 import org.sysunit.mesh.NodeInfo;
 import org.sysunit.mesh.CommandGroup;
 import org.sysunit.mesh.StopCommand;
@@ -67,6 +68,8 @@ public class MasterNode
     private int blockSequence;
 
     private boolean jvmError;
+
+    private boolean isCompleted;
 
     public MasterNode()
     {
@@ -232,7 +235,7 @@ public class MasterNode
                                                        getScenarioInfo(),
                                                        getTestMeshManager() );
 
-        TestPlan plan = builder.buildTestPlan();
+        final TestPlan plan = builder.buildTestPlan();
 
         JvmBinding[] jvmBindings = plan.getJvmBindings();
 
@@ -250,31 +253,90 @@ public class MasterNode
 
         waitForSlaves();
 
-        if ( ! this.jvmError )
+        Thread thr = null;
+                        
+        if ( ! MasterNode.this.jvmError )
         {
             initializeJvms( plan );
-
+                            
             if ( getFundamentalErrors().length == 0 )
             {
-                performSetUp();
-                
-                if ( ! hasThrown() )
-                {
-                    performRun();
-                    
-                    if ( ! hasThrown() )
+                thr = new Thread()
                     {
-                        performAssertValid();
+                        public void run()
+                        {
+                            try
+                            {
+                                performSetUp();
+                                
+                                if ( ! hasThrown() )
+                                {
+                                    performRun();
+                                    
+                                    if ( ! hasThrown() )
+                                    {
+                                        performAssertValid();
+                                    }
+                                }
+                                
+                                performTearDown();
+                            }
+                            catch (InterruptedException e)
+                            {
+                                // swallow
+                            }
+                            catch (Exception e)
+                            {
+                                addFundamentalError( e );
+                            }
+                            finally
+                            {
+                                isCompleted( true );
+                            }
+                        }
+                    };
+
+                thr.start();
+                
+                long timeout = getSystemTestInfo().getTimeout();
+                
+                if ( timeout > 0 )
+                {
+                    long start = System.currentTimeMillis();
+                    long stop  = start + timeout;
+                    
+                    synchronized ( this )
+                    {
+                        while ( System.currentTimeMillis() < stop
+                                &&
+                                ! isCompleted() )
+                        {
+                            long now = System.currentTimeMillis();
+                            
+                            long left = stop - now;
+                            
+                            wait( left );
+                        }
+                    }
+                    
+                    if ( ! isCompleted() )
+                    {
+                        abortTest();
+                        addFundamentalError( new WatchdogError() );
+                        thr.interrupt();
                     }
                 }
-                
-                performTearDown();
             }
         }
+                
+        if ( thr != null )
+        {
+            thr.join();
+            collectOutputs();
+            performStop();
+            destroyJvms();
+        }
 
-        performStop();
-        destroyJvms();
-        collectOutputs();
 
         Throwable[] fundamentalErrors = getFundamentalErrors();
             
@@ -557,5 +619,16 @@ public class MasterNode
             }
             System.err.println( "----------------------------------------------" );
         }
+    }
+
+    synchronized void isCompleted(boolean isCompleted)
+    {
+        this.isCompleted = isCompleted;
+        notifyAll();
+    }
+
+    synchronized boolean isCompleted()
+    {
+        return this.isCompleted;
     }
 }

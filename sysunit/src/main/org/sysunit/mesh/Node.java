@@ -125,6 +125,11 @@ public class Node
     {
         return (Throwable[]) this.fundamentalErrors.toArray( EMPTY_THROWABLE_ARRAY );
     }
+
+    protected void addFundamentalError(Throwable error)
+    {
+        this.fundamentalErrors.add( error );
+    }
     
     void reportError(int uid,
                      Throwable thrown)

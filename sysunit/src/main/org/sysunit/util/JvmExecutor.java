@@ -78,12 +78,16 @@ public class JvmExecutor
 
     public String getStdout()
     {
-        return this.stdoutEater.getOutput();
+        return  ( ( this.stdoutEater != null )
+                  ? ( this.stdoutEater.getOutput() )
+                  : "" );
     }
 
     public String getStderr()
     {
-        return this.stderrEater.getOutput();
+        return ( ( this.stderrEater != null )
+                 ? ( this.stderrEater.getOutput() )
+                 : "" );
     }
 
     public String[] getCommandArray()
