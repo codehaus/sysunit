@@ -29,7 +29,7 @@ public class TestNode extends Node {
 
     public static void main(String[] args) {
         // lets assume the messenger.xml is on the classpath
-        String messengerName = "topicConnection";
+        String messengerName = "sysunitTopicConnection";
         String groupSubject = "SYSUNIT.TESTNODES";
         if (args.length < 3) {
         	System.out.println("Usage: <masterSubject> <xmlURI> <jvmName> [<groupSubject>]");

@@ -29,7 +29,7 @@ public class SlaveNode extends Node {
 
     public static void main(String[] args) {
         // lets assume the messenger.xml is on the classpath
-        String messengerName = "topicConnection";
+        String messengerName = "sysunitTopicConnection";
         String groupSubject = "SYSUNIT.SLAVES";
         if (args.length > 0) {
 			groupSubject = args[0];

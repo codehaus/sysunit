@@ -9,7 +9,7 @@
   || seem to work well.
   -->
 <manager>
-	<messenger name="topicConnection">
+	<messenger name="sysunitTopicConnection">
 		<jndi lookupName="JmsTopicConnectionFactory">
 			<property>
 				<name>java.naming.factory.initial</name>
@@ -21,7 +21,7 @@
 			</property>
 		</jndi>
 	</messenger>
-	<messenger name="queueConnection">
+	<messenger name="sysunitQueueConnection">
 		<jndi lookupName="JmsQueueConnectionFactory">
 			<property>
 				<name>java.naming.factory.initial</name>

@@ -28,7 +28,7 @@ import org.sysunit.transport.local.LocalDispatcherTest;
  */
 public class JmsDispatcherTest extends LocalDispatcherTest {
 
-	protected String messengerName = "topicConnection";
+	protected String messengerName = "sysunitTopicConnection";
 	protected String groupSubject = "SYSUNIT." + getClass().getName();
 	protected Messenger messenger;
 	protected Destination groupDestination;

@@ -30,7 +30,7 @@ import org.sysunit.mock.MockTestServer;
  */
 public class MockServersTest extends TestCase {
 
-    protected String messengerName = "topicConnection";
+    protected String messengerName = "sysunitTopicConnection";
     protected String masterGroupSubject = "SYSUNIT.MASTERS";
     protected String slaveGroupSubject = "SYSUNIT.SLAVES";
 	

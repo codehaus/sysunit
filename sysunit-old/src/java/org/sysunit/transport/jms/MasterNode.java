@@ -36,7 +36,7 @@ public class MasterNode extends Node {
     	}
     	
         // lets assume the messenger.xml is on the classpath
-        String messengerName = "topicConnection";
+        String messengerName = "sysunitTopicConnection";
         String groupSubject = "SYSUNIT.MASTERS";
         String slaveGroupSubject = "SYSUNIT.SLAVES";
         String xml = args[0];
