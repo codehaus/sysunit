@@ -46,29 +46,22 @@ public class MasterNode extends Node {
 
         Throwable[] errors = null;
 
-        try {
-            Messenger messenger = MessengerManager.get(messengerName);
-            if (messenger == null) {
-                System.out.println("Could not find a messenger instance called: " + messengerName);
-                return;
-            }
-            Destination groupDestination = messenger.getDestination(groupSubject);
-            Destination slaveGroupDestination = messenger.getDestination(slaveGroupSubject);
-            MasterServer masterServer = new MasterServer(xml);
-            MasterNode controller = new MasterNode(masterServer,
-                                                   messenger,
-                                                   groupDestination,
-                                                   slaveGroupDestination);
-            controller.start();
-
-            errors = masterServer.waitFor();
-
+        Messenger messenger = MessengerManager.get(messengerName);
+        if (messenger == null) {
+            System.out.println("Could not find a messenger instance called: " + messengerName);
+            return;
         }
-        catch (Exception e) {
-            System.out.println("Caught: " + e);
-            e.printStackTrace();
-        }
-
+        Destination groupDestination = messenger.getDestination(groupSubject);
+        Destination slaveGroupDestination = messenger.getDestination(slaveGroupSubject);
+        MasterServer masterServer = new MasterServer(xml);
+        MasterNode controller = new MasterNode(masterServer,
+                                               messenger,
+                                               groupDestination,
+                                               slaveGroupDestination);
+        controller.start();
+        
+        errors = masterServer.waitFor();
+        
         if ( errors != null
              &&
              errors.length != 0 ) {

@@ -68,6 +68,13 @@
     </j:file>
 
   </goal>
+
+  <goal name="sysunit:test">
+    <test:dependency-handle/>
+    <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
+    ${testPlugin.setVariable('testcase', 'org.sysunit.SumoSystemTestSuite')}
+    <attainGoal name="test:single"/>
+  </goal>
  
 </project>
 
