@@ -3,6 +3,11 @@ package org.sysunit.tests;
 public class ThreadOnlySuccessfulTest
     extends WatchedSystemTestCase
 {
+    public static Object suite()
+        throws Exception {
+        return suite( ThreadOnlySuccessfulTest.class );
+    }
+    
     public void setUp()
         throws Exception
     {

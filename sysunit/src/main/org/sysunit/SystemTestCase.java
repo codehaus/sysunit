@@ -64,7 +64,7 @@ public class SystemTestCase
      */
     public int countTestCases()
     {
-        return 1;
+        return 2;
     }
 
     /**
@@ -467,6 +467,17 @@ public class SystemTestCase
         {
             wait();
         }
+    }
+
+    public static Test suite(Class systemTestClass)
+        throws Exception {
+        TestSuite suite = new TestSuite();
+
+        suite.addTest( (Test) systemTestClass.newInstance() );
+
+        suite.setName( systemTestClass.getName() );
+
+        return suite;
     }
 }
 
