@@ -13,7 +13,6 @@ public class Node {
 
         ServerSocket serverSocket = new ServerSocket( 0 );
         serverSocket.setSoTimeout( 1000 );
-        serverSocket.setReuseAddress( true );
 
         CommandThread thread = new CommandThread( server,
                                                   serverSocket );

@@ -8,10 +8,10 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.ObjectInputStream;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.net.InetAddress;
-import java.net.SocketTimeoutException;
 
 public class CommandThread
     extends Thread {
@@ -48,7 +48,7 @@ public class CommandThread
             try {
                 Socket client = getServerSocket().accept();
                 handleClient( client );
-            } catch (SocketTimeoutException e) {
+            } catch (InterruptedIOException e) {
                 // swallow and loop
             } catch (Exception e) {
                 log.error( "accept()",
