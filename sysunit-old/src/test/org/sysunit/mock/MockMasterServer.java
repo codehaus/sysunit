@@ -16,5 +16,8 @@ import org.sysunit.command.master.MasterServer;
  * @version $Revision$
  */
 public class MockMasterServer extends MasterServer {
-
+	
+	public MockMasterServer() {
+		super("dummySysTest.jelly");
+	}
 }

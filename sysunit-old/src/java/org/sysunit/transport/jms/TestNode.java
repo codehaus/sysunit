@@ -31,7 +31,7 @@ public class TestNode extends Node {
         // lets assume the messenger.xml is on the classpath
         String messengerName = "topicConnection";
         String groupSubject = "SYSUNIT.TESTNODES";
-        if (args.length <= 3) {
+        if (args.length < 3) {
         	System.out.println("Usage: <masterSubject> <xmlURI> <jvmName> [<groupSubject>]");
         	return;
         }
@@ -41,7 +41,11 @@ public class TestNode extends Node {
         if (args.length > 3) {
 			groupSubject = args[3];
         }
-
+        
+		System.out.println("Starting Test Logical Machine for Master: " + masterSubject);
+		System.out.println("    xml: " + xml);
+		System.out.println("    jvmName: " + jvmName);
+        
         try {
             Messenger messenger = MessengerManager.get(messengerName);
             if (messenger == null) {

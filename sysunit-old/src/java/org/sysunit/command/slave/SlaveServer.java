@@ -32,6 +32,14 @@ public class SlaveServer extends Server {
      * @param command
      */
     public void startTestNode(StartTestNodeCommand command) {
+        log.info(
+            "About to start xml: "
+                + command.getXml()
+                + " with logical machine: "
+                + command.getJvmName()
+                + " from Master: "
+                + command.getMasterID());
+
         if (isForkJvm()) {
             runTestInForkedJvm(command);
         }
@@ -70,10 +78,10 @@ public class SlaveServer extends Server {
         TestNode.main(args);
     }
 
-   /**
-     * Runs the Test logical machine in a new forked JVM
-     * @param command
-     */
+    /**
+      * Runs the Test logical machine in a new forked JVM
+      * @param command
+      */
     private void runTestInForkedJvm(StartTestNodeCommand command) {
         String[] args = getTestArguments(command);
 
@@ -81,20 +89,19 @@ public class SlaveServer extends Server {
         Thread thread = new Thread(runner);
         thread.start();
     }
-    
+
     /**
      * Creates the command line arguments to the TestNode JVM
      * 
      * @param command
      * @return
      */
-	protected String[] getTestArguments(StartTestNodeCommand command) {
-		// the TestNode needs to know the destination of the Master
-		String destination = command.getMasterID();
+    protected String[] getTestArguments(StartTestNodeCommand command) {
+        // the TestNode needs to know the destination of the Master
+        String destination = command.getMasterID();
 
-		String[] args = { TestNode.class.getName(), destination, command.getXml(), command.getJvmName()};
-		return args;
-	}
+        String[] args = { destination, command.getXml(), command.getJvmName()};
+        return args;
+    }
 
- 
 }

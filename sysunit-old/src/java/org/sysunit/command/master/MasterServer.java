@@ -41,7 +41,8 @@ public class MasterServer extends Server {
     private Dispatcher slaveGroupDispatcher;
 	private JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
 	
-    public MasterServer() {
+    public MasterServer(String xml) {
+    	this.xml = xml;
     }
 
 	public void start() throws Exception {

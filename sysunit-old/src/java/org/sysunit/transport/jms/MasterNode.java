@@ -25,15 +25,21 @@ import org.sysunit.command.master.MasterServer;
  */
 public class MasterNode extends Node {
 
-    private MasterServer server = new MasterServer();
-
+	private MasterServer server;
+	
     public static void main(String[] args) {
+    	if (args.length <1)  {
+    		System.out.println("Usage: <xmlURI> [<slaveTopic>]");
+    		return;
+    	}
+    	
         // lets assume the messenger.xml is on the classpath
         String messengerName = "topicConnection";
         String groupSubject = "SYSUNIT.MASTERS";
         String slaveGroupSubject = "SYSUNIT.SLAVES";
-        if (args.length > 0) {
-            slaveGroupSubject = args[0];
+        String xml = args[0];
+        if (args.length > 1) {
+            slaveGroupSubject = args[1];
         }
 
         try {
@@ -45,7 +51,7 @@ public class MasterNode extends Node {
             Destination groupDestination = messenger.getDestination(groupSubject);
             Destination slaveGroupDestination = messenger.getDestination(slaveGroupSubject);
             MasterNode controller =
-                new MasterNode(new MasterServer(), messenger, groupDestination, slaveGroupDestination);
+                new MasterNode(new MasterServer(xml), messenger, groupDestination, slaveGroupDestination);
             controller.start();
         }
         catch (Exception e) {
