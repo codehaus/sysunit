@@ -8,6 +8,48 @@
   || troubles with using the call() statements with OpenJMS, but other messages
   || seem to work well.
   -->
+
+<manager>
+    <messenger name="sysunitTopicConnection">
+        <factory className="com.spirit.messenger.WaveTopicSessionFactory">
+            <property>
+                <name>driverName</name>
+                <value>SpiritJungle</value>
+            </property>
+            <property>
+                <name>discoverURL</name>
+                <value>multicast://224.0.0.04:5076</value>
+            </property>
+<!--
+            <property>
+                <name>tcpNoDelay</name>
+                <value>true</value>
+            </property>
+-->
+        </factory>
+    </messenger>
+
+    <messenger name="sysunitQueueConnection">
+        <factory className="com.spirit.messenger.WaveQueueSessionFactory">
+            <property>
+                <name>driverName</name>
+                <value>SpiritJungle</value>
+            </property>
+            <property>
+                <name>discoverURL</name>
+                <value>multicast://224.0.0.04:5076</value>
+            </property>
+<!--
+            <property>
+                <name>tcpNoDelay</name>
+                <value>true</value>
+            </property>
+-->
+        </factory>
+    </messenger>
+</manager>
+
+<!--
 <manager>
 	<messenger name="sysunitTopicConnection">
 		<jndi lookupName="JmsTopicConnectionFactory">
@@ -34,3 +76,4 @@
 		</jndi>
 	</messenger>
 </manager>
+-->

@@ -36,7 +36,7 @@ public class JvmNameExtractorTest extends TestCase {
 
     public void testSomeInvalidXML() throws Exception {
         try {
-			List names = extractor.getJvmNames("doesNotExist.systest");
+			List names = extractor.getJvmNamesList("doesNotExist.systest");
             fail("Should have thrown ResourceNotFoundException");
         }
         catch (ResourceNotFoundException e) {
@@ -48,7 +48,7 @@ public class JvmNameExtractorTest extends TestCase {
 	public void testSampleSystemTestJelly() throws Exception {
 		String[] expected = { "a", "a", "a", "a", "b", "b" };
     	
-		List names = extractor.getJvmNames("org/sysunit/jelly/sampleSystemTest.systest");
+		List names = extractor.getJvmNamesList("org/sysunit/jelly/sampleSystemTest.systest");
     	
 		assertListEquals("JVM names returned", expected, names);
 	}
@@ -56,7 +56,7 @@ public class JvmNameExtractorTest extends TestCase {
 	public void testTBeanStyleSystemTestJelly() throws Exception {
 		String[] expected = { "a", "a", "a", "a", "b", "b", "b" };
     	
-		List names = extractor.getJvmNames("org/sysunit/jelly/tbeanStyleSystemTest.systest");
+		List names = extractor.getJvmNamesList("org/sysunit/jelly/tbeanStyleSystemTest.systest");
     	
 		assertListEquals("JVM names returned", expected, names);
 	}

@@ -20,7 +20,7 @@ import org.sysunit.command.master.RegisterSynchronizableTBeanCommand;
 import org.sysunit.command.master.UnregisterSynchronizableTBeanCommand;
 import org.sysunit.command.master.TBeansSetUpCommand;
 import org.sysunit.command.master.TBeansRanCommand;
-import org.sysunit.command.master.TBeansDoneCommand;
+import org.sysunit.command.master.TBeansTornDownCommand;
 import org.sysunit.command.master.SyncCommand;
 import org.sysunit.jelly.JvmRunner;
 import org.sysunit.util.Checkpoint;
@@ -48,6 +48,9 @@ public class TestServer
     private int syncCounter;
     private Object syncLock;
 
+    private boolean isDone;
+    private Object isDoneLock;
+
     public TestServer(String xml, String jvmName) {
         log.info( "test server " + jvmName + " with " + xml + " is " + getName() );
         this.xml = xml;
@@ -59,6 +62,7 @@ public class TestServer
                                      this );
 
         this.syncLock = new Object();
+        this.isDoneLock = new Object();
     }
 
     public void start() throws Exception {
@@ -82,14 +86,17 @@ public class TestServer
 
 
     public void setUpTBeans() throws Exception {
+        log.info( getName() + " //// setUpTBeans()" );
         getRunner().getManager().setUpTBeans();
     }
 
     public void runTest() throws Exception {
+        log.info( getName() + " //// runTest()" );
         getRunner().getManager().runTest();
     }
 
     public void tearDownTBeans() throws Exception {
+        log.info( getName() + " //// tearDownTBeans()" );
         getRunner().getManager().tearDownTBeans();
     }
 
@@ -122,13 +129,7 @@ public class TestServer
                      String syncPointName)
         throws InterruptedException, SynchronizationException {
 
-        log.info( "sync " + tbeanId + " on " + syncPointName + " on test server " + getName() );
-
-        int counter = 0;
-
-        synchronized ( this.syncLock ) {
-            counter = this.syncCounter;
-        }
+        int count = this.syncCounter;
 
         try {
             getMasterDispatcher().dispatch( new SyncCommand( getName(),
@@ -139,37 +140,21 @@ public class TestServer
         }
 
         synchronized ( this.syncLock ) {
-            if ( counter != this.syncCounter ) {
-                log.info( "test-server: unblocking inside sync on " + getName() );
-                this.synchronizer.unblockAll();
-                return;
+            while ( this.syncCounter == count ) {
+                this.syncLock.wait();
             }
         }
-
-        log.info( "test-server: syncing inside sync on " + getName() );
-        synchronizer.sync( tbeanId,
-                           syncPointName );
     }
 
     public synchronized void unblockAll() {
-        log.info( "test-server: unblocking all on " + getName() );
-
         synchronized ( this.syncLock ) {
             ++this.syncCounter;
-            this.synchronizer.unblockAll();
+            this.syncLock.notifyAll();
         }
-        log.info( "test-server: unblocked all on " + getName() );
     }
 
     public void registerSynchronizableTBean(String tbeanId)
         throws SynchronizationException {
-        log.info( "registering synchronizable tbean " + tbeanId + " with " + getName() );
-        try {
-            getMasterDispatcher().dispatch( new RegisterSynchronizableTBeanCommand( getName(),
-                                                                                    tbeanId ) );
-        } catch (DispatchException e) {
-            throw new SynchronizationException( e );
-        }
     }
 
     public void unregisterSynchronizableTBean(String tbeanId)
@@ -196,12 +181,27 @@ public class TestServer
             getMasterDispatcher().dispatch( new TBeansRanCommand( getName() ) );
         } else if ( checkpoint.getName().equals( "done" ) ) {
             Throwable[] errors = getRunner().getManager().collectErrors();
-            getMasterDispatcher().dispatch( new TBeansDoneCommand( getName(),
-                                                                   errors ) );
+            getMasterDispatcher().dispatch( new TBeansTornDownCommand( getName(),
+                                                                       errors ) );
+            synchronized( this.isDoneLock ) {
+                log.debug( "notifying WAIT FOR" );
+                this.isDone = true;
+                this.isDoneLock.notifyAll();
+            }
         } else {
             log.error( "unknown checkpoint: " + checkpoint.getName() );
         }
+    }
 
+    public void waitFor()
+        throws InterruptedException {
+        synchronized ( this.isDoneLock ) {
+            while ( ! this.isDone ) {
+                this.isDoneLock.wait();
+            }
+        }
+
+        log.debug( "notified WAIT FOR" );
     }
 
 }

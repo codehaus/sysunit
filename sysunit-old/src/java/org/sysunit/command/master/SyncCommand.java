@@ -1,7 +1,7 @@
 package org.sysunit.command.master;
 
 public class SyncCommand
-    extends MasterCommand {
+    extends RunState.Command {
 
     private String testServerName;
     private String tbeanId;
@@ -27,8 +27,10 @@ public class SyncCommand
         return this.syncPointName;
     }
 
-    public void run(MasterServer masterServer)
+    public void run(RunState state)
         throws Exception {
-        masterServer.sync( this );
+        state.sync( getTestServerName(),
+                    getTBeanId(),
+                    getSyncPointName() );
     }
 }

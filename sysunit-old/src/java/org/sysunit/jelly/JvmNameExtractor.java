@@ -27,7 +27,10 @@ import org.sysunit.remote.RemoteTBeanManager;
  * @version $Revision$
  */
 public class JvmNameExtractor {
+
     private static final Log log = LogFactory.getLog(JvmNameExtractor.class);
+
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
     
     private JellyContext context;
     private RemoteTBeanManager manager;// = new RemoteTBeanManager();
@@ -47,7 +50,7 @@ public class JvmNameExtractor {
      * 
      * @param xml
      */
-    public List getJvmNames(String xml) throws Exception {
+    public List getJvmNamesList(String xml) throws Exception {
         // lets assume the XML is on the classpath
         URL url = getClass().getClassLoader().getResource(xml);
         if (url == null) {
@@ -63,7 +66,10 @@ public class JvmNameExtractor {
 
         context.runScript(url, output);
         
-        // grab the names...
-        return (List) context.getVariable("org.sysunit.jvmList");
+        return (List)context.getVariable("org.sysunit.jvmList");
+    }
+
+    public String[] getJvmNames(String xml) throws Exception {
+        return (String[]) getJvmNamesList( xml ).toArray( EMPTY_STRING_ARRAY );
     }
 }

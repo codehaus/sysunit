@@ -1,8 +1,8 @@
 package org.sysunit.command.master;
 
 public class TBeansSetUpCommand
-    extends MasterCommand {
-
+    extends SetUpState.Command {
+    
     private String testServerName;
 
     public TBeansSetUpCommand(String testServerName) {
@@ -13,8 +13,8 @@ public class TBeansSetUpCommand
         return this.testServerName;
     }
 
-    public void run(MasterServer masterServer)
+    public void run(SetUpState state)
         throws Exception {
-        masterServer.tbeansSetUp( getTestServerName() );
+        state.testServerSetUp( getTestServerName() );
     }
 }

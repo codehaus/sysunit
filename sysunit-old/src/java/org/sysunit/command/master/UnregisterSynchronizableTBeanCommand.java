@@ -1,7 +1,7 @@
 package org.sysunit.command.master;
 
 public class UnregisterSynchronizableTBeanCommand
-    extends MasterCommand {
+    extends RunState.Command {
 
     private String testServerName;
     private String tbeanId;
@@ -20,8 +20,9 @@ public class UnregisterSynchronizableTBeanCommand
         return this.tbeanId;
     }
 
-    public void run(MasterServer masterServer)
+    public void run(RunState state)
         throws Exception {
-        masterServer.unregisterSynchronizableTBean( this );
+        state.unregisterSynchronizableTBean( getTestServerName(),
+                                             getTBeanId() );
     }
 }

@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
  * @version $Revision$
  */
 public class TestNodeLaunchedCommand
-    extends MasterCommand {
+    extends LaunchState.Command {
 
     private static final Log log = LogFactory.getLog(TestNodeLaunchedCommand.class);
 
@@ -32,12 +32,13 @@ public class TestNodeLaunchedCommand
         this.numSynchronizableTBeans = numSynchronizableTBeans;
    }
 
-    public void run(MasterServer masterServer) throws Exception {
-        log.debug( "running TestNodeStartedCommand for " + name );
-    	masterServer.addTestNode(this);
+    public void run(LaunchState state) throws Exception {
+    	state.addLaunchedTestNode( getTestServerName(),
+                                   getNumSynchronizableTBeans(),
+                                   getReplyDispatcher() );
     }
     
-    public String getName() {
+    public String getTestServerName() {
         return name;
     }
 

@@ -19,7 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.command.Server;
 import org.sysunit.command.master.RequestJarCommand;
-import org.sysunit.transport.jms.TestNode;
+// import org.sysunit.transport.jms.TestNode;
 
 /**
  * The Slave server which spawns another JVM to run each TestNode
@@ -34,10 +34,10 @@ public class SlaveServer extends Server {
 
     private File tmpDir;
 
-    private Map waiters;
+    private Map masterSessions;
 
     public SlaveServer() {
-        this.waiters = new HashMap();
+        this.masterSessions = new HashMap();
     }
 
     /**
@@ -103,7 +103,8 @@ public class SlaveServer extends Server {
         final String[] args = getTestArguments(command);
 
         // lets run the TestNode
-
+        
+        /*
         Thread thread = new Thread() {
                 public void run() {
                     TestNode.main(args);
@@ -111,6 +112,7 @@ public class SlaveServer extends Server {
             };
 
         thread.start();
+        */
     }
 
     /**
@@ -120,21 +122,40 @@ public class SlaveServer extends Server {
     private synchronized void launchNodeInForkedJvm(LaunchTestNodeCommand command)
         throws Exception {
 
+        MasterSession session = getMasterSession( command );
+
+        log.info( "using session " + session );
+
+        session.addTestNode( getTestArguments( command ) );
+    }
+
+    protected synchronized MasterSession getMasterSession(LaunchTestNodeCommand command)
+        throws Exception {
+
+        if ( this.masterSessions.containsKey( command.getMasterID() ) ) {
+            return (MasterSession) this.masterSessions.get( command.getMasterID() );
+        }
+
         String mungedId = sanitizePath( command.getMasterID() );
 
         File dir = new File( this.tmpDir,
                              mungedId );
 
-        LaunchWaiter waiter = new LaunchWaiter( dir,
-                                                command,
-                                                getTestArguments( command ) );
+        MasterSession session = new MasterSession( command.getReplyDispatcher(),
+                                                   dir,
+                                                   command.getJarMap(),
+                                                   this );
 
-        log.info( "PUT " + command.getMasterID() );
+        this.masterSessions.put( command.getMasterID(),
+                                 session );
 
-        this.waiters.put( command.getMasterID() + "-false",
-                          waiter );
+        return session;
+        
+    }
 
-        waiter.start();
+    protected synchronized MasterSession lookupMasterSession(String masterID)
+        throws Exception {
+        return (MasterSession) this.masterSessions.get( masterID );
     }
 
     protected String sanitizePath(String path) {
@@ -159,21 +180,6 @@ public class SlaveServer extends Server {
         return path;
     }
 
-    public synchronized void storeJar(String jarName,
-                                      byte[] bytes,
-                                      String masterId)
-        throws Exception {
-
-        LaunchWaiter waiter = (LaunchWaiter) this.waiters.get( masterId );
-
-        log.debug( "GET " + masterId + " // " + waiter );
-
-        log.info( "storing " + jarName );
-
-        waiter.storeJar( jarName,
-                         bytes );
-    }
-
     /**
      * Creates the command line arguments to the TestNode JVM
      * 
@@ -182,10 +188,18 @@ public class SlaveServer extends Server {
      */
     protected String[] getTestArguments(LaunchTestNodeCommand command) {
         // the TestNode needs to know the destination of the Master
-        String destination = command.getMasterID();
+        String destination = command.getReplyDispatcher().toString();
 
         String[] args = { destination, command.getXml(), command.getJvmName()};
         return args;
+    }
+
+    public void storeJar(String masterID,
+                         String jarName,
+                         byte[] bytes)
+        throws Exception {
+        lookupMasterSession( masterID ).storeJar( jarName,
+                                                  bytes );
     }
 
 }

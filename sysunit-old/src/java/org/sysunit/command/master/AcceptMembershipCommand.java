@@ -9,8 +9,6 @@
  */
 package org.sysunit.command.master;
 
-
-
 /**
  * A reply to the {@link RequestMembersCommand} to indicate that 
  * this node would like to join the test network.
@@ -18,15 +16,19 @@ package org.sysunit.command.master;
  * @author James Strachan
  * @version $Revision$
  */
-public class AcceptMembershipCommand extends MasterCommand {
+public class AcceptMembershipCommand
+    extends DiscoveryState.Command {
+
 	private String name;
 	
 	public AcceptMembershipCommand(String name) {
 		this.name = name;
 	}
     
-    public void run(MasterServer context) throws Exception {
-    	context.acceptMember(this);
+    public void run(DiscoveryState state)
+        throws Exception {
+    	state.addSlaveNode( getName(),
+                            getReplyDispatcher() );
     }
     
     public String getName() {

@@ -167,7 +167,7 @@ public class RemoteTBeanManager { // implements Runnable {
 
     public void setUpTBeans() {
         try {
-        	log.debug("About to run tbeans: " + tbeans);
+        	log.info("About to run tbeans: " + tbeans);
         	
             startTBeans();
             //  waitForTBeans(10000);
@@ -191,6 +191,8 @@ public class RemoteTBeanManager { // implements Runnable {
 
     public void startTBeans() throws Throwable {
 
+        log.info( getTestServerName() + " ///// starting TBeans " + this.tbeans.keySet() );
+
         Checkpoint beginCheckpoint = new Checkpoint( "begin",
                                                      tbeans.size() + 1,
                                                      this.beginCallback );
@@ -206,7 +208,7 @@ public class RemoteTBeanManager { // implements Runnable {
         for (Iterator tbeanIdIter = this.tbeans.keySet().iterator(); tbeanIdIter.hasNext();) {
             
             String tbeanId = (String) tbeanIdIter.next();
-            String qualifiedTBeanId = getTestServerName() + tbeanId;
+            String qualifiedTBeanId = getTestServerName() + ":" + tbeanId;
 
             TBean tbean = (TBean) this.tbeans.get(tbeanId);
 
@@ -227,6 +229,7 @@ public class RemoteTBeanManager { // implements Runnable {
 
             this.tbeanThreads.add(thread);
 
+            log.info( this + " starting tbean " + qualifiedTBeanId );
             thread.start();
         }
 
@@ -237,7 +240,7 @@ public class RemoteTBeanManager { // implements Runnable {
 
     public void waitForTBeans(long timeout) throws InterruptedException, WatchdogException {
 
-		log.debug("Waiting for TBeans...");
+		log.info("Waiting for TBeans...");
 		
         long start = new Date().getTime();
 

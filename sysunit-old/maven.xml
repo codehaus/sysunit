@@ -29,13 +29,12 @@
 
   </goal>
 
-  <goal name="setclasspath" prereqs="java:compile, test:compile">
-		<path id="test.classpath">
-	    <pathelement path="${maven.build.dest}"/>
-	    <pathelement path="target/classes"/>
-	    <pathelement path="target/test-classes"/>
-	    <path refid="maven.dependency.classpath"/>
-		</path>
+  <goal name="setclasspath" prereqs="java:compile">
+    <path id="s.classpath">
+      <pathelement path="${maven.build.dest}"/>
+      <pathelement path="target/classes"/>
+      <path refid="maven.dependency.classpath"/>
+    </path>
   </goal>
 
   <goal name="sysunit:build-plugin">
@@ -51,6 +50,21 @@
   </goal>
 
   <goal name="sysunit:install" prereqs="jar:install,sysunit:install-plugin"/>
- 
+
+  <goal name="master" prereqs="setclasspath">
+    <java classname="org.sysunit.transport.socket.MasterNode" fork="yes">
+      <classpath refid="s.classpath"/>
+    </java>
+  </goal>
+
+  <goal name="slave" prereqs="jar:jar">
+    <java classname="org.sysunit.transport.socket.SlaveNode" fork="yes">
+      <classpath>
+        <pathelement path="target/${maven.final.name}.jar"/>
+        <path refid="maven.dependency.classpath"/>
+      </classpath>
+    </java>
+  </goal>
+
 </project>
 

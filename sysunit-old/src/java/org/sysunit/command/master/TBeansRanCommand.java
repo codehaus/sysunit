@@ -1,7 +1,7 @@
 package org.sysunit.command.master;
 
 public class TBeansRanCommand
-    extends MasterCommand {
+    extends RunState.Command {
 
     private String testServerName;
 
@@ -13,8 +13,8 @@ public class TBeansRanCommand
         return this.testServerName;
     }
 
-    public void run(MasterServer masterServer)
+    public void run(RunState state)
         throws Exception {
-        masterServer.tbeansRan( getTestServerName() );
+        state.tbeansRan( getTestServerName() );
     }
 }

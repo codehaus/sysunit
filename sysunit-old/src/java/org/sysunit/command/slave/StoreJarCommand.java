@@ -29,8 +29,9 @@ public class StoreJarCommand
 
     public void run(SlaveServer server)
         throws Exception {
-        server.storeJar( getJarName(),
-                         getBytes(),
-                         getMasterID() );
+        System.err.println( "STORE JAR: " + getJarName() + " // " + this );
+        server.storeJar( getMasterID(),
+                         getJarName(),
+                         getBytes() );
     }
 }

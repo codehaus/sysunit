@@ -1,20 +1,28 @@
 package org.sysunit.command.master;
 
 public class TBeanErrorCommand
-    extends MasterCommand {
+    extends RunState.Command {
 
+    private String testServerName;
     private String tbeanId;
 
-    public TBeanErrorCommand(String tbeanId) {
-        this.tbeanId = tbeanId;
+    public TBeanErrorCommand(String testServerName,
+                             String tbeanId) {
+        this.testServerName = testServerName;
+        this.tbeanId        = tbeanId;
+    }
+
+    public String getTestServerName() {
+        return this.testServerName;
     }
 
     public String getTBeanId() {
         return this.tbeanId;
     }
 
-    public void run(MasterServer masterServer)
+    public void run(RunState state)
         throws Exception {
-        masterServer.error( getTBeanId() );
+        state.tbeanError( getTestServerName(),
+                          getTBeanId() );
     }
 }

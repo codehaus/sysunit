@@ -9,94 +9,135 @@
  */
 package org.sysunit.command.master;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.util.Date;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.sysunit.command.DispatchException;
+import org.sysunit.command.StateServer;
 import org.sysunit.command.Dispatcher;
 import org.sysunit.command.MissingPropertyException;
-import org.sysunit.command.Server;
-import org.sysunit.command.slave.RequestMembersCommand;
-import org.sysunit.command.slave.LaunchTestNodeCommand;
-import org.sysunit.command.test.SetUpTBeansCommand;
-import org.sysunit.command.test.TearDownTBeansCommand;
-import org.sysunit.command.test.RunTestCommand;
-import org.sysunit.command.test.KillCommand;
 import org.sysunit.jelly.JvmNameExtractor;
-import org.sysunit.jelly.TimeoutExtractor;
-import org.sysunit.SysUnitException;
-import org.sysunit.SynchronizationException;
-import org.sysunit.WatchdogException;
 
-/**
- * The Server for Master nodes on the network
- * 
- * @author James Strachan
- * @version $Revision$
- */
+import java.io.File;
+import java.io.FileInputStream;
+
 public class MasterServer
-    extends Server {
-    private static final Throwable[] EMPTY_THROWABLE_ARRAY = new Throwable[0];
+    extends StateServer {
 
-    private static final Log log = LogFactory.getLog(MasterServer.class);
+    private String xml;
+    private String[] jvmNames;
+    private Dispatcher[] slaveNodeDispatchers;
 
-	private Map members = new HashMap();
-	private Map testNodes = new HashMap();
-	private String xml;
-	private long waitTime = 10000L;
-    private long timeout;
-
-    private Dispatcher slaveGroupDispatcher;
-	private JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
-	private TimeoutExtractor timeoutExtractor = new TimeoutExtractor();
-    private MasterSynchronizer synchronizer = new MasterSynchronizer();
-
-    private Object isStartedUpLock = new Object();
-    private boolean isStartedUp;
-
-    private Object isDoneLock = new Object();
     private boolean isDone;
+    private Object isDoneLock;
+    private Throwable[] errors;
 
-    private List jvmNames;
-    private int setUpServers;
-    private int ranServers;
-    private int doneServers;
-
-    private List errors;
-	
     public MasterServer(String xml) {
-    	this.xml = xml;
-        this.errors = new ArrayList();
+        this.xml = xml;
+        this.isDone = false;
+        this.isDoneLock = new Object();
     }
 
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+
+    public String getXml() {
+        return this.xml;
+    }
+    
+    public String[] getJvmNames() {
+        return this.jvmNames;
+    }
+
+    public void setSlaveNodeDispatchers(Dispatcher[] slaveNodeDispatchers) {
+        this.slaveNodeDispatchers = slaveNodeDispatchers;
+    }
+
+    public Dispatcher[] getSlaveNodeDispatchers() {
+        return this.slaveNodeDispatchers;
+    }
+
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+
 	public void start() throws Exception {
-		if (xml == null) {
-			throw new MissingPropertyException(this, "xml");
-		}
-		if (slaveGroupDispatcher == null) {
-			throw new MissingPropertyException(this, "slaveGroupDispatcher");
+
+		if ( getXml() == null ) {
+			throw new MissingPropertyException( this,
+                                                "xml" );
 		}
 		
-		// lets send an advertisement
-		slaveGroupDispatcher.dispatch(new RequestMembersCommand());
+        JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
+		this.jvmNames = jvmNameExtractor.getJvmNames(xml);
 
-		// now lets wait until some people arrive...
+        enterState( new LaunchState( this,
+                                     getSlaveNodeDispatchers(),
+                                     getXml(),
+                                     getJvmNames() ) );
+    }
+
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+
+
+    protected synchronized void exitState(LaunchState state)
+        throws Exception {
+        if ( getState() != state ) {
+            return;
+        }
+        enterState( new SetUpState( this,
+                                    state.getTestNodeInfos() ) );
+    }
+
+    protected synchronized void exitState(SetUpState state)
+        throws Exception {
+        if ( getState() != state ) {
+            return;
+        }
+        enterState( new RunState( this,
+                                  state.getTestNodeInfos() ) );
+    }
+
+    protected synchronized void exitState(RunState state)
+        throws Exception {
+        if ( getState() != state ) {
+            return;
+        }
+        enterState( new TearDownState( this,
+                                       state.getTestNodeInfos() ) );
+    }
+
+    protected synchronized void exitState(TearDownState state)
+        throws Exception {
+        if ( getState() != state ) {
+            return;
+        }
+
+        this.errors = state.getErrors();
+
+        synchronized ( this.isDoneLock ) {
+            this.isDone = true;
+            this.isDoneLock.notifyAll();
+        }
+    }
+
+    public Throwable[] waitFor()
+        throws Exception {
+        synchronized ( this.isDoneLock ) {
+            while ( ! this.isDone ) {
+                this.isDoneLock.wait( 1000 );
+            }
+        }
+
+        return this.errors;
+    }
+    
+    /*
+		getSlaveGroupDispatcher().dispatch( new RequestMembersCommand() );
+
 		Thread.sleep(waitTime);
 
-		// now lets start kicking off the JVMs
-		this.jvmNames = jvmNameExtractor.getJvmNames(xml);
-        this.timeout = timeoutExtractor.getTimeout(xml);
+
+        TimeoutExtractor timeoutExtractor = new TimeoutExtractor();
+        this.timeout  = timeoutExtractor.getTimeout(xml);
+
+        setState( new LaunchState() );
 
         if ( this.members.isEmpty() ) {
             throw new SysUnitException( "No slave JVMs" );
@@ -104,306 +145,16 @@ public class MasterServer
 
 		roundRobbinJvms(xml);
 	}
-	
-	
-	/**
-	 * Typically this method is only used by the master to find members
-	 * 
-	 * @param dispatcher
-	 */
-	public void acceptMember(AcceptMembershipCommand command) {
-		members.put(command.getName(), command.getReplyDispatcher());
-	}
+    */
 
-	/**
-	 * @param command
-	 */
-	public void addTestNode(TestNodeLaunchedCommand command)
-        throws Exception {
-        TestNodeInfo testNodeInfo = new TestNodeInfo( command.getName(),
-                                                      command.getNumSynchronizableTBeans(),
-                                                      command.getReplyDispatcher() );
-        log.debug( "adding test node: " + testNodeInfo );
-		testNodes.put(command.getName(), testNodeInfo );
-        getSynchronizer().addTestNode( testNodeInfo );
-
-        if ( jvmNames.size() == testNodes.size() ) {
-            setUpTBeans();
-        }
-	}
-
-    protected void setUpTBeans()
-        throws Exception {
-        for ( Iterator testNodeInfoIter = this.testNodes.values().iterator();
-              testNodeInfoIter.hasNext(); ) {
-            TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
-
-            log.debug( "starting test on " + testNodeInfo.getName() );
-            testNodeInfo.getDispatcher().dispatch( new SetUpTBeansCommand() );
-            log.debug( "started test on " + testNodeInfo.getName() );
-        }
-    }
-    protected void tearDownTBeans()
-        throws Exception {
-        for ( Iterator testNodeInfoIter = this.testNodes.values().iterator();
-              testNodeInfoIter.hasNext(); ) {
-            TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
-
-            testNodeInfo.getDispatcher().dispatch( new TearDownTBeansCommand() );
-        }
-    }
-
-    public void tbeansSetUp(String testServerName)
-        throws Exception {
-        ++this.setUpServers;
-
-        if ( this.setUpServers == jvmNames.size() ) {
-            synchronized ( this.isStartedUpLock ) {
-                this.isStartedUp = true;
-                this.isStartedUpLock.notifyAll();
-            }
-            runTest();
-        }
-    }
-
-    public void tbeansRan(String testServerName)
-        throws Exception {
-        ++this.ranServers;
-        
-        if ( this.ranServers == jvmNames.size() ) {
-            tearDownTBeans();
-        }
-    }
-    
-    public void tbeansDone(String testServerName,
-                           Throwable[] errors) {
-        addErrors( errors );
-        
-        ++this.doneServers;
-        
-        if ( this.doneServers == jvmNames.size() ) {
-            if ( ! this.errors.isEmpty() ) {
-                log.error( "THERE WERE ERRORS: " + this.errors );
-            } else {
-                log.info( "SUCCESSFUL" );
-            }
-            
-            synchronized ( this.isDoneLock ) {
-                this.isDone = true;
-                this.isDoneLock.notifyAll();
-            }
-        }
-    }
-
-    public Throwable[] waitFor()
-        throws Exception {
-        waitForStartUp();
-        return waitForCompletion();
-    }
-
-    public void waitForStartUp()
-        throws Exception {
-
-        synchronized ( this.isStartedUpLock ) {
-            while ( ! this.isStartedUp ) {
-                this.isStartedUpLock.wait();
-            }
-        }
-    }
-
-    public Throwable[] waitForCompletion()
-        throws Exception {
-
-        long start = new Date().getTime();
-
-        long timeLeft = timeout;
-
-        log.debug( "waitForing: " + timeLeft );
-        synchronized ( this.isDoneLock ) {
-            while ( ! this.isDone ) {
-                log.debug( "this.isDone == " + this.isDone + " timeLeft: " + timeLeft );
-                this.isDoneLock.wait( timeLeft );
-
-                if ( timeout > 0 ) {
-                    long now = new Date().getTime();
-                    timeLeft = timeout - ( now - start );
-                }
-
-                if ( timeout > 0
-                     &&
-                     timeLeft <= 0 ) {
-                    
-                    killAll();
-                    throw new WatchdogException( timeout,
-                                                 new String[0] );
-                }
-            }
-        }
-
-        return (Throwable[]) this.errors.toArray( EMPTY_THROWABLE_ARRAY );
-    }
-
-    public void killAll()
-        throws DispatchException {
-
-        for ( Iterator testNodeInfoIter = this.testNodes.values().iterator();
-              testNodeInfoIter.hasNext(); ) {
-            TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
-
-            testNodeInfo.getDispatcher().dispatch( new KillCommand() );
-        }
-    }
-
-    public void addErrors(Throwable[] errors) {
-        for ( int i = 0 ; i < errors.length ; ++i ) {
-            this.errors.add( errors[i] );
-        }
-    }
-        
-
-    protected void runTest()
-        throws Exception {
-
-        for ( Iterator testNodeInfoIter = this.testNodes.values().iterator();
-              testNodeInfoIter.hasNext(); ) {
-            TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
-
-            log.debug( "starting test on " + testNodeInfo.getName() );
-            testNodeInfo.getDispatcher().dispatch( new RunTestCommand() );
-            log.debug( "started test on " + testNodeInfo.getName() );
-        }
-    }
-
-    public TestNodeInfo getTestNodeInfo(String name) {
-        return (TestNodeInfo) testNodes.get( name );
-    }
-
-	// Properties
-	//-------------------------------------------------------------------------    
-
-	/**
-	 * @return a Map keyed by name of all the members's Dispatcher object
-	 */
-	public Map getMemberMap() {
-		return members;
-	}
-
-    public Map getTestNodesMap() {
-        return testNodes;
-    }
-
-	/**
-	 * @return
-	 */
-	public Dispatcher getSlaveGroupDispatcher() {
-		return slaveGroupDispatcher;
-	}
-
-	/**
-	 * @param slaveGroupDispatcher
-	 */
-	public void setSlaveGroupDispatcher(Dispatcher slaveGroupDispatcher) {
-		this.slaveGroupDispatcher = slaveGroupDispatcher;
-	}
-
-	/**
-	 * @return
-	 */
-	public long getWaitTime() {
-		return waitTime;
-	}
-
-	/**
-	 * @param waitTime
-	 */
-	public void setWaitTime(long waitTime) {
-		this.waitTime = waitTime;
-	}
-	/**
-	 * @return
-	 */
-	public String getXml() {
-		return xml;
-	}
-
-	/**
-	 * @param xml
-	 */
-	public void setXml(String xml) {
-		this.xml = xml;
-	}
-
-    public MasterSynchronizer getSynchronizer() {
-        return this.synchronizer;
-    }
-
-    public void sync(SyncCommand syncCommand)
-        throws SynchronizationException, DispatchException {
-        getSynchronizer().sync( syncCommand.getTBeanId(),
-                                syncCommand.getSyncPointName() );
-    }
-
-	// Implementation methods
-	//-------------------------------------------------------------------------    
-	protected void roundRobbinJvms(String xml) throws Exception {
-		// lets create an Array of the dispatchers
-		Collection dispatcherCollection = members.values();
-		
-		log.info("Dispatching: " + jvmNames.size() + " JVM(s) across: " + dispatcherCollection.size() + " dispatcher(s)");
-
-        Properties jarMap = new Properties();
-
-        InputStream jarsIn = getClass().getClassLoader().getResourceAsStream( "sysunit-jars.properties" );
-        
-        if ( jarsIn != null ) {
-            try {
-                jarMap.load( jarsIn );
-            } finally {
-                jarsIn.close();
-            }
-        }
-
-        log.debug( jarMap );
-
-        //if ( 1 == 1 ) {
-            //throw new Error( "foo" );
-        //}
-		
-		int size = dispatcherCollection.size();
-		Dispatcher[] dispatchers = new Dispatcher[size];
-		dispatcherCollection.toArray(dispatchers);
-
-		int idx = 0;
-		for (Iterator iter = jvmNames.iterator(); iter.hasNext(); idx++) {
-			String jvmName = (String) iter.next();
-
-			if (idx >= size) {
-				idx = 0;
-			}
-			
-			Dispatcher dispatcher = dispatchers[idx];
-			
-			log.info("Dispatching jvm: " + jvmName + " to dispatcher: " + dispatcher);
-
-            String mungedName = getName().substring( 0,
-                                                     getName().lastIndexOf( "-false" ) );
-
-            // String mungedName = getName();
-			
-			dispatcher.dispatch(new LaunchTestNodeCommand(xml,
-                                                          jvmName,
-                                                          mungedName,
-                                                          jarMap));
-		}
-	}
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
     public byte[] requestJar(String jarName,
                              String path)
         throws Exception {
 
         File file = new File( path );
-
-        log.info( file + " requested" );
 
         FileInputStream in = new FileInputStream( file );
 
@@ -418,18 +169,5 @@ public class MasterServer
         }
     }
 
-    public void registerSynchronizableTBean(RegisterSynchronizableTBeanCommand command)
-        throws DispatchException {
-        this.synchronizer.registerSynchronizableTBean( command.getTBeanId() );
-    }
 
-    public void unregisterSynchronizableTBean(UnregisterSynchronizableTBeanCommand command)
-        throws DispatchException {
-        this.synchronizer.unregisterSynchronizableTBean( command.getTBeanId() );
-    }
-
-    public void error(String tbeanId)
-        throws DispatchException {
-        this.synchronizer.error( tbeanId );
-    }
 }

@@ -4,20 +4,22 @@ import org.sysunit.command.Dispatcher;
 
 public class TestNodeInfo {
 
-    private String name;
+    public static final TestNodeInfo[] EMPTY_ARRAY = new TestNodeInfo[0];
+
+    private String testNodeName;
     private int numSynchronizableTBeans;
     private Dispatcher dispatcher;
 
-    public TestNodeInfo(String name,
+    public TestNodeInfo(String testNodeName,
                         int numSynchronizableTBeans,
                         Dispatcher dispatcher) {
-        this.name = name;
+        this.testNodeName = testNodeName;
         this.numSynchronizableTBeans = numSynchronizableTBeans;
         this.dispatcher = dispatcher;
     }
 
-    public String getName() {
-        return this.name;
+    public String getTestNodeName() {
+        return this.testNodeName;
     }
 
     public int getNumSynchronizableTBeans() {
@@ -26,10 +28,5 @@ public class TestNodeInfo {
 
     public Dispatcher getDispatcher() {
         return this.dispatcher;
-    }
-
-    public String toString() {
-        return "[TestNodeInfo: name=" + this.name
-            + "; numSynchronizableTBeans=" + this.numSynchronizableTBeans + "]";
     }
 }

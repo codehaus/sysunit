@@ -7,11 +7,14 @@ public class RequestJarCommand
 
     private String jarName;
     private String path;
+    private String grist;
 
     public RequestJarCommand(String jarName,
-                             String path) { 
+                             String path,
+                             String grist) { 
         this.jarName = jarName;
         this.path = path;
+        this.grist = grist;
     }
 
     public String getJarName() {
@@ -26,6 +29,8 @@ public class RequestJarCommand
         throws Exception {
         byte[] bytes = server.requestJar( getJarName(),
                                           getPath().replace('@', '\\' ) );
+
+        System.err.println( "FETCH JAR: " + getJarName() + " // " + this + " // " + this.grist);
 
         getReplyDispatcher().dispatch( new StoreJarCommand( getJarName(),
                                                             bytes,

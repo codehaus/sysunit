@@ -54,4 +54,12 @@ public class LaunchTestNodeCommand extends SlaveCommand {
         return this.jarMap;
     }
 
+    public String toString() {
+        return "[LaunchTestNodeCommand: xml=" + this.xml
+            + "; jvmName=" + this.jvmName
+            + "; masterID=" + this.masterID
+            + "; jarMap=" + this.jarMap
+            + "]";
+    }
+
 }

@@ -4,7 +4,7 @@
          xmlns:test="test">
 
   <goal name="sysunit:slave" description="Runs a slave node">
-    <java classname="org.sysunit.transport.jms.SlaveNode" fork="yes">
+    <java classname="org.sysunit.transport.socket.SlaveNode" fork="yes">
       <classpath path="${plugin.dependencyClasspath}"/>
     </java>
   </goal>

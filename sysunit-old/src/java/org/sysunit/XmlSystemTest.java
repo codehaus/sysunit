@@ -31,7 +31,7 @@ public class XmlSystemTest
         testResult.startTest( this );
 
         try {
-            org.sysunit.transport.jms.MasterNode.main( new String[] { getXmlPath() } );
+            org.sysunit.transport.socket.MasterNode.main( new String[] { getXmlPath() } );
         } catch (MultiThrowable mt) {
             Throwable[] throwables = mt.getThrowables();
 

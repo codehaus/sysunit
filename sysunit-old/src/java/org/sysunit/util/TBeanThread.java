@@ -6,8 +6,13 @@ import org.sysunit.TBeanSynchronizer;
 import org.sysunit.Synchronizer;
 import org.sysunit.SynchronizationException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class TBeanThread
     extends Thread {
+
+    private static final Log log = LogFactory.getLog(TBeanThread.class);
 
     public static final TBeanThread[] EMPTY_ARRAY = new TBeanThread[0];
 
@@ -77,16 +82,26 @@ public class TBeanThread
     public void run() {
         try {
             try {
+                log.info( getTBeanId() + " before setUp()");
+                System.err.println( "FOO        " + getTBean() );
                 tbean.setUp();
+                System.err.println( "BAR        " + getTBean() );
+                log.info( getTBeanId() + " after setUp()");
+                log.info( getTBeanId() + " before begin pass()" );
                 getBeginCheckpoint().pass();
+                log.info( getTBeanId() + " after begin pass()" );
+                log.info( getTBeanId() + " before begin block()" );
                 getBeginBlocker().block();
+                log.info( getTBeanId() + " after begin block()" );
             } catch (Exception e) {
                 setError( e );
                 return;
             }
             
             try {
+                log.info( getTBeanId() + " before run()" );
                 tbean.run();
+                log.info( getTBeanId() + " after run()" );
             } catch (Throwable e) {
                 setError( e );
                 e.printStackTrace();

@@ -173,7 +173,7 @@ public class LocalSynchronizer
     }
 
     protected synchronized void addWaitingTBean(String tbeanId) {
-        log.info( this + " local-sync: add " + tbeanId + " to " + this.waitingTBeanIds );
+        log.info( "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5 " + this + " local-sync: add " + tbeanId + " to " + this.waitingTBeanIds );
         this.waitingTBeanIds.add( tbeanId );
     }
 
@@ -188,9 +188,11 @@ public class LocalSynchronizer
         LocalSyncPoint syncPoint = null;
 
         synchronized ( this ) {
-            log.info( "sync " + tbeanId + " on " + syncPointName );
+            log.info( "*&*&*I&*&*&*&*&*& " + this.waitingTBeanIds );
+            log.info( "local sync " + tbeanId + " on " + syncPointName );
 
             if ( isWaitingTBean( tbeanId ) ) {
+                log.info( "already sync: " + this.waitingTBeanIds );
                 throw new AlreadySynchronizedException( tbeanId,
                                                         syncPointName );
             }
