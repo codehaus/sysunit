@@ -128,7 +128,7 @@ public class LocalSynchronizer
      *
      * @param tbeanId The identifier of the synchronizable TBean.
      */
-    synchronized void registerSynchronizableTBean(String tbeanId) {
+    public synchronized void registerSynchronizableTBean(String tbeanId) {
         this.tbeanIds.add( tbeanId );
     }
 

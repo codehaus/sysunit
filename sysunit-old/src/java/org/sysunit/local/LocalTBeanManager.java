@@ -254,4 +254,8 @@ public class LocalTBeanManager
             }
         }
     }
+
+    public void addTBean(String tbeanId, TBean tbean) {
+    	tbeans.put(tbeanId, tbean);   
+    }
 }

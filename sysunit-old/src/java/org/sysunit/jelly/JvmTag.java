@@ -45,18 +45,22 @@ public class JvmTag extends TagSupport {
             throw new MissingAttributeException("name");
         }
         
+		SystemTestTag tag = (SystemTestTag) findAncestorWithClass(SystemTestTag.class);
+		if (tag == null) {
+			throw new JellyTagException("This tag should be nested inside a <systemTest> tag");
+		}
+		
         if (isEnabled()) {
             // lets run this JVM locally
             invokeBody(output);
+            
+            // now lets run the TBeanManager
+			tag.getManager().run();            
         }
         else {
-            // lets register the JVM name & count with the system test object
-            // in times when a client wishes to remotely create the
-            // system test JVMs
-            SystemTestTag tag = (SystemTestTag) findAncestorWithClass(SystemTestTag.class);
-            if (tag == null) {
-                throw new JellyTagException("This tag should be nested inside a <systemTest> tag");
-            }
+			// lets register the JVM name & count with the system test object
+			// in times when a client wishes to remotely create the
+			// system test JVMs
             tag.addJvm(name, count);
         }
 	}

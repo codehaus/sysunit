@@ -22,6 +22,9 @@ public class MockTBeanManager
         this.inited = true;
     }
 
+    public void addTBean(String tbeanId, TBean tbean) {
+    }
+
     public boolean isInited() {
         return this.inited;
     }

@@ -18,7 +18,7 @@ import org.apache.commons.jelly.TagSupport;
 import org.apache.commons.jelly.XMLOutput;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.sysunit.remote.RemoteTBeanManager;
 
 /** 
  * Creates a System Test library for defining system tests in XML via Jelly scripts
@@ -33,19 +33,21 @@ public class SystemTestTag extends TagSupport {
 
     /** The name of this system test */
     private String name;
-        
+
     /** the Java class name to use for the tag */
     private String className;
 
     /** the ClassLoader used to load beans */
     private ClassLoader classLoader;
-    
+
     /** The system test class */
     private Class systemTestClass;
-    
+
+    private RemoteTBeanManager manager;
+
     /** All the JVMs to be created in client mode */
     private List jvms = new ArrayList();
-    
+
     public SystemTestTag() {
     }
 
@@ -56,64 +58,59 @@ public class SystemTestTag extends TagSupport {
      * @param count
      */
     public void addJvm(String name, int count) {
-        for (int i = 0; i < count; i++ ) {
+        for (int i = 0; i < count; i++) {
             jvms.add(name);
         }
     }
-    
     // Tag interface
     //-------------------------------------------------------------------------                    
     public void doTag(XMLOutput output) throws MissingAttributeException, JellyTagException {
         if (className == null) {
-			throw new MissingAttributeException("className");
-		}
-        
+            throw new MissingAttributeException("className");
+        }
+
         jvms.clear();
         systemTestClass = null;
-		try {
-			ClassLoader classLoader = getClassLoader();
-			systemTestClass = classLoader.loadClass(className);
-		} 
-		catch (ClassNotFoundException e) {
-			try {
-				systemTestClass = getClass().getClassLoader().loadClass(className);
-			} 
+        try {
+            ClassLoader classLoader = getClassLoader();
+            systemTestClass = classLoader.loadClass(className);
+        }
+        catch (ClassNotFoundException e) {
+            try {
+                systemTestClass = getClass().getClassLoader().loadClass(className);
+            }
             catch (ClassNotFoundException e2) {
-				try {
-					systemTestClass = Class.forName(className);
-				} 
+                try {
+                    systemTestClass = Class.forName(className);
+                }
                 catch (ClassNotFoundException e3) {
-                    log.error( "Could not load class: " + className + " exception: " + e, e );
-					throw new JellyTagException(
-						"Could not find class: "
-							+ className
-							+ " using ClassLoader: "
-							+ classLoader);
-				}
-			}
-		}
-		
-        invokeBody(output);
-	}
+                    log.error("Could not load class: " + className + " exception: " + e, e);
+                    throw new JellyTagException(
+                        "Could not find class: " + className + " using ClassLoader: " + classLoader);
+                }
+            }
+        }
 
-    
+        invokeBody(output);
+    }
+
     // Properties
     //-------------------------------------------------------------------------                    
-    
+
     /** 
      * Sets the name of the tag to create
      */
     public void setName(String name) {
         this.name = name;
     }
-    
+
     /** 
      * Sets the Java class name to use for the tag
      */
     public void setClassName(String className) {
         this.className = className;
     }
-    
+
     /**
      * Sets the ClassLoader to use to load the class. 
      * If no value is set then the current threads context class
@@ -126,16 +123,40 @@ public class SystemTestTag extends TagSupport {
     /**
      * @return the ClassLoader to use to load classes
      *  or will use the thread context loader if none is specified.
-     */    
+     */
     public ClassLoader getClassLoader() {
-        if ( classLoader == null ) {
+        if (classLoader == null) {
             ClassLoader answer = Thread.currentThread().getContextClassLoader();
-            if ( answer == null ) {
+            if (answer == null) {
                 answer = getClass().getClassLoader();
             }
             return answer;
         }
         return classLoader;
+    }
+
+    /**
+     * @return the system test class used for this system test
+     */
+    public Class getSystemTestClass() {
+        return systemTestClass;
+    }
+
+    /**
+     * @return
+     */
+    public RemoteTBeanManager getManager() throws JellyTagException {
+        if (manager == null) {
+            manager = new RemoteTBeanManager();
+        }
+        return manager;
+    }
+
+    /**
+     * @param manager
+     */
+    public void setManager(RemoteTBeanManager manager) {
+        this.manager = manager;
     }
 
     // Implementation methods

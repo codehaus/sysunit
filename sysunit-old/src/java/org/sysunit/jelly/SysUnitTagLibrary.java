@@ -27,7 +27,8 @@ public class SysUnitTagLibrary extends TagLibrary {
     public SysUnitTagLibrary() {
         registerTag("systemTest", SystemTestTag.class);
         registerTag("jvm", JvmTag.class);
-        registerTag("tbean", TBeanTag.class);
+		registerTag("thread", ThreadTag.class);
+		registerTag("tbean", TBeanTag.class);
     }
 
     // TagLibrary interface

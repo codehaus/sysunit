@@ -62,6 +62,8 @@ package org.sysunit;
 
 import java.lang.reflect.Method;
 
+import org.apache.commons.beanutils.MethodUtils;
+
 /**
  * <code>TBeanFactory</code> implementation which uses a static method
  * to synthesize simple <code>TBean</code>s.
@@ -100,21 +102,33 @@ public class ThreadMethodTBeanFactory
     /** Thread TBean body method. */
     private Method threadMethod;
     
-    // ----------------------------------------------------------------------
-    //     Constructors
-    // ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	//     Constructors
+	// ----------------------------------------------------------------------
 
-    /**
-     * Construct.
-     *
-     * @param testCase The test-case.
-     * @param threadMethod Static TBean thread body method.
-     */
-    public ThreadMethodTBeanFactory(SystemTestCase testCase,
-                                    Method threadMethod) {
-        this.testCase     = testCase;
-        this.threadMethod = threadMethod;
-    }
+	/**
+	 * Construct.
+	 *
+	 * @param testCase The test-case.
+	 * @param threadMethod TBean thread body method.
+	 */
+	public ThreadMethodTBeanFactory(SystemTestCase testCase,
+									Method threadMethod) {
+		this.testCase     = testCase;
+		this.threadMethod = threadMethod;
+	}
+
+	/**
+	 * Construct.
+	 *
+	 * @param testCase The test-case.
+	 * @param threadMethodName name of the thread method
+	 */
+	public ThreadMethodTBeanFactory(SystemTestCase testCase,
+									String threadMethodName) {
+		this.testCase = testCase;
+		this.threadMethod = MethodUtils.getAccessibleMethod(testCase.getClass(), threadMethodName, new Class[0]);
+	}
 
     // ----------------------------------------------------------------------
     //     Instance methods

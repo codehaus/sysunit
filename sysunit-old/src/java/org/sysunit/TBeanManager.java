@@ -84,6 +84,15 @@ public interface TBeanManager {
     void initialize()
         throws Exception;
 
+	/**
+	 * Allows tbeans to be dynamically added such as
+	 * when running a selection of TBeans remotely
+	 * 
+	 * @param tbeanId the ID to use
+	 * @param tbean the TBean to add
+	 */
+	void addTBean(String tbeanId, TBean tbean);
+	
     void startTBeans(SystemTestCase testCase,
                      TestResult testResult)
         throws Throwable;
