@@ -58,8 +58,10 @@ public class BeaconTransmitterThread
         DatagramSocket beaconSocket = null;
         DatagramPacket beacon       = null;
 
-        String message = "slave|" + getCommandPort();
-        
+        String type = System.getProperty( "sysunit.type" );
+
+        String message = "slave|" + getCommandPort() + "|" + type;
+
         byte[] messageBytes = message.getBytes();
         
         try {

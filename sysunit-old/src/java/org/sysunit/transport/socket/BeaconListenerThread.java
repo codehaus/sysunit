@@ -106,7 +106,14 @@ public class BeaconListenerThread
         //System.err.println( "received beacon [" + message + "] from " + packet.getAddress().getHostAddress() );
 
         if ( message.startsWith( "slave|" ) ) {
-            String portStr = message.substring( message.indexOf( "|" )+1 );
+            int portIndex = message.indexOf( "|" ) + 1;
+            int typeIndex = message.indexOf( "|", portIndex ) + 1;
+
+            String portStr = message.substring( portIndex,
+                                                typeIndex - 2 );
+
+            String typeStr = message.substring( typeIndex );
+
             int port = Integer.parseInt( portStr );
 
             SlaveNodeInfo slaveNode = new SlaveNodeInfo( packet.getAddress(),

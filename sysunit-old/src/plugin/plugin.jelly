@@ -8,6 +8,7 @@
     <java classname="org.sysunit.transport.socket.SlaveNode" fork="yes">
       <classpath path="${plugin.dependencyClasspath}"/>
       <sysproperty key="sysunit.port" value="${sysunit.port}"/>
+      <sysproperty key="sysunit.type" value="${sysunit.type}"/>
     </java>
   </goal>
 
