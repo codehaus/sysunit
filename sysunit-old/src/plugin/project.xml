@@ -109,15 +109,9 @@
     </dependency>
 
     <dependency>
-      <id>spiritwave</id>
-      <version>6.0-b94</version>
-    </dependency>
-
-    <dependency>
       <id>log4j</id>
       <version>1.2.7</version>
     </dependency>
-
 
   </dependencies>
 
