@@ -13,7 +13,7 @@
 		
     <menu name="SysUnit">
       <item name="Home"                href="index.html"/>
-      <item name="User Guide"          href="guide.html"/>
+      <item name="Manual (PDF)"          href="sysunit-manual.pdf"/>
       <item name="Issues"          		 href="issues.html"/>
       <item name="Clover Report"       href="clover/index.html"/>
     </menu>
