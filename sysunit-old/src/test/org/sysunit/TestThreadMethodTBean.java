@@ -23,7 +23,7 @@ public class TestThreadMethodTBean
     }
 
     public void testRun()
-        throws Exception {
+        throws Throwable {
 
         Test test = new Test();
         Method threadMethod = test.getClass().getMethod( "threadOne",

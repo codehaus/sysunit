@@ -90,8 +90,8 @@ public interface TBeanFactory {
      *
      * @return The newly created TBean.
      *
-     * @throws Exception If an error occurs while attempting to
+     * @throws Throwable If an error occurs while attempting to
      *         create the TBean.
      */
-    TBean newTBean() throws Exception;
+    TBean newTBean() throws Throwable;
 }

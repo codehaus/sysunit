@@ -6,7 +6,7 @@ public class TestFactoryMethodTBeanFactory
     extends SysUnitTestCase {
 
     public void testConstruct()
-        throws Exception {
+        throws Throwable {
 
         final TBean tbean = new NoOpTBean();
 

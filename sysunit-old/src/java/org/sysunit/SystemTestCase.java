@@ -379,7 +379,7 @@ public class SystemTestCase
     }
 
     protected void startTBeans(TestResult testResult)
-        throws Exception {
+        throws Throwable {
         getTBeanManager().startTBeans( this,
                                        testResult );
     }

@@ -86,7 +86,7 @@ public interface TBeanManager {
 
     void startTBeans(SystemTestCase testCase,
                      TestResult testResult)
-        throws Exception;
+        throws Throwable;
 
     void waitForTBeans(SystemTestCase testCase,
                        long timeout)

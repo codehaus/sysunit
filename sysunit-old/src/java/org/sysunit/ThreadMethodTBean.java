@@ -61,6 +61,7 @@ package org.sysunit;
  */
 
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Synthetic <code>TBean</code> whose body comes from a <code>SystemTestCase<code>
@@ -147,8 +148,16 @@ public class ThreadMethodTBean
      * @see TBean
      */
     public void run()
-        throws Exception {
-        getThreadMethod().invoke( getTestCase(),
-                                  EMPTY_OBJECT_ARRAY );
+        throws Throwable {
+        try {
+            getThreadMethod().invoke( getTestCase(),
+                                      EMPTY_OBJECT_ARRAY );
+        } catch (InvocationTargetException e) {
+            if ( e.getCause() != null ) {
+                throw e.getCause();
+            } else {
+                throw e;
+            }
+        }
     }
 }

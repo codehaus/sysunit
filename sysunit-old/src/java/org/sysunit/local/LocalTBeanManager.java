@@ -135,7 +135,7 @@ public class LocalTBeanManager
      */
     public void startTBeans(SystemTestCase testCase,
                             TestResult testResult)
-        throws Exception {
+        throws Throwable {
 
         String[] factoryNames = testCase.getTBeanFactoryNames();
         
