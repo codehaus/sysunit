@@ -190,7 +190,12 @@ public class LocalTBeanManager
             }
 
             if ( timeLeft <= 0 ) {
-                throw new WatchdogException( timeout );
+                while ( threadIter.hasNext() ) {
+                    thread = (TBeanThread) threadIter.next();
+                    if ( thread.isAlive() ) {
+                        throw new WatchdogException( timeout );
+                    }
+                }
             }
         }
     }

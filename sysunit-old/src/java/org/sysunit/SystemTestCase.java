@@ -365,6 +365,7 @@ public class SystemTestCase
             initializeFactories();
             startTBeans( testResult );
             waitForTBeans();
+            validateTBeans( testResult );
         } catch (Throwable t) {
             testResult.addError( this,
                                  t );

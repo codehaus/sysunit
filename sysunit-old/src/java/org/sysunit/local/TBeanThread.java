@@ -103,11 +103,15 @@ public class TBeanThread
     public LocalSynchronizer getSynchronizer() {
         return this.synchronizer;
     }
+
+    public Barrier getBarrier() {
+        return this.barrier;
+    }
     
     public void run() {
         try {
             setUpSynchronizer();
-            this.barrier.block();
+            getBarrier().block();
             tbean.run();
         } catch (Throwable e) {
             this.error = e;

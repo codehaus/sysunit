@@ -59,6 +59,24 @@ public class TestLocalSynchronizer
                       synchronizer.getRegisteredTBeans() );
     }
 
+    public void testSyncPoints()
+        throws Exception {
+        LocalSynchronizer synchronizer = new LocalSynchronizer();
+
+        LocalSyncPoint syncPointOne = synchronizer.getSyncPoint( "syncPointOne" );
+
+        assertSame( syncPointOne,
+                    synchronizer.getSyncPoint( "syncPointOne" ) );
+
+        LocalSyncPoint syncPointTwo = synchronizer.getSyncPoint( "syncPointTwo" );
+
+        assertSame( syncPointTwo,
+                    synchronizer.getSyncPoint( "syncPointTwo" ) );
+
+        assertNotSame( syncPointOne,
+                       syncPointTwo );
+    }
+
     public void testSync_OneTBean()
         throws Exception {
         final LocalSynchronizer synchronizer = new LocalSynchronizer();
@@ -192,7 +210,6 @@ public class TestLocalSynchronizer
                       bufOne.toString() );
     }
 
-    /*
     public void testSync_AlreadySynchronized()
         throws Exception {
 
@@ -211,36 +228,29 @@ public class TestLocalSynchronizer
                     } 
                 }
             };
-        
-        threadOne.setDaemon( true );
 
-        Thread watchdog = new Thread() {
+        final StringBuffer buf = new StringBuffer();
+
+        Thread threadTwo = new Thread() {
                 public void run() {
-                    //System.exit( 1 );
-                    fail( "watchdoggedly" );
+                    try {
+                        synchronizer.sync( "one",
+                                           "syncpoint.1" );
+                        fail( "should have throw SynchronizationException" );
+                    } catch (Exception e) {
+                        // expected and correct
+                        buf.append( "cheese" );
+                    } 
                 }
             };
+        
+        threadOne.start();
+        Thread.sleep( 500 );
+        threadTwo.start();
 
-        watchdog.setDaemon( true );
+        threadTwo.join();
 
-        // threadOne.start();
-        watchdog.start();
-
-        try {
-            synchronizer.sync( "one",
-                               "syncpoint.2" );
-            fail( "should have thrown AlreadySynchronizedException" );
-        } catch (AlreadySynchronizedException e) {
-            // expected and correct
-
-            assertEquals( "one",
-                          e.getTBeanId() );
-
-            assertEquals( "syncpoint.2",
-                          e.getSyncPoint() );
-        }
-
-        // threadOne.join();
+        assertEquals( "cheese",
+                      buf.toString() );
     }
-    */
 }
