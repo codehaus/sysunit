@@ -65,6 +65,7 @@ public class PingPongThread
 
         if ( pingSocket == null )
         {
+            System.err.println( "slavehost using bcast" );
             try
             {
                 pingSocket = new DatagramSocket( getPingPort() + 1 );
