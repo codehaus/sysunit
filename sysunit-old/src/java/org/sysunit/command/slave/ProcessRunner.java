@@ -24,13 +24,18 @@ public class ProcessRunner
 	 * @param arguments
 	 * @return
 	 */
-	public static ProcessRunner newInstance(String[] arguments) {
+	public static ProcessRunner newJavaProcess(Class theClass, String[] arguments) {
 		String javaHome = System.getProperty( "java.home" );
 
 		String javaCmd = new File( new File( javaHome,
 											 "bin" ),
 								   "java" ).getPath();
 
+		// now lets add the Java class to the head of the arguments
+		String[] newArgs = new String[arguments.length+1];
+		newArgs[0] = theClass.getName();
+		System.arraycopy(newArgs, 1, arguments, 0, arguments.length);
+		
 		return new ProcessRunner( javaCmd, arguments );
 	}
 	

@@ -12,6 +12,7 @@ package org.sysunit.command.slave;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.command.Server;
+import org.sysunit.transport.jms.TestNode;
 
 /**
  * The Slave server which spawns another JVM to run each TestNode
@@ -22,6 +23,8 @@ import org.sysunit.command.Server;
 public class SlaveServer extends Server {
     private static final Log log = LogFactory.getLog(SlaveServer.class);
 
+    private boolean forkJvm = false;
+
     public SlaveServer() {
     }
 
@@ -29,15 +32,69 @@ public class SlaveServer extends Server {
      * @param command
      */
     public void startTestNode(StartTestNodeCommand command) {
-        ProcessRunner runner = ProcessRunner.newInstance( 
-                                                  new String[] {
-                                                      org.sysunit.jelly.JvmRunner.class.getName(),
-                                                      command.getXml(),
-                                                      command.getJvmName()
-                                                  } );
+        if (isForkJvm()) {
+            runTestInForkedJvm(command);
+        }
+        else {
+            runTestLocally(command);
+        }
+    }
 
-        Thread thread = new Thread( runner );
+    // Properties
+    //-------------------------------------------------------------------------    
 
+    /**
+     * @return
+     */
+    public boolean isForkJvm() {
+        return forkJvm;
+    }
+
+    /**
+     * @param forkJvm
+     */
+    public void setForkJvm(boolean forkJvm) {
+        this.forkJvm = forkJvm;
+    }
+
+    // Implementation methods
+    //-------------------------------------------------------------------------    
+
+    /**
+     * @param command
+     */
+    private void runTestLocally(StartTestNodeCommand command) {
+        String[] args = getTestArguments(command);
+
+        // lets run the TestNode
+        TestNode.main(args);
+    }
+
+   /**
+     * Runs the Test logical machine in a new forked JVM
+     * @param command
+     */
+    private void runTestInForkedJvm(StartTestNodeCommand command) {
+        String[] args = getTestArguments(command);
+
+        ProcessRunner runner = ProcessRunner.newJavaProcess(TestNode.class, args);
+        Thread thread = new Thread(runner);
         thread.start();
     }
+    
+    /**
+     * Creates the command line arguments to the TestNode JVM
+     * 
+     * @param command
+     * @return
+     */
+	protected String[] getTestArguments(StartTestNodeCommand command) {
+		// the TestNode needs to know the destination of the Master
+		String destination = command.getMasterID();
+
+		String[] args = { TestNode.class.getName(), destination, command.getXml(), command.getJvmName()};
+		return args;
+	}
+
+ 
 }
