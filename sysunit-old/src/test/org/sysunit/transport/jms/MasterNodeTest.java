@@ -29,7 +29,7 @@ public class MasterNodeTest extends TestCase {
         return new TestSuite(MasterNodeTest.class);
     }
 
-    public void testMasterAndSlave() throws Exception {
+    public void testMasterAndSlave() throws Throwable {
 		String[] args = {};
 		SlaveNode.main(args);
 		
