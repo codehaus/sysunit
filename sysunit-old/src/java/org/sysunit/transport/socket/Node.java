@@ -10,7 +10,6 @@ public class Node {
 
     public CommandThread createCommandThread(Server server)
         throws Exception {
-
         ServerSocket serverSocket = new ServerSocket( 0 );
         serverSocket.setSoTimeout( 1000 );
 

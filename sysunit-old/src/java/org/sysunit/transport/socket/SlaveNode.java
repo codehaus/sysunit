@@ -15,7 +15,7 @@ public class SlaveNode
     public static void main(String[] args)
         throws Exception {
         SlaveNode node = new SlaveNode( InetAddress.getByName( "224.0.0.42" ),
-                                        5076 );
+                                        BeaconTransmitterThread.PORT );
         node.start();
     }
 

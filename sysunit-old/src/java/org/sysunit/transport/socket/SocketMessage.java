@@ -8,19 +8,13 @@ import java.net.InetAddress;
 public class SocketMessage
     implements Serializable {
 
-    private InetAddress replyToAddr;
     private int replyToPort;
     private Object payload;
 
     public SocketMessage(SocketDispatcher replyTo,
                          Object payload) {
-        this.replyToAddr = replyTo.getCommandThread().getAddr();
         this.replyToPort = replyTo.getCommandThread().getPort();
         this.payload     = payload;
-    }
-
-    public InetAddress getReplyToAddr() {
-        return this.replyToAddr;
     }
 
     public int getReplyToPort() {
@@ -32,8 +26,7 @@ public class SocketMessage
     }
 
     public String toString() {
-        return "[SocketMessage: replyToAddr=" + this.replyToAddr
-            + "; replyToPort=" + this.replyToPort
+        return "[SocketMessage: replyToPort=" + this.replyToPort
             + "; payload=" + this.payload
             + "]";
     }

@@ -74,7 +74,7 @@ public class CommandThread
                 Command command = (Command) payload;
                 log.debug( "command: " + command.getClass().getName() + " // " + command );
                 command.setReplyDispatcher( new SocketDispatcher( this,
-                                                                  message.getReplyToAddr(),
+                                                                  client.getInetAddress(),
                                                                   message.getReplyToPort() ) );
 
                 command.run( getServer() );

@@ -22,7 +22,7 @@ public class MasterNode
         }
 
         MasterNode node = new MasterNode( InetAddress.getByName( "224.0.0.42" ),
-                                          5076,
+                                          BeaconTransmitterThread.PORT,
                                           args[0] );
 
         node.start();
@@ -74,7 +74,7 @@ public class MasterNode
 
         BeaconListenerThread beaconThread = new BeaconListenerThread( getBeaconAddr(),
                                                                       getBeaconPort(),
-                                                                      5000 );
+                                                                      10000 );
 
         beaconThread.setDaemon( false );
         beaconThread.start();

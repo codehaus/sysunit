@@ -7,11 +7,16 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 public class BeaconTransmitterThread
     extends Thread {
 
     private static final Log log = LogFactory.getLog( BeaconTransmitterThread.class );
+
+    public static final int PORT = 30808;
 
     private InetAddress beaconAddr;
     private int beaconPort;
@@ -48,21 +53,43 @@ public class BeaconTransmitterThread
 
     public void run() {
 
+        DatagramSocket beaconSocket = null;
+        DatagramPacket beacon       = null;
+
+        String message = "slave|" + getCommandPort();
+        
+        byte[] messageBytes = message.getBytes();
+        
         try {
 
-            MulticastSocket beaconSocket = new MulticastSocket( getBeaconPort() );
+            MulticastSocket mcastSocket = new MulticastSocket( getBeaconPort() );
+            mcastSocket.joinGroup( getBeaconAddr() );
+            beaconSocket = mcastSocket;
 
-            beaconSocket.joinGroup( getBeaconAddr() );
+            beacon = new DatagramPacket( messageBytes,
+                                         messageBytes.length,
+                                         getBeaconAddr(),
+                                         getBeaconPort() );
 
-            String message = "slave|" + getCommandPort();
-
-            byte[] messageBytes = message.getBytes();
-
-            DatagramPacket beacon = new DatagramPacket( messageBytes,
-                                                        messageBytes.length,
-                                                        getBeaconAddr(),
-                                                        getBeaconPort() );
-
+        } catch (IOException e) {
+            try {
+                beaconSocket = new DatagramSocket(); 
+                
+                beacon = new DatagramPacket( messageBytes,
+                                             messageBytes.length,
+                                             InetAddress.getLocalHost(),
+                                             getBeaconPort() + 1 );
+            } catch (SocketException ee) {
+                log.error( ee );
+                return;
+            } catch (UnknownHostException ee) {
+                log.error( ee );
+                return;
+            }
+        }
+        
+        try
+        {
             while ( true ) {
                 log.debug( "sending beacon [" + message + "]" );
                 beaconSocket.send( beacon );
@@ -72,7 +99,6 @@ public class BeaconTransmitterThread
                     break;
                 }
             }
-
         } catch (IOException e) {
             log.error( e );
         }
