@@ -32,7 +32,7 @@ public class MasterSynchronizer {
                      String syncPointName)
         throws SynchronizationException, DispatchException {
 
-        log.info( "* * * * * * * * * * * * synchronizing " + tbeanId + " on " + syncPointName );
+        log.debug( "* * * * * * * * * * * * synchronizing " + tbeanId + " on " + syncPointName );
 
         if ( this.waitingTBeans.containsKey( tbeanId ) ) {
             throw new AlreadySynchronizedException( tbeanId,
@@ -47,12 +47,12 @@ public class MasterSynchronizer {
 
     public void addTestNode(TestNodeInfo testNodeInfo) {
         this.dispatchers.add( testNodeInfo.getDispatcher() );
-        log.info( "adding test node: " + testNodeInfo );
+        log.debug( "adding test node: " + testNodeInfo );
     }
 
     protected void unblockAll()
         throws DispatchException {
-        log.info( "* * * * * unblocking all " + numTBeans );
+        log.debug( "* * * * * unblocking all " + numTBeans );
         for ( Iterator dispatcherIter = this.dispatchers.iterator();
               dispatcherIter.hasNext(); ) {
             Dispatcher dispatcher = (Dispatcher) dispatcherIter.next();
@@ -62,12 +62,12 @@ public class MasterSynchronizer {
 
         this.waitingTBeans.clear();
 
-        log.info( "* * * * after unblock all" + numTBeans );
+        log.debug( "* * * * after unblock all" + numTBeans );
     }
 
     protected void checkUnblockAll()
         throws DispatchException {
-        log.info( "checking unblock on " + this.waitingTBeans + " vs " + this.numTBeans );
+        log.debug( "checking unblock on " + this.waitingTBeans + " vs " + this.numTBeans );
         if ( this.waitingTBeans.size() == this.numTBeans ) {
             unblockAll();
         }

@@ -184,7 +184,7 @@ public class LocalSynchronizer
                      String syncPointName)
         throws SynchronizationException, InterruptedException {
 
-        log.info( "sync " + tbeanId + " on " + syncPointName );
+        log.debug( "sync " + tbeanId + " on " + syncPointName );
 
         LocalSyncPoint syncPoint = null;
 
@@ -237,7 +237,7 @@ public class LocalSynchronizer
      * @see Synchronizer
      */
     public synchronized void unblockAll() {
-        log.info( "unblocking all " + this.waitingTBeanIds );
+        log.debug( "unblocking all " + this.waitingTBeanIds );
         for ( Iterator syncPointIter = this.syncPoints.values().iterator();
               syncPointIter.hasNext(); ) {
             LocalSyncPoint syncPoint = (LocalSyncPoint) syncPointIter.next();

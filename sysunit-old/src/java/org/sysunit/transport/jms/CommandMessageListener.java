@@ -38,7 +38,7 @@ public class CommandMessageListener implements MessageListener {
 	}
 	
     public void onMessage(Message message) {
-        log.info( this.server.getName() + " onMessage(" + message + ")" );
+        log.debug( this.server.getName() + " onMessage(" + message + ")" );
         if (message instanceof ObjectMessage) {
             ObjectMessage objectMessage = (ObjectMessage) message;
             try {

@@ -98,8 +98,6 @@ public class MasterServer
 		this.jvmNames = jvmNameExtractor.getJvmNames(xml);
         this.timeout = timeoutExtractor.getTimeout(xml);
 
-        System.err.println( "###################### " + jvmNames );
-
         if ( this.members.isEmpty() ) {
             throw new SysUnitException( "No slave JVMs" );
         }
@@ -125,7 +123,7 @@ public class MasterServer
         TestNodeInfo testNodeInfo = new TestNodeInfo( command.getName(),
                                                       command.getNumSynchronizableTBeans(),
                                                       command.getReplyDispatcher() );
-        log.info( "adding test node: " + testNodeInfo );
+        log.debug( "adding test node: " + testNodeInfo );
 		testNodes.put(command.getName(), testNodeInfo );
         getSynchronizer().addTestNode( testNodeInfo );
 
@@ -140,9 +138,9 @@ public class MasterServer
               testNodeInfoIter.hasNext(); ) {
             TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
 
-            log.info( "starting test on " + testNodeInfo.getName() );
+            log.debug( "starting test on " + testNodeInfo.getName() );
             testNodeInfo.getDispatcher().dispatch( new SetUpTBeansCommand() );
-            log.info( "started test on " + testNodeInfo.getName() );
+            log.debug( "started test on " + testNodeInfo.getName() );
         }
     }
     protected void tearDownTBeans()
@@ -220,10 +218,10 @@ public class MasterServer
 
         long timeLeft = timeout;
 
-        log.info( "waitForing: " + timeLeft );
+        log.debug( "waitForing: " + timeLeft );
         synchronized ( this.isDoneLock ) {
             while ( ! this.isDone ) {
-                log.info( "this.isDone == " + this.isDone + " timeLeft: " + timeLeft );
+                log.debug( "this.isDone == " + this.isDone + " timeLeft: " + timeLeft );
                 this.isDoneLock.wait( timeLeft );
 
                 if ( timeout > 0 ) {
@@ -270,9 +268,9 @@ public class MasterServer
               testNodeInfoIter.hasNext(); ) {
             TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
 
-            log.info( "starting test on " + testNodeInfo.getName() );
+            log.debug( "starting test on " + testNodeInfo.getName() );
             testNodeInfo.getDispatcher().dispatch( new RunTestCommand() );
-            log.info( "started test on " + testNodeInfo.getName() );
+            log.debug( "started test on " + testNodeInfo.getName() );
         }
     }
 
@@ -365,7 +363,7 @@ public class MasterServer
             }
         }
 
-        log.info( jarMap );
+        log.debug( jarMap );
 
         //if ( 1 == 1 ) {
             //throw new Error( "foo" );

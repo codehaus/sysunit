@@ -4,7 +4,7 @@
 
   <goal name="sysunit:slave" prereqs="setclasspath" description="Runs a slave node">
     <java classname="org.sysunit.transport.jms.SlaveNode" fork="yes">
-      <classpath refid="test.classpath"/>
+      <classpath refid="maven.dependency.classpath"/>
     </java>
   </goal>
 

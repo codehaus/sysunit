@@ -129,7 +129,7 @@ public class SlaveServer extends Server {
                                                 command,
                                                 getTestArguments( command ) );
 
-        log.info( "PUT " + command.getMasterID() );
+        log.debug( "PUT " + command.getMasterID() );
 
         this.waiters.put( command.getMasterID() + "-false",
                           waiter );
@@ -144,7 +144,7 @@ public class SlaveServer extends Server {
 
         LaunchWaiter waiter = (LaunchWaiter) this.waiters.get( masterId );
 
-        log.info( "GET " + masterId + " // " + waiter );
+        log.debug( "GET " + masterId + " // " + waiter );
 
         waiter.storeJar( jarName,
                          bytes );

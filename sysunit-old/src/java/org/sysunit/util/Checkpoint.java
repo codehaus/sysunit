@@ -29,7 +29,7 @@ public class Checkpoint {
         throws Exception {
         ++this.passed;
 
-        log.info( "* * * checkpoint " + getName() + " pass " + this.passed + " of " + this.numThreads );
+        log.debug( "* * * checkpoint " + getName() + " pass " + this.passed + " of " + this.numThreads );
 
         if ( this.passed == this.numThreads ) {
             notifyCallback();

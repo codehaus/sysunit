@@ -120,7 +120,7 @@ class LocalSyncPoint {
      * Unblock all waiters.
      */
     synchronized void unblockAll() {
-        log.info( "unblock all for " + getName() + " // " + this.blockCounter );
+        log.debug( "unblock all for " + getName() + " // " + this.blockCounter );
         ++this.blockCounter;
         notifyAll();
     }

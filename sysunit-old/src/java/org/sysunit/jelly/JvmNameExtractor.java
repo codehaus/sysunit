@@ -61,7 +61,6 @@ public class JvmNameExtractor {
         }
         XMLOutput output = XMLOutput.createDummyXMLOutput();
 
-        System.err.println( "((((((((((((((((" + url );
         context.runScript(url, output);
         
         // grab the names...

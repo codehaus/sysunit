@@ -51,7 +51,7 @@ public class JmsDispatcher implements Dispatcher {
 	}
 
     public void dispatch(Command command) throws DispatchException {
-        log.info( "dispatching " + command.getClass().getName() + " to " + destination );
+        log.debug( "dispatching " + command.getClass().getName() + " to " + destination );
     	try {
             Message message = messenger.createObjectMessage(command);
             if (replyToDestination != null) {

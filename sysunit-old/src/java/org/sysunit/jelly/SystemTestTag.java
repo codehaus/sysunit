@@ -103,8 +103,6 @@ public class SystemTestTag extends TagSupport {
             }
         }
 
-        System.err.println( "######################################################## timeout: " + getTimeout() );
-
         getContext().setVariable( "org.sysunit.timeout",
                                   new Long( getTimeout() ) );
 
@@ -132,12 +130,10 @@ public class SystemTestTag extends TagSupport {
 
 
     public void setTimeout(long timeout) {
-        System.err.println( "######################################################## set timeout: " + timeout );
         this.timeout = timeout;
     }
 
     public long getTimeout() {
-        System.err.println( "######################################################## get timeout: " + this.timeout );
         return this.timeout;
     }
     

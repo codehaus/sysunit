@@ -167,13 +167,13 @@ public class RemoteTBeanManager { // implements Runnable {
 
     public void setUpTBeans() {
         try {
-        	log.info("About to run tbeans: " + tbeans);
+        	log.debug("About to run tbeans: " + tbeans);
         	
             startTBeans();
             //  waitForTBeans(10000);
             // validateTBeans(case, result);
 
-			log.info("Completed");
+			log.debug("Completed");
 
         }
         catch (Throwable e) {
@@ -237,7 +237,7 @@ public class RemoteTBeanManager { // implements Runnable {
 
     public void waitForTBeans(long timeout) throws InterruptedException, WatchdogException {
 
-		log.info("Waiting for TBeans...");
+		log.debug("Waiting for TBeans...");
 		
         long start = new Date().getTime();
 

@@ -46,7 +46,7 @@ public class TestServer
     private Synchronizer synchronizer;
 
     public TestServer(String xml, String jvmName) {
-        log.info( "test server " + jvmName + " with " + xml + " is " + getName() );
+        log.debug( "test server " + jvmName + " with " + xml + " is " + getName() );
         this.xml = xml;
         this.jvmName = jvmName;
         this.synchronizer = new TestSynchronizer();
@@ -57,8 +57,8 @@ public class TestServer
     }
 
     public void start() throws Exception {
-        log.info( "#######################################" );
-        log.info( "starting test server " + getName() );
+        log.debug( "#######################################" );
+        log.debug( "starting test server " + getName() );
     	Dispatcher dispatcher = getMasterDispatcher();
         this.runner.setTestServerName( getName() );
     	if (dispatcher == null) {
@@ -67,7 +67,7 @@ public class TestServer
         // start the test running
         getRunner().run(xml, jvmName);
 
-        log.info( "tellilng master that " + getName() + " has " + getRunner().getManager().getNumSynchronizableTBeans() );
+        log.debug( "tellilng master that " + getName() + " has " + getRunner().getManager().getNumSynchronizableTBeans() );
 
 		getMasterDispatcher().dispatch(new TestNodeLaunchedCommand(getName(),
                                                                    getRunner().getManager().getNumSynchronizableTBeans()));
@@ -117,7 +117,7 @@ public class TestServer
                      String syncPointName)
         throws InterruptedException, SynchronizationException {
 
-        log.info( "sync " + tbeanId + " on " + syncPointName + " on test server " + getName() );
+        log.debug( "sync " + tbeanId + " on " + syncPointName + " on test server " + getName() );
 
         try {
             getMasterDispatcher().dispatch( new SyncCommand( getName(),
@@ -132,13 +132,13 @@ public class TestServer
     }
 
     public synchronized void unblockAll() {
-        log.info( "unblocking all on " + getName() );
+        log.debug( "unblocking all on " + getName() );
         this.synchronizer.unblockAll();
     }
 
     public void registerSynchronizableTBean(String tbeanId)
         throws SynchronizationException {
-        log.info( "registering synchronizable tbean " + tbeanId + " with " + getName() );
+        log.debug( "registering synchronizable tbean " + tbeanId + " with " + getName() );
         try {
             getMasterDispatcher().dispatch( new RegisterSynchronizableTBeanCommand( getName(),
                                                                                     tbeanId ) );
@@ -149,7 +149,7 @@ public class TestServer
 
     public void unregisterSynchronizableTBean(String tbeanId)
         throws SynchronizationException {
-        log.info( "unregistering synchronizable tbean " + tbeanId + " with " + getName() );
+        log.debug( "unregistering synchronizable tbean " + tbeanId + " with " + getName() );
         try {
             getMasterDispatcher().dispatch( new UnregisterSynchronizableTBeanCommand( getName(),
                                                                                       tbeanId ) );
@@ -159,12 +159,12 @@ public class TestServer
     }
 
     public void error(String tbeanId) {
-        log.info( "error in tbean " + tbeanId + " with " + getName() );
+        log.debug( "error in tbean " + tbeanId + " with " + getName() );
     }
 
     public void notify(Checkpoint checkpoint)
         throws Exception {
-        log.info( "################## &&&&&&&  ########  checkpoint: " + checkpoint.getName() );
+        log.debug( "################## &&&&&&&  ########  checkpoint: " + checkpoint.getName() );
         if ( checkpoint.getName().equals( "begin" ) ) {
             getMasterDispatcher().dispatch( new TBeansSetUpCommand( getName() ) );
         } else if ( checkpoint.getName().equals( "end" ) ) {

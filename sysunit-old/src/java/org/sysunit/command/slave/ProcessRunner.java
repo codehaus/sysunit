@@ -56,8 +56,8 @@ public class ProcessRunner
                          String[] arguments,
                          File[] classpath) {
 
-        log.info( "EXEC: " + executable );
-        log.info( "ARGS: " + Arrays.asList( arguments ) );
+        log.debug( "EXEC: " + executable );
+        log.debug( "ARGS: " + Arrays.asList( arguments ) );
         this.executable = executable;
         this.arguments  = arguments;
         this.classpath = classpath;
@@ -107,7 +107,7 @@ public class ProcessRunner
         Runtime runtime = Runtime.getRuntime();
 
         try {
-            log.info( "commandArray: " + Arrays.asList( getCommandArray() ) );
+            log.debug( "commandArray: " + Arrays.asList( getCommandArray() ) );
             Process process = runtime.exec( getCommandArray() );
 
             Thread stdoutEater = new Thread( new InputStreamEater( process.getInputStream() ) );

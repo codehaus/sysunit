@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 public class TestNodeLaunchedCommand
     extends MasterCommand {
 
-    private static final Log log = LogFactory.getLog(TestNodeStartedCommand.class);
+    private static final Log log = LogFactory.getLog(TestNodeLaunchedCommand.class);
 
     private String name;
     private int numSynchronizableTBeans;
@@ -33,7 +33,7 @@ public class TestNodeLaunchedCommand
    }
 
     public void run(MasterServer masterServer) throws Exception {
-        log.info( "running TestNodeStartedCommand for " + name );
+        log.debug( "running TestNodeStartedCommand for " + name );
     	masterServer.addTestNode(this);
     }
     

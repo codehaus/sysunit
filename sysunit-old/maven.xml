@@ -48,6 +48,8 @@
 
   <goal name="sysunit:install-plugin" prereqs="sysunit:build-plugin">
   </goal>
+
+  <goal name="sysunit:install" prereqs="jar:install,sysunit:install-plugin"/>
  
 </project>
 

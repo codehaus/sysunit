@@ -48,10 +48,10 @@ public class LaunchWaiter
     private synchronized void setUpClasspath()
         throws Exception {
         if ( this.dir.exists() ) {
-            log.info( "#$#$#$#$#$ DIR EXISTS" );
+            log.debug( "#$#$#$#$#$ DIR EXISTS" );
             return;
         } else {
-            log.info( "####### SETTING UP CLASSPATH" );
+            log.debug( "####### SETTING UP CLASSPATH" );
         }
 
         this.dir.mkdirs();
@@ -66,7 +66,7 @@ public class LaunchWaiter
             String name = (String) nameIter.next();
             String path = (String) jarMap.get( name );
 
-            log.info( "fetching " + name + " from " + path );
+            log.debug( "fetching " + name + " from " + path );
 
             command.getReplyDispatcher().dispatch( new RequestJarCommand( name,
                                                                           path ) );
@@ -76,7 +76,7 @@ public class LaunchWaiter
     protected synchronized void waitForJars()
         throws InterruptedException {
         while ( getJarFiles().length != command.getJarMap().size() ) {
-            log.info( getJarFiles().length + " of " + command.getJarMap().size() );
+            log.debug( getJarFiles().length + " of " + command.getJarMap().size() );
             wait( 500 );
         }
     }
