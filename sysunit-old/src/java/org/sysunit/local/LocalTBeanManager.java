@@ -60,21 +60,18 @@ package org.sysunit.local;
  *
  */
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import junit.framework.AssertionFailedError;
-import junit.framework.TestResult;
-
-import org.sysunit.SynchronizableTBean;
-import org.sysunit.SystemTestCase;
 import org.sysunit.TBean;
 import org.sysunit.TBeanManager;
-import org.sysunit.WatchdogException;
+import org.sysunit.SynchronizableTBean;
+import org.sysunit.TBeanSynchronizer;
+import org.sysunit.SystemTestCase;
+import org.sysunit.SynchronizationException;
+
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Single-JVM <code>TBeanManager</code> implementation.
@@ -92,8 +89,7 @@ public class LocalTBeanManager
     //     Constants
     // ----------------------------------------------------------------------
 
-    /** Empty <code>String</code> array. */
-    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+    private static final Throwable[] EMPTY_THROWABLE_ARRAY = new Throwable[0];
 
     // ----------------------------------------------------------------------
     //     Instace members
@@ -105,8 +101,6 @@ public class LocalTBeanManager
     /** <code>Thread</code>s for each <code>TBean</code>. */
     private Set tbeanThreads;
 
-    private LocalSynchronizer synchronizer;
-
     // ----------------------------------------------------------------------
     //     Constructors
     // ----------------------------------------------------------------------
@@ -117,7 +111,6 @@ public class LocalTBeanManager
     public LocalTBeanManager() {
         this.tbeans       = new HashMap();
         this.tbeanThreads = new HashSet();
-        this.synchronizer = new LocalSynchronizer();
     }
 
     // ----------------------------------------------------------------------
@@ -127,33 +120,24 @@ public class LocalTBeanManager
     /**
      * @see TBeanManager
      */
-    public void initialize() {
+    public void init() {
         // nothing required
-    }
-
-    protected TBeanThread[] getTBeanThreads() {
-        return (TBeanThread[]) this.tbeanThreads.toArray( TBeanThread.EMPTY_ARRAY );
-    }
-
-    protected TBean[] getTBeans() {
-        return (TBean[]) this.tbeans.values().toArray( TBean.EMPTY_ARRAY );
-    }
-
-    LocalSynchronizer getSynchronizer() {
-        return this.synchronizer;
     }
 
     /**
      * @see TBeanManager
      */
-    public void startTBeans(SystemTestCase testCase,
-                            TestResult testResult)
-        throws Throwable {
+    public void setUpTBeans(SystemTestCase testCase)
+        throws Exception {
+
+        System.err.println( "set up tbeans" );
 
         String[] factoryNames = testCase.getTBeanFactoryNames();
+        
+        final LocalSynchronizer synchronizer = new LocalSynchronizer();
 
         for ( int i = 0 ; i < factoryNames.length ; ++i ) {
-            String tbeanId = factoryNames[i];
+            final String tbeanId = factoryNames[i];
             TBean tbean = testCase.getTBeanFactory( tbeanId ).newTBean();
 
             this.tbeans.put( tbeanId,
@@ -164,20 +148,15 @@ public class LocalTBeanManager
             }
         }
 
-        Barrier beginBarrier = new Barrier( this.tbeans.size() );
-        Barrier endBarrier   = new Barrier( this.tbeans.size() );
-
         for ( Iterator tbeanIdIter = this.tbeans.keySet().iterator();
               tbeanIdIter.hasNext(); ) {
 
-            String tbeanId = (String) tbeanIdIter.next();
-            TBean  tbean   = (TBean) this.tbeans.get( tbeanId );
+            final String tbeanId = (String) tbeanIdIter.next();
+            final TBean  tbean   = (TBean) this.tbeans.get( tbeanId );
 
             TBeanThread thread = new TBeanThread( tbeanId,
                                                   tbean,
-                                                  this.synchronizer,
-                                                  beginBarrier,
-                                                  endBarrier );
+                                                  synchronizer );
 
             this.tbeanThreads.add( thread );
 
@@ -185,77 +164,35 @@ public class LocalTBeanManager
         }
     }
 
-    public void waitForTBeans(SystemTestCase testCase,
-                              long timeout)
-        throws InterruptedException, WatchdogException {
+    public Throwable[] validateTBeans(SystemTestCase testCase)
+        throws InterruptedException {
 
-        long start = new Date().getTime();
+        Set errors = new HashSet();
 
-        long timeLeft = timeout;
+        for ( Iterator threadIter = this.tbeanThreads.iterator();
+              threadIter.hasNext(); ) {
+            TBeanThread thread = (TBeanThread) threadIter.next();
+            thread.join();
 
-        TBeanThread[] threads = getTBeanThreads();
-
-        for ( int i = 0 ; i < threads.length ; ++i ) {
-            threads[i].join( timeLeft );
-            if ( timeout > 0 ) {
-                long now = new Date().getTime();
-                timeLeft = timeout - (now - start);
-            }
-
-            if ( timeout > 0
-                 &&
-                 timeLeft <= 0 ) {
-                ++i;
-                Set longTBeanIds = new HashSet();
-                for ( int j = 0 ; j < threads.length ; ++j ) {
-                    if ( ! threads[j].isDone() ) {
-                        longTBeanIds.add( threads[j].getTBeanId() );
-                    }
-                }
-
-                if ( ! longTBeanIds.isEmpty() ) {
-                    throw new WatchdogException( timeout,
-                                                 (String[]) longTBeanIds.toArray( EMPTY_STRING_ARRAY ) );
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-
-    public void validateTBeans(SystemTestCase testCase,
-                               TestResult testResult) {
-
-        TBeanThread[] threads = getTBeanThreads();
-
-        for ( int i = 0 ; i < threads.length ; ++i ) {
-            if ( threads[i].hasError() ) {
-                Throwable t = threads[i].getError();
-
-                if ( t instanceof AssertionFailedError ) {
-                    testResult.addFailure( testCase,
-                                           (AssertionFailedError) t );
-                } else {
-                    testResult.addError( testCase,
-                                         t );
-                }
+            if ( thread.hasError() ) {
+                errors.add( thread.getError() );
             } else {
                 try {
-                    threads[i].getTBean().assertValid();
+                    thread.getTBean().assertValid();
                 } catch (Throwable t) {
-                    if ( t instanceof AssertionFailedError ) {
-                        testResult.addFailure( testCase,
-                                               (AssertionFailedError) t );
-                    } else {
-                        testResult.addError( testCase,
-                                             t );
-                    }
+                    errors.add( t );
                 }
             }
         }
-    }
 
-    public void addTBean(String tbeanId, TBean tbean) {
-    	tbeans.put(tbeanId, tbean);   
+        return (Throwable[]) errors.toArray( EMPTY_THROWABLE_ARRAY );
+    }
+    
+    /**
+     * @see TBeanManager
+     */
+    public void tearDownTBeans(SystemTestCase testCase)
+        throws Exception {
+
     }
 }

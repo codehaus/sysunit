@@ -2,7 +2,8 @@
 
 <projectDescription>
   <name>sysunit</name>
-  <comment>SysUnit is a JUnit framework for system testing</comment>
+  <comment>
+  </comment>
   <projects>
   </projects>
   <buildSpec>

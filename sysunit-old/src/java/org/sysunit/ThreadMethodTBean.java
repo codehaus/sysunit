@@ -59,10 +59,7 @@ package org.sysunit;
  * <http://www.spiritsoft.com/>.
  *
  */
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -82,8 +79,6 @@ public class ThreadMethodTBean
     // ----------------------------------------------------------------------
     //     Constants
     // ----------------------------------------------------------------------
-
-    private static final Log log = LogFactory.getLog(ThreadMethodTBean.class);
 
     /** Empty <code>Object</code> array. */
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
@@ -152,16 +147,8 @@ public class ThreadMethodTBean
      * @see TBean
      */
     public void run()
-        throws Throwable {
-        try {
-            getThreadMethod().invoke( getTestCase(),
-                                      EMPTY_OBJECT_ARRAY );
-        } catch (InvocationTargetException e) {
-            if ( e.getTargetException() != null ) {
-                throw e.getTargetException();
-            } else {
-                throw e;
-            }
-        }
+        throws Exception {
+        getThreadMethod().invoke( getTestCase(),
+                                  EMPTY_OBJECT_ARRAY );
     }
 }

@@ -61,8 +61,6 @@ package org.sysunit.local;
  */
 
 import org.sysunit.SynchronizationException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Local sync-point manager.
@@ -74,15 +72,6 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id$
  */
 class LocalSyncPoint {
-
-    // ----------------------------------------------------------------------
-    //     Constants
-    // ----------------------------------------------------------------------
-
-    private static final Log log = LogFactory.getLog(LocalSyncPoint.class);
-
-    /** Empty <code>LocalSyncPoint</code> array. */
-    public static final LocalSyncPoint[] EMPTY_ARRAY = new LocalSyncPoint[0];
 
     // ----------------------------------------------------------------------
     //     Instance members
@@ -112,16 +101,12 @@ class LocalSyncPoint {
     //     Instance methods
     // ----------------------------------------------------------------------
 
-    String getName() {
-        return this.name;
-    }
-
     /**
      * Unblock all waiters.
      */
     synchronized void unblockAll() {
-        log.info( "unblock all for " + getName() + " // " + this.blockCounter );
         ++this.blockCounter;
+
         notifyAll();
     }
 

@@ -1,10 +1,11 @@
 package org.sysunit;
 
+import java.lang.NoSuchMethodException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.HashSet;
 
-public class SystemTestCaseTest
+public class TestSystemTestCase
     extends SysUnitTestCase {
 
     public void testConstruct_Bare()
@@ -17,34 +18,33 @@ public class SystemTestCaseTest
 
         assertLength( 0,
                       testCase.getTBeanFactoryNames() );
+    }
 
-        assertEquals( 0,
-                      testCase.getTimeout() );
+    public void testConstruct_Bare_WithName()
+        throws Exception {
 
-        assertEquals( 1.0,
-                      testCase.getTimeoutMultiplier(),
-                      0.0 );
+        SystemTestCase testCase = new SystemTestCase( "foo" );
 
-        assertEquals( 0,
-                      testCase.getAdjustedTimeout() );
+        assertEquals( "foo",
+                      testCase.getName() );
 
-        assertEquals( 1,
-                      testCase.countTestCases() );
+        assertLength( 0,
+                      testCase.getTBeanFactories() );
 
-        TBeanManager tbeanManager = testCase.getTBeanManager();
-
-        assertNotNull( tbeanManager );
-
-        assertSame( tbeanManager,
-                    testCase.getTBeanManager() );
+        assertLength( 0,
+                      testCase.getTBeanFactoryNames() );
     }
 
     public void testInit_WithThreadMethodTBeanFactory()
         throws Exception {
 
-        SystemTestCase testCase = new SingleThreadNoOpCase();
+        SystemTestCase testCase = new SystemTestCase() {
+                public void threadOne() {
+                    // nothing.
+                }
+            };
 
-        testCase.initializeFactories();
+        testCase.init();
 
         assertLength( 1,
                       testCase.getTBeanFactoryNames() );
@@ -64,9 +64,13 @@ public class SystemTestCaseTest
     public void testInit_WithFactoryMethodTBeanFactory()
         throws Exception {
 
-        SystemTestCase testCase = new SingleTBeanNullCase();
+        SystemTestCase testCase = new SystemTestCase() {
+                public TBean tbeanOne() {
+                    return null;
+                }
+            };
         
-        testCase.initializeFactories();
+        testCase.init();
         
         assertLength( 1,
                       testCase.getTBeanFactoryNames() );
@@ -204,7 +208,6 @@ public class SystemTestCaseTest
         }
     }
 
-    /*
     public void testSetUpTBeans()
         throws Exception {
 
@@ -244,7 +247,6 @@ public class SystemTestCaseTest
 
         assertNull( tbeanManager.getSetUp() );
     }
-    */
 
     public void testGetTBeanManager_ViaFactory()
         throws Exception {
@@ -267,79 +269,6 @@ public class SystemTestCaseTest
         } catch (Exception e) {
             // expected and correct
         }
-    }
-
-    public void testTimeout_Default() {
-        SystemTestCase testCase = new SystemTestCase();
-
-        assertEquals( 0,
-                      testCase.getTimeout() );
-
-        assertEquals( 0,
-                      testCase.getAdjustedTimeout() );
-    }
-
-    public void testTimeout_Overridden() {
-        SystemTestCase testCase = new SystemTestCase() {
-                public long getTimeout() {
-                    return 1500;
-                }
-            };
-
-        assertEquals( 1500,
-                      testCase.getTimeout() );
-
-        assertEquals( 1500,
-                      testCase.getAdjustedTimeout() );
-    }
-
-    public void testTimeout_Multiplier_Default() {
-        System.setProperty( SystemTestCase.TIMEOUT_MULTIPLIER_PROPERTY,
-                            "42" );
-
-        SystemTestCase testCase = new SystemTestCase();
-
-        assertEquals( 0,
-                      testCase.getTimeout() );
-
-        assertEquals( 42.0,
-                      testCase.getTimeoutMultiplier(),
-                      0.0 );
-
-        assertEquals( 0,
-                      testCase.getAdjustedTimeout() );
-    }
-
-    public void testTimeout_Multiplier_Overridden() {
-        System.setProperty( SystemTestCase.TIMEOUT_MULTIPLIER_PROPERTY,
-                            "42" );
-
-        SystemTestCase testCase = new SystemTestCase() {
-                public long getTimeout() {
-                    return 1000;
-                }
-            };
-
-        assertEquals( 1000,
-                      testCase.getTimeout() );
-        
-        assertEquals( 42.0,
-                      testCase.getTimeoutMultiplier(),
-                      0.0 );
-
-        assertEquals( 42000,
-                      testCase.getAdjustedTimeout() );
-    }
-
-    public void testAssertValid()
-        throws Exception {
-
-        SystemTestCase testCase = new SystemTestCase();
-
-        // shouldn't do anything bad by default
-
-        testCase.assertValid();
-                                                           
     }
 
     public TBean methodFish() {

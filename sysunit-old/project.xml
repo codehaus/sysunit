@@ -4,14 +4,14 @@
   <pomVersion>3</pomVersion>
   <name>SysUnit</name>
   <id>sysunit</id>
-  <currentVersion>1.0-beta-10</currentVersion>
+  <currentVersion>1.0</currentVersion>
   
   <organization>
     <name>SpritSoft, Inc.</name>
     <url>http://www.spiritsoft.com</url>
     <logo>/images/group-logo.gif</logo>
   </organization>
-  <logo>http://images.werken.com/codehaus_small.gif</logo>
+  <logo>http://sourceforge.net/sflogo.php?group_id=76653&amp;type=5</logo>
 
 
   <inceptionYear>2003</inceptionYear>
@@ -25,19 +25,17 @@
   	SysUnit is a JUnit framework for system testing
   </description>
   
-  <url>http://www.sysunit.org/</url>
-  <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10150</issueTrackingUrl>
+  <url>http://sysunit.sourceforge.net/</url>
+  <issueTrackingUrl>http://sourceforge.net/tracker/?group_id=76653</issueTrackingUrl>
   
-  <siteAddress>sysunit.org</siteAddress>
-  <siteDirectory>/www/sysunit.codehaus.org</siteDirectory>
-<!--
+  <siteAddress>sysunit.sourceforge.net</siteAddress>
+  <siteDirectory>/home/groups/s/sy/sysunit/htdocs</siteDirectory>
   <distributionDirectory>/home/groups/s/sy/sysunit/htdocs/dist</distributionDirectory>
--->
   
   <repository>
-    <connection>scm:cvs:pserver:anonymous@cvs.codehaus.org:/scm/cvs:sysunit</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.codehaus.org:/scm/cvs:sysunit</developerConnection>
-    <url>http://cvs.codehaus.org/viewcvs.cgi/sysunit/?root=codehaus</url>
+    <connection>scm:cvs:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sysunit:sysunit</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.sourceforge.net:/cvsroot/sysunit:sysunit</developerConnection>
+    <url>http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/sysunit/sysunit/</url>
   </repository>
   
   <mailingLists>
@@ -75,12 +73,14 @@
       <email>jstrachan@apache.org</email>
       <organization>SpiritSoft, Inc.</organization>
     </developer>
+  </developers>
 
+  <developers>
     <developer>
-      <name>bob mcwhirter</name>
-      <id>bob</id>
-      <email>bob@codehaus.org</email>
-      <organization>SpiritSoft, Inc.</organization>
+      <name>Bob McWhirter</name>
+      <id>werken</id>
+      <email>bob@werken.com</email>
+      <organization>The Werken Company</organization>
     </developer>
   </developers>
 
@@ -88,57 +88,12 @@
   </contributors>
 
   <dependencies>
-
     <dependency>
       <id>commons-logging</id>
       <version>1.0.2</version>
     </dependency>
 
-    <dependency>
-      <id>commons-jelly</id>
-      <version>SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <id>commons-jexl</id>
-      <version>1.0-beta-1</version>
-    </dependency>
-    
-    <dependency>
-      <id>commons-logging</id>
-      <version>1.0.2</version>
-    </dependency>
-
-    <dependency>
-      <id>commons-beanutils</id>
-      <version>1.6</version>
-    </dependency>
-
-    <dependency>
-      <id>commons-collections</id>
-      <version>3.0-dev</version>
-    </dependency>
-
-    <dependency>
-      <id>commons-digester</id>
-      <version>1.3</version>
-    </dependency>
-
-    <dependency>
-      <id>commons-messenger</id>
-      <version>1.0-dev-13</version>
-    </dependency>
-    
-    <dependency>
-      <id>dom4j</id>
-      <version>1.4-dev-8</version>
-    </dependency>
-
-    <dependency>
-      <id>junit</id>
-      <version>3.8.1</version>
-    </dependency>
-    
+		<!-- used by the JMX connectors -->
     <dependency>
       <id>mx4j+jmx</id>
       <version>1.1.1</version>
@@ -148,6 +103,85 @@
       <version>1.1.1</version>
     </dependency>
 
+		<!-- jars for jboss -->
+<!--
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+-->
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-system</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+<!--
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-common</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+-->
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-jmx</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jmx-adaptor-plugin</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jnp-client</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jnet</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jbossall-client</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+<!--
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-j2ee</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+-->
+
+		<!-- jars for unit tests -->
+
+    <dependency>
+      <id>junit</id>
+      <version>3.8.1</version>
+    </dependency>
+    
+<!--
+    <dependency>
+      <id>xml-apis</id>
+      <version>1.0.b2</version>
+    </dependency>
+    
+    <dependency>
+      <id>xerces</id>
+      <version>2.0.2</version>
+    </dependency>
+-->
   </dependencies>
   
   <build>
@@ -161,34 +195,30 @@
     <unitTest>
       <resources>
         <resource>
-          <directory>src/test</directory>
+          <directory>src/java</directory>
           <includes>
             <include>**/*.properties</include>
-            <include>**/*.jelly</include>
-            <include>**/*.xml</include>
-            <include>**/*.systest</include>
           </includes>
         </resource>
       </resources>
       <includes>
-        <include>**/*Test.java</include>
+        <include>**/Test*.java</include>
       </includes>
-      <excludes>
-        <exclude>**/jms/*.java</exclude>
-      </excludes>
     </unitTest>
 
     
     <!-- J A R  R E S O U R C E S -->
     <!-- Resources that are packaged up inside the JAR file -->
     <resources>
+<!--
       <resource>
-        <directory>src/java</directory>
+        <directory>src/jar</directory>
         <includes>
           <include>**/*.properties</include>
           <include>**/*.xml</include>
         </includes>
       </resource>
+-->
 <!--
       <includes>
         <include>**/*.properties</include>

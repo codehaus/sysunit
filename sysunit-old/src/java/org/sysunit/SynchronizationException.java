@@ -72,7 +72,7 @@ package org.sysunit;
  * @version $Id$
  */
 public class SynchronizationException
-    extends SysUnitException {
+    extends Exception {
 
     // ----------------------------------------------------------------------
     //     Constructors
@@ -83,9 +83,5 @@ public class SynchronizationException
      */
     public SynchronizationException() {
         // intentionally left blank
-    }
-
-    public SynchronizationException(Throwable rootCause) {
-        super( rootCause );
     }
 }

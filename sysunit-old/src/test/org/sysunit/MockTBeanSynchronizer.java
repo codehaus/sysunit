@@ -1,16 +1,14 @@
 package org.sysunit;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 public class MockTBeanSynchronizer
-    extends TBeanSynchronizer {
+    implements TBeanSynchronizer {
 
     private List syncPoints;
 
     public MockTBeanSynchronizer() {
-        super( null,
-               null );
         this.syncPoints = new ArrayList();
     }
 
@@ -20,7 +18,7 @@ public class MockTBeanSynchronizer
         this.syncPoints.add( syncPoint );
     }
 
-    public String[] getSyncPoints() {
-        return (String[]) this.syncPoints.toArray( new String[0] );
+    public List getSyncPoints() {
+        return this.syncPoints;
     }
 }

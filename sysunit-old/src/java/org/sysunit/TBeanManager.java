@@ -60,8 +60,6 @@ package org.sysunit;
  *
  */
 
-import junit.framework.TestResult;
-
 /**
  * Manages the instantiation and lifecycle of <code>tbean</code>s.
  *
@@ -81,26 +79,31 @@ public interface TBeanManager {
      * @throws Exception If an error occurs while attempting
      *         to perform initialization.
      */
-    void initialize()
+    void init()
         throws Exception;
 
-	/**
-	 * Allows tbeans to be dynamically added such as
-	 * when running a selection of TBeans remotely
-	 * 
-	 * @param tbeanId the ID to use
-	 * @param tbean the TBean to add
-	 */
-	void addTBean(String tbeanId, TBean tbean);
-	
-    void startTBeans(SystemTestCase testCase,
-                     TestResult testResult)
-        throws Throwable;
+    /**
+     * Set up the <code>TBean</code>s for a <code>SystemTestCase</code>.
+     *
+     * @param testCase The test case.
+     *
+     * @throws Exception If an error occurs while attempting to set up
+     *         the TBeans of the test case.
+     */
+    void setUpTBeans(SystemTestCase testCase)
+        throws Exception;
 
-    void waitForTBeans(SystemTestCase testCase,
-                       long timeout)
-        throws InterruptedException, WatchdogException;
+    Throwable[] validateTBeans(SystemTestCase testCase)
+        throws InterruptedException;
 
-    void validateTBeans(SystemTestCase testCase,
-                        TestResult testResult);
+    /**
+     * Tear down the <code>TBean</code>s for a <code>SystemTestCase</code>.
+     *
+     * @param testCase The test case.
+     *
+     * @throws Exception If an error occurs while attempting to tear down
+     *         the TBeans of the test case.
+     */
+    void tearDownTBeans(SystemTestCase testCase)
+        throws Exception;
 }

@@ -80,7 +80,7 @@ public abstract class AbstractTBean
      * @see org.sysunit.TBean
      */
     public void assertValid()
-        throws Throwable {
+        throws Exception {
         // intentionally left blank
     }
 

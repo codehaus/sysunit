@@ -2,7 +2,7 @@ package org.sysunit;
 
 import java.lang.reflect.Method;
 
-public class ThreadMethodTBeanTest
+public class TestThreadMethodTBean
     extends SysUnitTestCase {
 
     public void testConstruct()
@@ -23,7 +23,7 @@ public class ThreadMethodTBeanTest
     }
 
     public void testRun()
-        throws Throwable {
+        throws Exception {
 
         Test test = new Test();
         Method threadMethod = test.getClass().getMethod( "threadOne",

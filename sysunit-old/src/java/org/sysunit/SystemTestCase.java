@@ -60,17 +60,14 @@ package org.sysunit;
  *
  */
 
+import junit.framework.TestCase;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
-
-import junit.framework.Assert;
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import java.util.HashSet;
 
 /**
  * Base for all system tests.
@@ -90,15 +87,11 @@ import junit.framework.TestSuite;
  * @version $Id$
  */
 public class SystemTestCase
-    extends Assert
-    implements Test {
+    extends TestCase {
 
     // ----------------------------------------------------------------------
     //     Constants
     // ----------------------------------------------------------------------
-
-    /** Prefix for <code>ThreadMethodTBean</code> reflected methods. */
-    public static final String TIMEOUT_MULTIPLIER_PROPERTY = "org.sysunit.timeout.multiplier";
 
     /** Prefix for <code>ThreadMethodTBean</code> reflected methods. */
     private static final String THREAD_PREFIX = "thread";
@@ -114,9 +107,7 @@ public class SystemTestCase
     // ----------------------------------------------------------------------
 
     /** Thread-local <code>TBeanSynchronizer</code>. */
-    // private static ThreadLocal synchronizer = new ThreadLocal();
-
-    private TBeanSynchronizer synchronizer;
+    private static ThreadLocal synchronizer = new ThreadLocal();
 
     // ----------------------------------------------------------------------
     //     Instance members
@@ -145,6 +136,10 @@ public class SystemTestCase
      *
      * @param testName The name of the test to run. 
      */
+    public SystemTestCase(String testName) {
+        super( testName );
+        this.tbeanFactories = new HashMap();
+    }
 
     // ----------------------------------------------------------------------
     //     Instance methods
@@ -203,13 +198,12 @@ public class SystemTestCase
      * the test.
      * </p>
      *
-     * @throws Exception If a method matching the naming
+     * @throws InvalidMethodException If a method matching the naming
      *         patterns does not satisfy other conditions, such as public,
-     *         non-static, no-arg and return type with public default
-     *         constructor.
+     *         non-static, no-arg and return type.
      */
-    public void initializeFactories()
-        throws Exception {
+    void init()
+        throws InvalidMethodException {
 
         Set names = new HashSet();
 
@@ -237,7 +231,7 @@ public class SystemTestCase
                                names,
                                name );
                 addTBeanFactory( name,
-                                 new ThreadMethodTBeanFactory( (SystemTestCase) this.getClass().newInstance(),
+                                 new ThreadMethodTBeanFactory( this,
                                                                methods[i] ) );
             }
         }
@@ -315,86 +309,45 @@ public class SystemTestCase
         }
     }
 
-    /** 
-     * Retrieve the watchdog timeout, in milliseconds.
-     *
-     * <p>
-     * By default, this returns <code>0</code> to indicate
-     * that no watchdog should be used.  By overriding and
-     * providing a value greater-than zero, the watchdog
-     * will fail the test if it takes more than the specified
-     * number of milliseconds to complete.
-     * </p>
-     *
-     * <p>
-     * By setting the <code>org.sysunit.watchdog.multiplier</code>
-     * property to a floating-point number, the watchdog timer
-     * may be adjusted at runtime to account for slower or faster
-     * test environments.
-     * </p>
-     *
-     * @return The watchdog timeout in milliseconds.
-     */
-    public long getTimeout() {
-        return 0;
-    }
-
-    protected double getTimeoutMultiplier() {
-        String multString = System.getProperty( TIMEOUT_MULTIPLIER_PROPERTY );
-
-        if ( multString == null ) {
-            return 1.0;
-        }
-
-        return Double.parseDouble( multString );
-    }
-
-    protected long getAdjustedTimeout() {
-        return Math.round( getTimeout() * getTimeoutMultiplier() );
-    }
-
     /**
-     * @see Test
+     * @see TestCase
      */
-    public int countTestCases() {
-        return 1;
-    }
-
-    /**
-     * @see Test
-     */
-    public void run(TestResult testResult) {
-
-        testResult.startTest( this );
-        try {
-            initializeFactories();
-            startTBeans( testResult );
-            waitForTBeans();
-            validateTBeans( testResult );
-        } catch (Throwable t) {
-            testResult.addError( this,
-                                 t );
-        } finally {
-            testResult.endTest( this );
-        }
-    }
-
-    protected void startTBeans(TestResult testResult)
+    public void runBare()
         throws Throwable {
-        getTBeanManager().startTBeans( this,
-                                       testResult );
+        init();
+        setUpTBeans();
+        try { 
+            super.runBare();
+            Throwable[] errors = validateTBeans();
+            throw new Exception( errors.toString() );
+        } finally {
+            tearDownTBeans();
+        }
     }
 
-    protected void waitForTBeans()
+    /**
+     * Set up the <code>TBean</code>s.
+     *
+     * @throws Exception If an error occurs.
+     */
+    protected void setUpTBeans()
         throws Exception {
-        getTBeanManager().waitForTBeans( this,
-                                         getAdjustedTimeout() );
+        getTBeanManager().setUpTBeans( this );
     }
 
-    protected void validateTBeans(TestResult testResult)
+    protected Throwable[] validateTBeans()
         throws Exception {
-        getTBeanManager().validateTBeans( this,
-                                          testResult );
+        return getTBeanManager().validateTBeans( this );
+    }
+
+    /**
+     * Tear down the <code>TBean</code>s.
+     *
+     * @throws Exception If an error occurs.
+     */
+    protected void tearDownTBeans()
+        throws Exception {
+        getTBeanManager().tearDownTBeans( this );
     }
 
     /**
@@ -453,6 +406,7 @@ public class SystemTestCase
      */
     protected void sync(String syncPoint)
         throws SynchronizationException, InterruptedException {
+        // System.err.println( "syncing: " + syncPoint );
         getSynchronizer().sync( syncPoint );
     }
 
@@ -472,8 +426,7 @@ public class SystemTestCase
      * @param synchronizer The synchronizer for the calling thread.
      */
     void setSynchronizer(TBeanSynchronizer synchronizer) {
-        //SystemTestCase.synchronizer.set( synchronizer );
-        this.synchronizer = synchronizer;
+        SystemTestCase.synchronizer.set( synchronizer );
     }
 
     /**
@@ -493,8 +446,25 @@ public class SystemTestCase
      * @return The synchronizer for the calling thread.
      */
     TBeanSynchronizer getSynchronizer() {
-        // return (TBeanSynchronizer) SystemTestCase.synchronizer.get();
-        return this.synchronizer;
+        return (TBeanSynchronizer) SystemTestCase.synchronizer.get();
+    }
+
+    /** 
+     * Default test.
+     *
+     * <p>
+     * This test, by default, performs nothing and only
+     * calls {@link #assertValid}, which itself is defaultly
+     * a no-op.  This structure allows the simplest tests to
+     * be completely contained within the TBeans or threads.
+     * </p>
+     *
+     * @see #assertValid
+     *
+     * @throws Exception If an error occurs.
+     */
+    public void testSystem() throws Exception {
+        assertValid();
     }
 
     /**
@@ -506,16 +476,5 @@ public class SystemTestCase
      */
     public void assertValid() throws Exception {
         // intentionally left blank
-    }
-
-    public static Test suite(Class systemTestClass)
-        throws Exception {
-        TestSuite suite = new TestSuite();
-
-        suite.addTest( (Test) systemTestClass.newInstance() );
-
-        suite.setName( systemTestClass.getName() );
-
-        return suite;
     }
 }

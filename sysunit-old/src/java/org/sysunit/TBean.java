@@ -46,7 +46,7 @@ public interface TBean {
      * @throws Exception If an error occurs while attempting
      *         validate the TBean.
      */
-    void assertValid() throws Throwable;
+    void assertValid() throws Exception;
     
     /**
      * Called after the SysUnit test has run to clean up any resources such as 

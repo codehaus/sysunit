@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <document>
+
  <properties>
   <title>SysUnit</title>
   <author email="james.strachan@spiritsoft.com">James Strachan</author>
@@ -49,14 +50,9 @@
 	</li>
 </ul>
 </subsection>	
-
-<subsection name="Running tests">
-<p>
-	To actually run the tests we need a cluster of test servers to which we can deploy tests.
-</p>
-</subsection>	
 	
 </section>
+
 
 </body>
 </document>

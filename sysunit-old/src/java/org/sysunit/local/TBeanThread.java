@@ -60,37 +60,33 @@ package org.sysunit.local;
  *
  */
 
-import org.sysunit.SynchronizableTBean;
 import org.sysunit.TBean;
+import org.sysunit.SynchronizableTBean;
 import org.sysunit.TBeanSynchronizer;
-import org.sysunit.Synchronizer;
+import org.sysunit.SystemTestCase;
 import org.sysunit.SynchronizationException;
+
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+
 
 public class TBeanThread
     extends Thread {
 
-    public static final TBeanThread[] EMPTY_ARRAY = new TBeanThread[0];
-
     private String tbeanId;
     private TBean tbean;
-    private Synchronizer synchronizer;
-    private Barrier beginBarrier;
-    private Barrier endBarrier;
+    private LocalSynchronizer synchronizer;
     private Throwable error;
-    private boolean isDone;
 
     public TBeanThread(String tbeanId,
                        TBean tbean,
-                       Synchronizer synchronizer,
-                       Barrier beginBarrier,
-                       Barrier endBarrier) {
-        super( "tbean-thread." + tbeanId );
+                       LocalSynchronizer synchronizer) {
         this.tbeanId      = tbeanId;
         this.tbean        = tbean;
         this.synchronizer = synchronizer;
-        this.beginBarrier = beginBarrier;
-        this.endBarrier   = endBarrier;
-        this.isDone       = false;
     }
 
     public String getTBeanId() {
@@ -101,63 +97,16 @@ public class TBeanThread
         return this.tbean;
     }
 
-    public Synchronizer getSynchronizer() {
+    public LocalSynchronizer getSynchronizer() {
         return this.synchronizer;
-    }
-
-    public Barrier getBeginBarrier() {
-        return this.beginBarrier;
-    }
-
-    public Barrier getEndBarrier() {
-        return this.endBarrier;
     }
     
     public void run() {
-        setUpSynchronizer();
-
         try {
-            getBeginBarrier().block();
-        } catch (InterruptedException e) {
-            return;
-        }
-
-        try {
-            tbean.setUp();
             tbean.run();
         } catch (Throwable e) {
-            setError( e );
-            getSynchronizer().error( getTBeanId() );
-        } finally {
-            if ( getTBean() instanceof SynchronizableTBean ) {
-                try {
-                    getSynchronizer().unregisterSynchronizableTBean( getTBeanId() );
-                } catch (SynchronizationException e) {
-                    setError( e );
-                }
-            }
-            synchronized ( this ) {
-                this.isDone = true;
-            }
-            try {
-                tbean.tearDown();
-            } catch (Throwable t) {
-                setError( t );
-            }
-            try {
-                getEndBarrier().block();
-            } catch (InterruptedException e) {
-                // swallow and exit
-            }
+            this.error = e;
         }
-    }
-
-    public synchronized boolean isDone() {
-        if ( ! isAlive() ) {
-            return false;
-        }
-
-        return this.isDone;
     }
 
     public boolean hasError() {
@@ -168,14 +117,15 @@ public class TBeanThread
         return this.error;
     }
 
-    protected void setError(Throwable error) {
-        this.error = error;
-    }
-
     protected void setUpSynchronizer() {
         if ( getTBean() instanceof SynchronizableTBean ) {
-            ((SynchronizableTBean)getTBean()).setSynchronizer( new TBeanSynchronizer( getTBeanId(),
-                                                                                      getSynchronizer() ) );
+            ((SynchronizableTBean)getTBean()).setSynchronizer( new TBeanSynchronizer() {
+                    public void sync(String syncPoint)
+                        throws SynchronizationException, InterruptedException {
+                        getSynchronizer().sync( getTBeanId(),
+                                                syncPoint );
+                    }
+                } );
         }
     }
 }

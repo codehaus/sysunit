@@ -60,17 +60,15 @@ package org.sysunit.local;
  *
  */
 
+import org.sysunit.Synchronizer;
+import org.sysunit.SynchronizationException;
+import org.sysunit.AlreadySynchronizedException;
+
+import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
-
-import org.sysunit.AlreadySynchronizedException;
-import org.sysunit.SynchronizationException;
-import org.sysunit.Synchronizer;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Single-JVM <code>Synchronizer</code> implementation.
@@ -83,26 +81,18 @@ public class LocalSynchronizer
     implements Synchronizer {
 
     // ----------------------------------------------------------------------
-    //     Constants
-    // ----------------------------------------------------------------------
-
-    private static final Log log = LogFactory.getLog(LocalSynchronizer.class);
-
-    /** Empty <code>String</code> array. */
-    private static final String[] EMPTY_STRING_ARRAY = new String[0];
-
-    // ----------------------------------------------------------------------
     //     Instance members
     // ----------------------------------------------------------------------
 
     /** <code>TBean</code> <code>String</code> identifiers. */
     private Set tbeanIds;
 
+    /** <code>LocalSyncPoint</code>s indexed by <code>String</code> identifier. */
+    private Map syncPoints;
+
     /** <code>TBean</code> <code>String</code> identifiers that are waiting
      *  in a sync() call. */
     private Set waitingTBeanIds;
-
-    private int waitCounter;
 
     // ----------------------------------------------------------------------
     //     Constructors
@@ -113,8 +103,8 @@ public class LocalSynchronizer
      */
     public LocalSynchronizer() {
         this.tbeanIds        = new HashSet();
+        this.syncPoints      = new HashMap();
         this.waitingTBeanIds = new HashSet();
-        this.waitCounter     = 0;
     }
 
     // ----------------------------------------------------------------------
@@ -131,7 +121,7 @@ public class LocalSynchronizer
      *
      * @param tbeanId The identifier of the synchronizable TBean.
      */
-    public synchronized void registerSynchronizableTBean(String tbeanId) {
+    void registerSynchronizableTBean(String tbeanId) {
         this.tbeanIds.add( tbeanId );
     }
 
@@ -146,70 +136,76 @@ public class LocalSynchronizer
      *
      * @param tbeanId The identifier of the synchronizable TBean.
      */
-    public synchronized void unregisterSynchronizableTBean(String tbeanId) {
+    synchronized void unregisterSynchronizableTBean(String tbeanId) {
         this.tbeanIds.remove( tbeanId );
         this.waitingTBeanIds.remove( tbeanId );
-
-        checkUnblock();
-    }
-
-    protected String[] getRegisteredTBeans() {
-        return (String[]) this.tbeanIds.toArray( EMPTY_STRING_ARRAY );
-    }
-
-    protected String[] getWaitingTBeans() {
-        return (String[]) this.waitingTBeanIds.toArray( EMPTY_STRING_ARRAY );
-    }
-
-    protected synchronized boolean isWaitingTBean(String tbeanId) {
-        return this.waitingTBeanIds.contains( tbeanId );
-    }
-
-    protected synchronized void addWaitingTBean(String tbeanId) {
-        this.waitingTBeanIds.add( tbeanId );
+        if ( this.waitingTBeanIds.size() == tbeanIds.size() ) {
+            unblockAll();
+        }
     }
 
 
     /**
      * @see Synchronizer
      */
-    public synchronized void sync(String tbeanId,
-                                  String syncPointName)
+    public void sync(String tbeanId,
+                     String syncPointName)
         throws SynchronizationException, InterruptedException {
+
+        boolean shouldSync = true;
         
-        if ( isWaitingTBean( tbeanId ) ) {
-            throw new AlreadySynchronizedException( tbeanId,
-                                                    syncPointName );
-        }
+        synchronized ( this ) {
+            if ( this.waitingTBeanIds.contains( tbeanId ) ) {
+                throw new AlreadySynchronizedException( tbeanId,
+                                                        syncPointName );
+            }
             
-        addWaitingTBean( tbeanId );
+            this.waitingTBeanIds.add( tbeanId );
 
-        int waiter = this.waitCounter;
-
-        checkUnblock();
-            
-        while ( waiter == this.waitCounter ) {
-            wait();
+            if ( this.waitingTBeanIds.size() == tbeanIds.size() ) {
+                shouldSync = false;
+                unblockAll();
+            }
         }
+
+        if ( shouldSync ) {
+            LocalSyncPoint syncPoint = getSyncPoint( syncPointName );
+            syncPoint.sync( tbeanId );
+        } 
     }
 
-    private void checkUnblock() {
-        if ( shouldUnblock() ) {
-            unblockAll();
+    /**
+     * Retrieve (possibly creating) a <code>LocalSyncPoint</code>
+     * by identifier.
+     *
+     * @param syncPointName The sync-point identifier.
+     *
+     * @return The sync-point.
+     */
+    synchronized LocalSyncPoint getSyncPoint(String syncPointName) {
+        LocalSyncPoint syncPoint = (LocalSyncPoint) this.syncPoints.get( syncPointName );
+
+        if ( syncPoint == null ) {
+            syncPoint = new LocalSyncPoint( syncPointName );
+
+            this.syncPoints.put( syncPointName,
+                                 syncPoint );
         }
+
+        return syncPoint;
     }
 
-    private boolean shouldUnblock() {
-        return this.waitingTBeanIds.size() == tbeanIds.size();
-    }
+    /**
+     * Unblock all waiters.
+     */
+    synchronized void unblockAll() {
+        for ( Iterator syncPointIter = this.syncPoints.values().iterator();
+              syncPointIter.hasNext(); ) {
+            LocalSyncPoint syncPoint = (LocalSyncPoint) syncPointIter.next();
 
-    public synchronized void unblockAll() {
-        ++this.waitCounter;
+            syncPoint.unblockAll();
+        }
+
         this.waitingTBeanIds.clear();
-        notifyAll();
-    }
-
-    public void error(String tbeanId) {
-        unregisterSynchronizableTBean( tbeanId );
     }
 }

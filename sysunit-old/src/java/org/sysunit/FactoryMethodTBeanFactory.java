@@ -60,7 +60,6 @@ package org.sysunit;
  *
  */
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -141,17 +140,8 @@ public class FactoryMethodTBeanFactory
      * @see TBeanFactory
      */
     public TBean newTBean() 
-        throws Throwable {
-        try {
-            return (TBean) getFactoryMethod().invoke( getTestCase(),
-                                                      EMPTY_OBJECT_ARRAY );
-        } catch (InvocationTargetException e) {
-            if ( e.getTargetException() != null ) {
-                throw e.getTargetException();
-            } else {
-                throw e;
-            }
-        }
-        
+        throws Exception {
+        return (TBean) getFactoryMethod().invoke( getTestCase(),
+                                                  EMPTY_OBJECT_ARRAY );
     }
 }

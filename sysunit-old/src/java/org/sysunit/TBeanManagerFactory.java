@@ -112,7 +112,6 @@ public class TBeanManagerFactory {
      */
     public static TBeanManager newTBeanManager()
         throws Exception {
-
         String classname = System.getProperty( TBeanManager.class.getName() );
 
         if ( classname == null

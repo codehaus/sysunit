@@ -2,7 +2,7 @@ package org.sysunit;
 
 import java.security.SecureClassLoader;
 
-public class TBeanManagerFactoryTest
+public class TestTBeanManagerFactory
     extends SysUnitTestCase {
 
     public void testNewTBeanManager_WithContextClassLoader()
@@ -24,7 +24,8 @@ public class TBeanManagerFactoryTest
 
         assertNotNull( manager );
 
-        assertTrue( buffer.toString().indexOf( "load:org.sysunit.local.LocalTBeanManager" ) >= 0 );
+        assertEquals( "load:org.sysunit.local.LocalTBeanManager",
+                      buffer.toString() );
     }
 
     public void testNewTBeanManager_WithNoContextClassLoader()
