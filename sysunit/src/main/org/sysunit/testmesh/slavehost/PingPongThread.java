@@ -9,13 +9,16 @@ import java.net.DatagramSocket;
 import java.net.MulticastSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 public class PingPongThread
     extends Thread
 {
     private SlaveHostNode slaveHostNode;
     private InetAddress pingAddress;
+    private DatagramSocket pingSocket;
 
     public PingPongThread(SlaveHostNode slaveHostNode,
                           InetAddress pingAddress)
@@ -49,7 +52,7 @@ public class PingPongThread
 
     public void run()
     {
-        DatagramSocket pingSocket = null;
+        this.pingSocket = null;
 
         if ( getPingAddress() != null )
         {
@@ -71,6 +74,7 @@ public class PingPongThread
             try
             {
                 pingSocket = new DatagramSocket( getPingPort() + 1 );
+                pingSocket.setSoTimeout( 100 );
             }
             catch (SocketException e)
             {
@@ -84,6 +88,7 @@ public class PingPongThread
         DatagramPacket ping = new DatagramPacket( buf,
                                                   buf.length );
 
+      LOOP:
         while ( true )
         {
             try
@@ -93,6 +98,8 @@ public class PingPongThread
                 String message = new String( ping.getData(),
                                              0,
                                              ping.getLength() );
+
+                System.err.println( "got message: " + message );
                 
                 if ( message.startsWith( PingPongNode.PING_PREFIX ) )
                 {
@@ -124,10 +131,19 @@ public class PingPongThread
                     }
                 }
             }
+            catch (SocketTimeoutException e)
+            { 
+                continue LOOP;
+            }
             catch (IOException e)
             {
-                return;
+                //e.printStackTrace();
+                break LOOP;
             }
+        }
+        if ( this.pingSocket != null )
+        {
+          this.pingSocket.close();
         }
     }
 }
