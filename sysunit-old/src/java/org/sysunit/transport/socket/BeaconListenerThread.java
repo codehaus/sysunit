@@ -108,16 +108,17 @@ public class BeaconListenerThread
         if ( message.startsWith( "slave|" ) ) {
             int portIndex = message.indexOf( "|" ) + 1;
             int typeIndex = message.indexOf( "|", portIndex ) + 1;
-
+            
             String portStr = message.substring( portIndex,
-                                                typeIndex - 2 );
-
-            String typeStr = message.substring( typeIndex );
-
+                                             typeIndex - 2 );
+            
             int port = Integer.parseInt( portStr );
 
+            String type = message.substring( typeIndex );
+            
             SlaveNodeInfo slaveNode = new SlaveNodeInfo( packet.getAddress(),
-                                                         port );
+                                                         port,
+                                                         type );
 
             if ( ! this.slaveNodes.contains( slaveNode ) ) {
                 log.debug( "adding slave node: " + slaveNode );

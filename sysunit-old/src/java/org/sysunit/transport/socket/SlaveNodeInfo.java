@@ -8,11 +8,14 @@ public class SlaveNodeInfo {
 
     private InetAddress addr;
     private int port;
+    private String type;
 
     public SlaveNodeInfo(InetAddress addr,
-                         int port) {
+                         int port,
+                         String type) {
         this.addr = addr;
         this.port = port;
+        this.type = type;
     }
 
     public InetAddress getAddr() {
@@ -21,6 +24,10 @@ public class SlaveNodeInfo {
 
     public int getPort() {
         return this.port;
+    }
+
+    public String getType() {
+        return this.type;
     }
 
     public int hashCode() {
