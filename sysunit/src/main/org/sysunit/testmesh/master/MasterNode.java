@@ -89,6 +89,13 @@ public class MasterNode
         sendPing();
 
         Thread.sleep( getListenTime() );
+
+        if ( getSlaveHosts().length == 0 )
+        {
+            disableMulticast();
+            sendPing();
+            Thread.sleep( getListenTime() );
+        }
     }
 
     public ClasspathServer getClasspathServer()
