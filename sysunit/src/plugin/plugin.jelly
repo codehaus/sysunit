@@ -106,11 +106,13 @@
     </j:forEach>
 -->
 
-    <ant:path id="sysunit.test.compile.src.set"
-          location="${maven.build.dir}/sysunit"/>
-
-    <maven:addPath id="maven.test.compile.src.set" 
-                   refid="sysunit.test.compile.src.set"/>
+	<ant:available file="${maven.build.dir}/sysunit" property="sysunit_src_exists"/>
+	<j:if test="${sysunit_src_exists == 'true'}">
+    	<ant:path id="sysunit.test.compile.src.set"
+        	location="${maven.build.dir}/sysunit"/>
+		<maven:addPath id="maven.test.compile.src.set" 
+			refid="sysunit.test.compile.src.set"/> 
+	</j:if>
   </goal>
 
   <goal name="sysunit:setskip">
