@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.command.Dispatcher;
 import org.sysunit.command.Server;
+import org.sysunit.command.master.TestNodeStartedCommand;
 import org.sysunit.jelly.JvmRunner;
 
 /**
@@ -24,20 +25,25 @@ import org.sysunit.jelly.JvmRunner;
 public class TestServer extends Server {
     private static final Log log = LogFactory.getLog(TestServer.class);
 
-	private JvmRunner runner = new JvmRunner();
-	private Dispatcher masterDispatcher;
-	
-    public TestServer() {
+    private JvmRunner runner = new JvmRunner();
+    private Dispatcher masterDispatcher;
+    private String jvmName;
+    private String xml;
+
+    public TestServer(String xml, String jvmName) {
+        this.xml = xml;
+        this.jvmName = jvmName;
     }
 
-	public void run(String xml, String jvmName) throws Exception {
-		// now lets run the JVM test
-		getRunner().run(xml, jvmName);
-        
-	}
+    public void start() throws Exception {
+        getMasterDispatcher().dispatch(new TestNodeStartedCommand(getName()));
 
-	// Properties
-	//-------------------------------------------------------------------------    
+        // start the test running
+        getRunner().run(xml, jvmName);
+    }
+
+    // Properties
+    //-------------------------------------------------------------------------    
 
     public JvmRunner getRunner() {
         return runner;
@@ -46,7 +52,7 @@ public class TestServer extends Server {
     public void setRunner(JvmRunner runner) {
         this.runner = runner;
     }
-    
+
     /**
      * @return the Dispatcher used to communicate with the Master server
      */

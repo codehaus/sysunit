@@ -16,5 +16,9 @@ import org.sysunit.command.test.TestServer;
  * @version $Revision$
  */
 public class MockTestServer extends TestServer {
+	
+	public MockTestServer() {
+		super("mockSystemTest.jelly", "mockJvmName");
+	}
 
 }
