@@ -4,10 +4,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
-import java.net.SocketTimeoutException;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -69,7 +69,7 @@ public class BeaconListenerThread
                     Thread.sleep( 1000 );
                 } catch (InterruptedException e) {
                     break;
-                } catch (SocketTimeoutException e) {
+                } catch (InterruptedIOException e) {
                     // swallow
                 }
             }
