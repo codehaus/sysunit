@@ -40,7 +40,6 @@ public class XmlSystemTest
                                      throwables[i] );
             }
         } catch (Throwable e ) {
-            System.err.println( "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" + e );
             testResult.addError( this,
                                  e );
         } finally {

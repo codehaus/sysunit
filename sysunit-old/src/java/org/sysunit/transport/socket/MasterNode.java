@@ -82,6 +82,10 @@ public class MasterNode
 
         SlaveNodeInfo[] slaveNodes = beaconThread.getSlaveNodes();
 
+        if ( slaveNodes.length == 0 ) {
+            throw new Exception( "no slave nodes available" );
+        }
+
         SocketDispatcher[] slaveDispatchers = new SocketDispatcher[ slaveNodes.length ];
 
         for ( int i = 0 ; i < slaveNodes.length ; ++i ) {
