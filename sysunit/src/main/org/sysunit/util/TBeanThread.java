@@ -26,6 +26,9 @@ public class TBeanThread
     public TBeanThread(TBean tbean,
                        TBeanThreadCallback callback)
     {
+        super( ( tbean instanceof ThreadMethodTBean )
+               ? ( ((ThreadMethodTBean)tbean).getMethod().getName() )
+               : ( tbean.getClass().getName() ) );
         this.tbean    = tbean;
         this.callback = callback;
         this.task     = null;

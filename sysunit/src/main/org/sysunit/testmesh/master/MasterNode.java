@@ -5,6 +5,7 @@ import org.sysunit.mesh.CommandGroup;
 import org.sysunit.model.PhysicalMachineInfo;
 import org.sysunit.model.DistributedSystemTestInfo;
 import org.sysunit.model.ScenarioInfo;
+import org.sysunit.model.JvmInfo;
 import org.sysunit.plan.TestPlan;
 import org.sysunit.plan.TestPlanBuilder;
 import org.sysunit.plan.JvmBinding;
@@ -21,6 +22,8 @@ import org.sysunit.testmesh.slave.PerformTearDownCommand;
 import org.sysunit.testmesh.slave.UnblockSynchronizerCommand;
 import org.sysunit.testmesh.slave.AbortTestCommand;
 import org.sysunit.util.ClasspathServer;
+
+import junit.framework.AssertionFailedError;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -41,6 +44,8 @@ public class MasterNode
 
     private TestMeshManager testMeshManager;
     private List slaves;
+
+    private Map jvms;
 
     private ScenarioInfo scenarioInfo;
 
@@ -72,6 +77,7 @@ public class MasterNode
 
         this.testMeshManager = new TestMeshManager();
         this.slaves          = new ArrayList();
+        this.jvms            = new HashMap();
 
         this.scenarioInfo    = scenarioInfo;
 
@@ -222,6 +228,9 @@ public class MasterNode
 
         for ( int i = 0 ; i < jvmBindings.length ; ++i )
         {
+            this.jvms.put( jvmBindings[ i ].getJvmId() + "",
+                           jvmBindings[ i ].getJvmInfo() );
+
             executeOn( jvmBindings[ i ].getNodeInfo(),
                        new StartSlaveCommand( getScenarioInfo().getJdk( jvmBindings[ i ].getJvmInfo() ),
                                               jvmBindings[ i ].getJvmId() ) );
@@ -257,7 +266,22 @@ public class MasterNode
 
         for ( int i = 0 ; i < this.thrown.size() ; ++i )
         {
-            thrown[ i ] = ((ThrowEntry)this.thrown.get( i )).getThrown();
+            ThrowEntry entry = (ThrowEntry) this.thrown.get( i );
+
+            thrown[ i ] = entry.getThrown();
+
+            if ( thrown[ i ] instanceof AssertionFailedError )
+            {
+                thrown[ i ] = new SlaveAssertionFailedError( entry.getJvmInfo(),
+                                                             entry.getTBeanId(),
+                                                             (AssertionFailedError) thrown[ i ] );
+            }
+            else
+            {
+                thrown[ i ] = new SlaveThrowable( entry.getJvmInfo(),
+                                                  entry.getTBeanId(),
+                                                  thrown[ i ] );
+            }
         }
 
         for ( int i = 0; i < fundamentalErrors.length ; ++i )
@@ -314,7 +338,7 @@ public class MasterNode
                                  String tbeanId,
                                  Throwable thrown)
     {
-        this.thrown.add( new ThrowEntry( null,
+        this.thrown.add( new ThrowEntry( (JvmInfo) this.jvms.get( jvmId + "" ),
                                          tbeanId,
                                          thrown ) );
     }
@@ -330,7 +354,7 @@ public class MasterNode
                                Throwable thrown)
         throws Exception
     {
-        this.thrown.add( new ThrowEntry( null,
+        this.thrown.add( new ThrowEntry( (JvmInfo) this.jvms.get( jvmId + "" ),
                                          tbeanId,
                                          thrown ) );
         abortTest();
@@ -346,7 +370,7 @@ public class MasterNode
                                        String tbeanId,
                                        Throwable thrown)
     {
-        this.thrown.add( new ThrowEntry( null,
+        this.thrown.add( new ThrowEntry( (JvmInfo) this.jvms.get( jvmId + "" ),
                                          tbeanId,
                                          thrown ) );
     }
@@ -362,7 +386,7 @@ public class MasterNode
                                     Throwable thrown)
         throws Exception
     {
-        this.thrown.add( new ThrowEntry( null,
+        this.thrown.add( new ThrowEntry( (JvmInfo) this.jvms.get( jvmId + "" ),
                                          tbeanId,
                                          thrown ) );
     }
