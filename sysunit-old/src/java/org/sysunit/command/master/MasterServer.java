@@ -13,6 +13,7 @@ import org.sysunit.command.StateServer;
 import org.sysunit.command.Dispatcher;
 import org.sysunit.command.MissingPropertyException;
 import org.sysunit.jelly.JvmNameExtractor;
+import org.sysunit.jelly.TimeoutExtractor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,10 +29,13 @@ public class MasterServer
     private Object isDoneLock;
     private Throwable[] errors;
 
+    private long timeout;
+
     public MasterServer(String xml) {
         this.xml = xml;
         this.isDone = false;
         this.isDoneLock = new Object();
+        this.timeout = 0;
     }
 
     // ----------------------------------------------------------------------
@@ -64,7 +68,10 @@ public class MasterServer
 		}
 		
         JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
-		this.jvmNames = jvmNameExtractor.getJvmNames(xml);
+		this.jvmNames = jvmNameExtractor.getJvmNames( xml );
+
+        TimeoutExtractor timeoutExtractor = new TimeoutExtractor();
+        this.timeout = timeoutExtractor.getTimeout( xml );
 
         enterState( new LaunchState( this,
                                      getSlaveNodeDispatchers(),
@@ -91,7 +98,8 @@ public class MasterServer
             return;
         }
         enterState( new RunState( this,
-                                  state.getTestNodeInfos() ) );
+                                  state.getTestNodeInfos(),
+                                  timeout ) );
     }
 
     protected synchronized void exitState(RunState state)

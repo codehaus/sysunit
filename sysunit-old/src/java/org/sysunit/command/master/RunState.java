@@ -40,9 +40,11 @@ public class RunState
     private int numActiveSyncTBeans;
     private Set waitingTBeans;
     private Set ranTestServers;
+    private WatchdogThread watchdog;
 
     public RunState(MasterServer server,
-                    TestNodeInfo[] testNodeInfos) {
+                    TestNodeInfo[] testNodeInfos,
+                    long watchdogTimeout) {
         super( server );
 
         this.testNodeInfos = testNodeInfos;
@@ -52,8 +54,14 @@ public class RunState
             this.numActiveSyncTBeans = this.numSyncTBeans;
         }
 
-        this.waitingTBeans  = new HashSet();
-        this.ranTestServers = new HashSet();
+        this.waitingTBeans   = new HashSet();
+        this.ranTestServers  = new HashSet();
+        this.watchdog        = new WatchdogThread( watchdogTimeout,
+                                                   this );
+    }
+
+    public WatchdogThread getWatchdog() {
+        return this.watchdog;
     }
 
     public void enter()
@@ -61,6 +69,7 @@ public class RunState
         for ( int i = 0 ; i < this.testNodeInfos.length ; ++i ) {
             this.testNodeInfos[ i ].getDispatcher().dispatch( new RunTestCommand() );
         }
+        this.watchdog.start();
     }
 
     public synchronized void sync(String testServerName,
@@ -122,12 +131,19 @@ public class RunState
         this.ranTestServers.add( testServerName );
 
         if ( this.ranTestServers.size() == testNodeInfos.length ) {
+            getWatchdog().cancel();
             getServer().exitState( this );
         }
     }
 
     public void tbeanError(String testServerName,
                            String tbeanId)
+        throws Exception {
+        getWatchdog().cancel();
+        kill();
+    }
+
+    public void kill()
         throws Exception {
         for ( int i = 0 ; i < testNodeInfos.length ; ++i ) {
             testNodeInfos[ i ].getDispatcher().dispatch( new KillCommand() );
