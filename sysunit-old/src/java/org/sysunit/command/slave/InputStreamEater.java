@@ -8,11 +8,8 @@ public class InputStreamEater
 
     private InputStream in;
 
-    private StringBuffer buffer;
-
     public InputStreamEater(InputStream in) {
         this.in = in;
-        this.buffer = new StringBuffer();
     }
 
     public void run() {
@@ -24,12 +21,7 @@ public class InputStreamEater
             while ( (read = this.in.read( buf,
                                           0,
                                           buf.length ) ) >= 0 ) {
-                if ( read > 0 ) { 
-                    buffer.append( new String( buf,
-                                               0,
-                                               read ) );
-                }
-                System.err.print( new String( buf, 0, read ) );
+                // discard
             }
         } catch (IOException e) {
             // swallow

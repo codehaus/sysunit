@@ -54,7 +54,7 @@ public class MasterServer
 	private Map members = new HashMap();
 	private Map testNodes = new HashMap();
 	private String xml;
-	private long waitTime = 1000L;
+	private long waitTime = 10000L;
     private long timeout;
 
     private Dispatcher slaveGroupDispatcher;
