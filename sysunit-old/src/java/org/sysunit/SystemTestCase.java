@@ -60,7 +60,8 @@ package org.sysunit;
  *
  */
 
-import junit.framework.TestCase;
+import junit.framework.Test;
+import junit.framework.TestResult;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -88,15 +89,14 @@ import java.util.HashSet;
  * @version $Id$
  */
 public class SystemTestCase
-    extends TestCase
-    implements Watched {
+    implements Test {
 
     // ----------------------------------------------------------------------
     //     Constants
     // ----------------------------------------------------------------------
 
     /** Prefix for <code>ThreadMethodTBean</code> reflected methods. */
-    public static final String WATCHDOG_MULTIPLIER_PROPERTY = "org.sysunit.watchdog.multiplier";
+    public static final String TIMEOUT_MULTIPLIER_PROPERTY = "org.sysunit.timeout.multiplier";
 
     /** Prefix for <code>ThreadMethodTBean</code> reflected methods. */
     private static final String THREAD_PREFIX = "thread";
@@ -124,8 +124,6 @@ public class SystemTestCase
     /** <code>TBeanManager</code> used for this test-run.  Only applicable
      *  to head test case if distributed. */
     private TBeanManager tbeanManager;
-
-    private Watchdog watchdog;
 
     // ----------------------------------------------------------------------
     //     Constructors
@@ -206,7 +204,7 @@ public class SystemTestCase
      *         non-static, no-arg and return type with public default
      *         constructor.
      */
-    void init()
+    void initializeFactories()
         throws Exception {
 
         Set names = new HashSet();
@@ -337,8 +335,8 @@ public class SystemTestCase
         return 0;
     }
 
-    protected double getWatchdogMultiplier() {
-        String multString = System.getProperty( WATCHDOG_MULTIPLIER_PROPERTY );
+    protected double getTimeoutMultiplier() {
+        String multString = System.getProperty( TIMEOUT_MULTIPLIER_PROPERTY );
 
         if ( multString == null ) {
             return 1.0;
@@ -347,77 +345,55 @@ public class SystemTestCase
         return Double.parseDouble( multString );
     }
 
-    protected long getAdjustedWatchdogTimeout() {
-        return Math.round( getTimeout() * getWatchdogMultiplier() );
-    }
-
-    protected void setUpWatchdog() {
-        if ( getTimeout() <= 0 ) {
-            return;
-        }
-
-        this.watchdog = new Watchdog( this,
-                                      getAdjustedWatchdogTimeout() );
-    }
-
-    protected void cancelWatchdog() {
-        if ( getWatchdog() != null ) {
-            getWatchdog().cancel();
-        }
-    }
-
-    public void triggerTimeout() {
-        fail( "tests did not complete before watchdog expiration in " +
-              getAdjustedWatchdogTimeout() + " ms" );
-    }
-
-    Watchdog getWatchdog() {
-        return this.watchdog;
+    protected long getAdjustedTimeout() {
+        return Math.round( getTimeout() * getTimeoutMultiplier() );
     }
 
     /**
-     * @see TestCase
+     * @see Test
      */
-    public void runBare()
-        throws Throwable {
-        init();
-        setUpTBeans();
-        try { 
-            setUpWatchdog();
-            super.runBare();
-            cancelWatchdog();
+    public int countTestCases() {
+        return 1;
+    }
 
-            Throwable[] errors = validateTBeans();
+    /**
+     * @see Test
+     */
+    public void run(TestResult testResult) {
 
-            if ( errors.length > 0 )
-            {
-                for ( int i = 0 ; i < errors.length ; ++i )
-                {
-                    if ( errors[i] instanceof InvocationTargetException )
-                    {
-                        errors[i] = ((InvocationTargetException)errors[i]).getTargetException();
-                    }
-                }
-                throw new MultiThrowable( errors );
-            }
+        try {
+            initializeFactories();
+            startTBeans( testResult );
+            waitForTBeans();
+        } catch (Throwable t) {
+            testResult.addError( this,
+                                 t );
         } finally {
-            tearDownTBeans();
+            try {
+                tearDownTBeans();
+            } catch (Throwable t) {
+                testResult.addError( this,
+                                     t );
+            }
         }
     }
 
-    /**
-     * Set up the <code>TBean</code>s.
-     *
-     * @throws Exception If an error occurs.
-     */
-    protected void setUpTBeans()
+    protected void startTBeans(TestResult testResult)
         throws Exception {
-        getTBeanManager().setUpTBeans( this );
+        getTBeanManager().startTBeans( this,
+                                       testResult );
     }
 
-    protected Throwable[] validateTBeans()
+    protected void waitForTBeans()
         throws Exception {
-        return getTBeanManager().validateTBeans( this );
+        getTBeanManager().waitForTBeans( this,
+                                         getAdjustedTimeout() );
+    }
+
+    protected void validateTBeans(TestResult testResult)
+        throws Exception {
+        getTBeanManager().validateTBeans( this,
+                                          testResult );
     }
 
     /**
@@ -526,24 +502,6 @@ public class SystemTestCase
      */
     TBeanSynchronizer getSynchronizer() {
         return (TBeanSynchronizer) SystemTestCase.synchronizer.get();
-    }
-
-    /** 
-     * Default test.
-     *
-     * <p>
-     * This test, by default, performs nothing and only
-     * calls {@link #assertValid}, which itself is defaultly
-     * a no-op.  This structure allows the simplest tests to
-     * be completely contained within the TBeans or threads.
-     * </p>
-     *
-     * @see #assertValid
-     *
-     * @throws Exception If an error occurs.
-     */
-    public void testSystem() throws Exception {
-        assertValid();
     }
 
     /**

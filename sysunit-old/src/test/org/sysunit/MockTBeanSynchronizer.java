@@ -18,7 +18,7 @@ public class MockTBeanSynchronizer
         this.syncPoints.add( syncPoint );
     }
 
-    public List getSyncPoints() {
-        return this.syncPoints;
+    public String[] getSyncPoints() {
+        return (String[]) this.syncPoints.toArray( new String[0] );
     }
 }

@@ -1,11 +1,15 @@
 package org.sysunit;
 
+import junit.framework.TestResult;
+
 public class MockTBeanManager
     implements TBeanManager
 {
     private boolean inited;
 
-    private SystemTestCase setUp;
+    private SystemTestCase started;
+    private SystemTestCase waited;
+    private long timeout;
     private SystemTestCase validated;
     private SystemTestCase tornDown;
 
@@ -22,20 +26,33 @@ public class MockTBeanManager
         return this.inited;
     }
 
-    public void setUpTBeans(SystemTestCase testCase)
+    public void startTBeans(SystemTestCase testCase,
+                            TestResult testResult)
         throws Exception {
-        this.setUp = testCase;
+        this.started = testCase;
     }
 
-    public SystemTestCase getSetUp() {
-        return this.setUp;
+    public SystemTestCase getStarted() {
+        return this.started;
     }
 
-    public Throwable[] validateTBeans(SystemTestCase testCase)
-        throws InterruptedException {
+    public void waitForTBeans(SystemTestCase testCase,
+                              long timeout) {
+        this.waited = testCase;
+        this.timeout = timeout;
+    }
+
+    public SystemTestCase getWaited() {
+        return this.waited;
+    }
+
+    public long getTimeout() {
+        return this.timeout;
+    }
+
+    public void validateTBeans(SystemTestCase testCase,
+                               TestResult testResult) {
         this.validated = testCase;
-
-        return new Throwable[0];
     }
 
     public SystemTestCase getValidated() {

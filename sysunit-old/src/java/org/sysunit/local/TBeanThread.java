@@ -79,14 +79,17 @@ public class TBeanThread
     private String tbeanId;
     private TBean tbean;
     private LocalSynchronizer synchronizer;
+    private Barrier barrier;
     private Throwable error;
 
     public TBeanThread(String tbeanId,
                        TBean tbean,
-                       LocalSynchronizer synchronizer) {
+                       LocalSynchronizer synchronizer,
+                       Barrier barrier) {
         this.tbeanId      = tbeanId;
         this.tbean        = tbean;
         this.synchronizer = synchronizer;
+        this.barrier      = barrier;
     }
 
     public String getTBeanId() {
@@ -104,6 +107,7 @@ public class TBeanThread
     public void run() {
         try {
             setUpSynchronizer();
+            this.barrier.block();
             tbean.run();
         } catch (Throwable e) {
             this.error = e;

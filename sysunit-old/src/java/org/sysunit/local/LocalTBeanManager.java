@@ -67,13 +67,17 @@ import org.sysunit.TBeanSynchronizer;
 import org.sysunit.SystemTestCase;
 import org.sysunit.SynchronizationException;
 import org.sysunit.TBeanThrowable;
+import org.sysunit.WatchdogException;
 
-import java.lang.reflect.InvocationTargetException;
+import junit.framework.TestResult;
+import junit.framework.AssertionFailedError;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Date;
 
 /**
  * Single-JVM <code>TBeanManager</code> implementation.
@@ -129,7 +133,8 @@ public class LocalTBeanManager
     /**
      * @see TBeanManager
      */
-    public void setUpTBeans(SystemTestCase testCase)
+    public void startTBeans(SystemTestCase testCase,
+                            TestResult testResult)
         throws Exception {
 
         String[] factoryNames = testCase.getTBeanFactoryNames();
@@ -154,9 +159,12 @@ public class LocalTBeanManager
             final String tbeanId = (String) tbeanIdIter.next();
             final TBean  tbean   = (TBean) this.tbeans.get( tbeanId );
 
+            Barrier barrier = new Barrier( this.tbeans.size() );
+
             TBeanThread thread = new TBeanThread( tbeanId,
                                                   tbean,
-                                                  synchronizer );
+                                                  synchronizer,
+                                                  barrier );
 
             this.tbeanThreads.add( thread );
 
@@ -164,35 +172,60 @@ public class LocalTBeanManager
         }
     }
 
-    public Throwable[] validateTBeans(SystemTestCase testCase)
-        throws InterruptedException {
+    public void waitForTBeans(SystemTestCase testCase,
+                              long timeout)
+        throws InterruptedException, WatchdogException {
 
-        Set errors = new HashSet();
+        long start = new Date().getTime();
+
+        long timeLeft = timeout;
 
         for ( Iterator threadIter = this.tbeanThreads.iterator();
               threadIter.hasNext(); ) {
             TBeanThread thread = (TBeanThread) threadIter.next();
-            thread.join();
+            thread.join( timeLeft );
+            if ( timeout > 0 ) {
+                long now = new Date().getTime();
+                timeLeft = timeout - (now - start);
+            }
+
+            if ( timeLeft <= 0 ) {
+                throw new WatchdogException( timeout );
+            }
+        }
+    }
+
+    public void validateTBeans(SystemTestCase testCase,
+                               TestResult testResult) {
+
+        for ( Iterator threadIter = this.tbeanThreads.iterator();
+              threadIter.hasNext(); ) {
+            TBeanThread thread = (TBeanThread) threadIter.next();
 
             if ( thread.hasError() ) {
                 Throwable t = thread.getError();
 
-                if ( t instanceof InvocationTargetException ) {
-                    t = ((InvocationTargetException)t).getTargetException();
+                if ( t instanceof AssertionFailedError ) {
+                    testResult.addFailure( testCase,
+                                           (AssertionFailedError) t );
+                } else {
+                    testResult.addError( testCase,
+                                         t );
                 }
-                errors.add( new TBeanThrowable( thread.getTBeanId(),
-                                                t ) );
             } else {
                 try {
                     thread.getTBean().assertValid();
                 } catch (Throwable t) {
-                    errors.add( new TBeanThrowable( thread.getTBeanId(),
-                                                    t ) );
+                    if ( t instanceof AssertionFailedError ) {
+                        testResult.addFailure( testCase,
+                                               (AssertionFailedError) t );
+                    } else {
+                        testResult.addError( testCase,
+                                             t );
+                    }
                 }
             }
         }
-
-        return (Throwable[]) errors.toArray( EMPTY_THROWABLE_ARRAY );
     }
     
     /**

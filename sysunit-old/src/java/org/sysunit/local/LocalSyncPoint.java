@@ -74,6 +74,13 @@ import org.sysunit.SynchronizationException;
 class LocalSyncPoint {
 
     // ----------------------------------------------------------------------
+    //     Constants
+    // ----------------------------------------------------------------------
+
+    /** Empty <code>LocalSyncPoint</code> array. */
+    public static final LocalSyncPoint[] EMPTY_ARRAY = new LocalSyncPoint[0];
+
+    // ----------------------------------------------------------------------
     //     Instance members
     // ----------------------------------------------------------------------
 
@@ -101,12 +108,15 @@ class LocalSyncPoint {
     //     Instance methods
     // ----------------------------------------------------------------------
 
+    String getName() {
+        return this.name;
+    }
+
     /**
      * Unblock all waiters.
      */
     synchronized void unblockAll() {
         ++this.blockCounter;
-
         notifyAll();
     }
 

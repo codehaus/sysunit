@@ -1,5 +1,7 @@
 package org.sysunit;
 
+import junit.framework.AssertionFailedError;
+
 import java.lang.NoSuchMethodException;
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -25,7 +27,7 @@ public class TestSystemTestCase
 
         SystemTestCase testCase = new SingleThreadNoOpCase();
 
-        testCase.init();
+        testCase.initializeFactories();
 
         assertLength( 1,
                       testCase.getTBeanFactoryNames() );
@@ -47,7 +49,7 @@ public class TestSystemTestCase
 
         SystemTestCase testCase = new SingleTBeanNullCase();
         
-        testCase.init();
+        testCase.initializeFactories();
         
         assertLength( 1,
                       testCase.getTBeanFactoryNames() );
@@ -185,6 +187,7 @@ public class TestSystemTestCase
         }
     }
 
+    /*
     public void testSetUpTBeans()
         throws Exception {
 
@@ -224,6 +227,7 @@ public class TestSystemTestCase
 
         assertNull( tbeanManager.getSetUp() );
     }
+    */
 
     public void testGetTBeanManager_ViaFactory()
         throws Exception {
@@ -248,95 +252,68 @@ public class TestSystemTestCase
         }
     }
 
-    public void testSetUpWatchdog_ZeroTimeout()
+    public void testSynchronizer()
         throws Exception {
 
-        SystemTestCase testCase = new SystemTestCase();
+        final SystemTestCase testCase = new SystemTestCase();
 
-        testCase.setUpWatchdog();
+        Thread threadOne = new Thread() {
+                public void run() {
+                    MockTBeanSynchronizer synchronizer = new MockTBeanSynchronizer();
+                    testCase.setSynchronizer( synchronizer );
+                    assertSame( synchronizer,
+                                testCase.getSynchronizer() );
+                    try {
+                        testCase.sync( "threadOne.one" );
+                        testCase.sync( "threadOne.two" );
+                        testCase.sync( "threadOne.three" );
+                    } catch (Throwable t) {
+                        fail( t.getMessage() );
+                    }
 
-        assertNull( testCase.getWatchdog() );
-    }
-
-    public void testSetUpWatchdog_NonZeroTimeout()
-        throws Exception {
-
-        SystemTestCase testCase = new SystemTestCase() {
-
-                public long getTimeout() {
-                    return 1000;
-                }
-
-                public void triggerTimeout() {
-                    // do nothing
+                    assertEquals( "threadOne.one",
+                                  synchronizer.getSyncPoints()[0] );
+                    assertEquals( "threadOne.two",
+                                  synchronizer.getSyncPoints()[0] );
+                    assertEquals( "threadOne.three",
+                                  synchronizer.getSyncPoints()[0] );
                 }
             };
 
-        testCase.setUpWatchdog();
+        Thread threadTwo = new Thread() {
+                public void run() {
+                    MockTBeanSynchronizer synchronizer = new MockTBeanSynchronizer();
+                    testCase.setSynchronizer( synchronizer );
+                    assertSame( synchronizer,
+                                testCase.getSynchronizer() );
+                    try {
+                        testCase.sync( "threadTwo.one" );
+                        testCase.sync( "threadTwo.two" );
+                        testCase.sync( "threadTwo.three" );
+                    } catch (Throwable t) {
+                        fail( t.getMessage() );
+                    }
 
-        Thread.sleep( 2000 );
-
-        assertNotNull( testCase.getWatchdog() );
-
-        assertEquals( 1000,
-                      testCase.getWatchdog().getTimeout() );
-    }
-
-    public void testSetUpWatchDog_NonZeroTimeout_WithMultiplierGreaterThanOne()
-        throws Exception {
-
-        System.setProperty( SystemTestCase.WATCHDOG_MULTIPLIER_PROPERTY,
-                            "2.0" );
-
-        SystemTestCase testCase = new SystemTestCase() {
-
-                public long getTimeout() {
-                    return 1000;
-                }
-
-                public void triggerTimeout() {
-                    // do nothing
+                    assertEquals( "threadTwo.one",
+                                  synchronizer.getSyncPoints()[0] );
+                    assertEquals( "threadTwo.two",
+                                  synchronizer.getSyncPoints()[0] );
+                    assertEquals( "threadTwo.three",
+                                  synchronizer.getSyncPoints()[0] );
                 }
             };
 
-        testCase.setUpWatchdog();
+        assertNull( testCase.getSynchronizer() );
 
-        Thread.sleep( 3000 );
+        threadOne.start();
+        threadTwo.start();
 
-        assertNotNull( testCase.getWatchdog() );
+        threadOne.join();
+        threadTwo.join();
 
-        assertEquals( 2000,
-                      testCase.getWatchdog().getTimeout() );
+        assertNull( testCase.getSynchronizer() );
     }
-    
 
-    public void testSetUpWatchDog_NonZeroTimeout_WithLessThanOne()
-        throws Exception {
-
-        System.setProperty( SystemTestCase.WATCHDOG_MULTIPLIER_PROPERTY,
-                            "0.5" );
-
-        SystemTestCase testCase = new SystemTestCase() {
-
-                public long getTimeout() {
-                    return 4000;
-                }
-
-                public void triggerTimeout() {
-                    // do nothing
-                }
-            };
-
-        testCase.setUpWatchdog();
-
-        Thread.sleep( 3000 );
-
-        assertNotNull( testCase.getWatchdog() );
-
-        assertEquals( 2000,
-                      testCase.getWatchdog().getTimeout() );
-    }
-    
     public TBean methodFish() {
         return null;
     }

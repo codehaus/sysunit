@@ -60,6 +60,8 @@ package org.sysunit;
  *
  */
 
+import junit.framework.TestResult;
+
 /**
  * Manages the instantiation and lifecycle of <code>tbean</code>s.
  *
@@ -82,20 +84,16 @@ public interface TBeanManager {
     void init()
         throws Exception;
 
-    /**
-     * Set up the <code>TBean</code>s for a <code>SystemTestCase</code>.
-     *
-     * @param testCase The test case.
-     *
-     * @throws Exception If an error occurs while attempting to set up
-     *         the TBeans of the test case.
-     */
-    void setUpTBeans(SystemTestCase testCase)
+    void startTBeans(SystemTestCase testCase,
+                     TestResult testResult)
         throws Exception;
 
-    Throwable[] validateTBeans(SystemTestCase testCase)
-        throws InterruptedException;
+    void waitForTBeans(SystemTestCase testCase,
+                       long timeout)
+        throws InterruptedException, WatchdogException;
 
+    void validateTBeans(SystemTestCase testCase,
+                        TestResult testResult);
     /**
      * Tear down the <code>TBean</code>s for a <code>SystemTestCase</code>.
      *

@@ -81,6 +81,13 @@ public class LocalSynchronizer
     implements Synchronizer {
 
     // ----------------------------------------------------------------------
+    //     Constants
+    // ----------------------------------------------------------------------
+
+    /** Empty <code>String</code> array. */
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
+    // ----------------------------------------------------------------------
     //     Instance members
     // ----------------------------------------------------------------------
 
@@ -121,7 +128,7 @@ public class LocalSynchronizer
      *
      * @param tbeanId The identifier of the synchronizable TBean.
      */
-    void registerSynchronizableTBean(String tbeanId) {
+    synchronized void registerSynchronizableTBean(String tbeanId) {
         this.tbeanIds.add( tbeanId );
     }
 
@@ -144,6 +151,18 @@ public class LocalSynchronizer
         }
     }
 
+    String[] getRegisteredTBeans() {
+        return (String[]) this.tbeanIds.toArray( EMPTY_STRING_ARRAY );
+    }
+
+    String[] getWaitingTBeans() {
+        return (String[]) this.waitingTBeanIds.toArray( EMPTY_STRING_ARRAY );
+    }
+
+    LocalSyncPoint[] getSyncPoints() {
+        return (LocalSyncPoint[]) this.syncPoints.values().toArray( LocalSyncPoint.EMPTY_ARRAY );
+    }
+
 
     /**
      * @see Synchronizer
@@ -152,8 +171,8 @@ public class LocalSynchronizer
                      String syncPointName)
         throws SynchronizationException, InterruptedException {
 
-        boolean shouldSync = true;
-        
+        LocalSyncPoint syncPoint = null;
+
         synchronized ( this ) {
             if ( this.waitingTBeanIds.contains( tbeanId ) ) {
                 throw new AlreadySynchronizedException( tbeanId,
@@ -161,17 +180,17 @@ public class LocalSynchronizer
             }
             
             this.waitingTBeanIds.add( tbeanId );
-
+            
             if ( this.waitingTBeanIds.size() == tbeanIds.size() ) {
-                shouldSync = false;
                 unblockAll();
+            } else {
+                syncPoint = getSyncPoint( syncPointName );
             }
         }
 
-        if ( shouldSync ) {
-            LocalSyncPoint syncPoint = getSyncPoint( syncPointName );
+        if ( syncPoint != null ) {
             syncPoint.sync( tbeanId );
-        } 
+        }
     }
 
     /**
@@ -182,7 +201,7 @@ public class LocalSynchronizer
      *
      * @return The sync-point.
      */
-    synchronized LocalSyncPoint getSyncPoint(String syncPointName) {
+    LocalSyncPoint getSyncPoint(String syncPointName) {
         LocalSyncPoint syncPoint = (LocalSyncPoint) this.syncPoints.get( syncPointName );
 
         if ( syncPoint == null ) {
@@ -198,7 +217,7 @@ public class LocalSynchronizer
     /**
      * Unblock all waiters.
      */
-    synchronized void unblockAll() {
+    void unblockAll() {
         for ( Iterator syncPointIter = this.syncPoints.values().iterator();
               syncPointIter.hasNext(); ) {
             LocalSyncPoint syncPoint = (LocalSyncPoint) syncPointIter.next();
