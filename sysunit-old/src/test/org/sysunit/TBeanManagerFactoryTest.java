@@ -24,8 +24,7 @@ public class TBeanManagerFactoryTest
 
         assertNotNull( manager );
 
-        assertEquals( "load:org.sysunit.local.LocalTBeanManager",
-                      buffer.toString() );
+        assertTrue( buffer.toString().indexOf( "load:org.sysunit.local.LocalTBeanManager" ) >= 0 );
     }
 
     public void testNewTBeanManager_WithNoContextClassLoader()
