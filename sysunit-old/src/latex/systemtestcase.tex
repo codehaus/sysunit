@@ -1,286 +1,214 @@
-\chapter{The \indexclass{SystemTestCase} Class}
+\chapter{The Basics}
 
 \section{Overview}
 
-When using the base JUnit framework, each unit test
-is represented by a single method of the form 
-\indexmethod{TestCase}{testXXX()} on a subclass of \indexclass{TestCase}.
-In this way, each subclass of \class{TestCase} may actually
-contain several tests.
+System tests are realized by creating subclasses of the 
+\indexclass{SystemTestCase}.  This class is plays a role similar
+to that of \indexclass{TestCase} in standard JUnit.  The
+\indexclass{SystemTestCase} implements the \indexclass{Test}
+interface from JUnit, allowing SysUnit tests to be executed within
+a normal test cycle by any normal JUnit test runner.
 
-Unlike the base JUnit framework, a SysUnit test class creates
-only a single test.  A system test is created by subclassing
-the \class{SystemTestCase} class.  JUnit's \method{testXXX()}
-idiom is \emph{not} used when creating tests, since SysUnit
-creates a test-per-class, instead of a test-per-method.
+Compared to standard \indexclass{TestCase}-based tests, which
+provide for \emph{test-per-method}, \indexclass{SystemTestCase}-based
+tests are larger-grained and use \emph{test-per-class} semantics.
+These semantics are required in order to allow a single system 
+test to define multiple simultaneous logical threads of execution
+which all participate in the test.
 
-Each portion of the system that interacts within a test
-is a \indexclass{TBean}, which may be interpreted as either
-a \emph{test bean} or a \emph{thread bean}.  A
-\class{TBean} is similar to the standard \class{Runnable}
-interface, with a few modifications to assist with testing.
-When a system test is executed, all of the test's \class{TBean}
-instances are executed in parallel.  The SysUnit framework
-handles the spawning of the threads necessarily for 
-concurrently executing the code.
-
-There are two different ways to create \class{TBean} instances
-for a test:  
-
-\begin{enumerate}
-	\item \class{TBean} factory method, using
-\indexmethod{SystemTestCase}{tbeanXXX()}.
-	\item Thread factory method, using
-\indexmethod{SystemTestCase}{threadXXX()}.
-\end{enumerate}
-
-
-\section{\class{TBean} Factory Method}
-
-To configure a unit of code to execute concurrently, a
-\emph{TBean factory method} may be used.  It is simply
-a method that begins with the prefix \texttt{tbean} and returns
-a \indexclass{TBean}.  When the test class is executed, each
-\class{TBean} factory method will be called to generate
-the set of \class{TBean} instances used for the test.
-
+\begin{figure}
 \begin{codelisting}
-public class MySystemTest
-  extends SystemTestCase
+import junit.framework.TestCase;
+
+public class MyUnitTest 
+    extends TestCase
 \{
-    public TBean tbeanLockManagerServer()
+    public void testSomething() 
+        throws Exception 
     \{
-        return new LockManagerServerTBean();
+        \dots
     \}
 
-    public TBean tbeanClientOne()
+    public void testSomethingElse() 
+        throws Exception 
     \{
-        return new LockClientTBean();
+        \dots
     \}
 \}
 \end{codelisting}
+\caption[JUnit \texttt{testXXX()} example]{Example JUnit \indexclass{TestCase}-based test, demonstrating
+two related by independent tests named \texttt{testSomething} and
+\texttt{testSomethingElse}.}
+\end{figure}
 
-\section{Thread\index{threads} Factory Method}
-
-To aide in creating concurrent tests without the need of
-embodying each unit of code within a \class{TBean}, SysUnit
-supports the notion of a \emph{thread factory method}.
-In addition to the \class{TBean} factory method for creating executable
-segments of code, any method that has the prefix of \texttt{thread}
-will also be run concurrently.
-
-\begin{note}
-The term ``thread'' is used through this manual to denote a
-general thread of execution, and not necessarily instances of
-\texttt{java.lang.}\indexclass{Thread}, though they may certainly be
-implemented using the \class{Thread} class under the covers.
-\end{note}
-
+\begin{figure}
 \begin{codelisting}
-public class MySystemTest
-  extends SystemTestCase
-\{
-    public void threadLockManagerServer()
-        throws Exception
-    \{
-        LockManagerServer server = new LockManagerServer( "jndi:..." );
-        server.start();
-        // other logic
-    \}
+import org.sysunit.SystemTestCase;
 
-    public void threadClientOne()
-        throws Exception
-    \{
-        LockManagerClient client = new LockManagerClient( "jndi:..." );
-    \}
-\}
-\end{codelisting}
-
-\section{Test Suites}
-
-Since SysUnit does not use the \class{TestCase} utility class
-from JUnit but rather simply implements \class{Test}, each system
-test must include a \indexmethod{Test}{suite()} method in order
-to set up the runnable test suite.  \class{SystemTestCase} contains
-the \indexmethod{SystemTestCase}{suite(Class testClass)} utility
-method to assist in the creation of the \indexclass{TestSuite}.
-
-
-\begin{codelisting}
-public class MySystemTest
-  extends SystemTestCase
-\{
-    public TestSuite suite() 
-    \{
-        return suite( MySystemTest.class );
-    \}
-\}
-\end{codelisting}
-
-\section{Synchronization\index{synchronization}}
-
-Many times, while multiple segments of code are running in independent
-threads of execution, it is desirable to synchronize at a point.  In
-multi-threaded programming, this is considered a
-\emph{barrier}\index{barrier},
-which is a point in the code that causes the threads to block and wait
-until all threads reach the same point, and then continue
-independently once unblocked.
-
-\begin{note}
-The term ``synchronization'' implies coordination, not unlike
-how secret-agents will synchronize their watches to ensure 
-activities happen at the same time.  SysUnit's usage of
-``synchronization'' should not be confused with Java's
-\texttt{synchronized} keyword, which actually ensures that
-multiple things \emph{do not} occur at the same time.
-\end{note}
-
-\subsection{\indexclass{Synchronizer}}
-
-The basis for synchronizing across multiple threads (local or
-distributed) is the \class{Synchronizer}, which describes a single
-\indexmethod{Synchronizer}{sync(...)} method.  
-
-\begin{codelisting}
-public interface Synchronizer 
-\{
-    void sync(String tbeanId,
-              String syncPointName)
-        throws SynchronizationException, InterruptedException;
-\}
-\end{codelisting}
-
-The \class{Synchronizer} provides a means for blocking at a named
-barrier, or \emph{sync-point}\index{sync-point} until all other threads of execution 
-block at a sync-point or have completed.  The \texttt{tbeanId}
-parameter identifies the \class{TBean} requesting the synchronization,
-while the \texttt{syncPointName} identifies the particular sync-point
-to wait for.  The \texttt{tbeanId} is typically derrived from the
-\method{tbeanXXX()} and \method{threadXXX()} method names, after
-removing the prefix.
-
-The \texttt{syncPointName} is any arbitrarily chosen identifier
-for the synchronization rendezvous.  The following example shows
-three \class{TBean} instances synchronizing at a sync-point
-named ``after-initialization''
-
-\begin{codelisting}
-    synchronizer.sync( "FirstTBean",
-                       "after-initialization" );
-\vskip0.5em
-\hrule
-\vskip0.5em
-    synchronizer.sync( "SecondTBean",
-                       "after-initialization" );
-\vskip0.5em
-\hrule
-\vskip0.5em
-    synchronizer.sync( "ThirdTBean",
-                       "after-initialization" );
-\end{codelisting}
-
-The \class{Synchronizer} guarantees that all three threads will
-reach the call to \method{sync(...)} and wait until the others
-have also reached that point.  All threads will then simultaneously
-unblock, allowing execution to continue.
-Any number of sync-points\index{sync-point!multiple} may be used through-out a test in order
-to allow coordination of multiple phases.
-
-\subsection{\indexclass{SynchronizableTBean},
-\indexclass{AbstractSynchronizableTBean}\\
-and \indexclass{TBeanSynchronizer}}
-
-The base \class{TBean} interface does not allow for synchronization. The
-\class{TBean} sub-interface \class{SynchronizableTBean} adds
-\indexmethod{SynchronizableTBean}{setSynchronizer(...)} method which
-signals to the SysUnit framework that a specialized \indexclass{TBeanSynchronizer}
-should be provided for synchronization within the \class{TBean}. 
-
-\begin{codelisting}
-public interface SynchronizableTBean
-    extends TBean 
-\{
-    void setSynchronizer(TBeanSynchronizer synchronizer);
-\}
-\end{codelisting}
-
-The \indexclass{TBeanSynchronizer} manages the \texttt{tbeanId}
-parameter required by \\ \class{Synchronizer.sync(...)}, providing
-a simple synchronization interface which requires only a
-\texttt{syncPointName} parameter.
-
-\begin{codelisting}
-public interface TBeanSynchronizer
-\{
-    void sync(String syncPointName)
-        throws SynchronizationException, InterruptedException;
-\}
-\end{codelisting}
-
-The \indexclass{AbstractSynchronizableTBean} provides a base
-for implementations of \indexclass{SynchronizableTBean} to
-manage the \indexclass{TBeanSynchronizer} and provides a convenience
-\indexmethod{AbstractSynchronizableTBean}{sync(...)} method.
-
-\begin{codelisting}
-public class MyFirstTBean
-    extends AbstractSynchronizableTBean
-\{
-    public void run()
-        throws Exception
-    \{
-        doSomething();
-        sync( "after-something" );
-        doSomethingElse();
-        sync( "after-something-else" );
-    \}
-\}
-
-\vskip0.5em
-\hrule
-\vskip0.5em
-
-public class MySecondTBean
-    extends AbstractSynchronizableTBean
-\{
-    public void run()
-        throws Exception
-    \{
-        doDifferentSomething();
-        sync( "after-something" );
-        doDifferentSomethingElse();
-        sync( "after-something-else" );
-    \}
-\}
-\end{codelisting}
-
-In general, \class{TBean} implementations should extend the
-\class{AbstractSynchronizableTBean} abstract class to make
-writing test code simpler.  Management of the \class{Synchronizer}
-and \texttt{tbeanId} will be managed automatically.
-
-\subsection{\class{SystemTestCase}.\indexmethod{SystemTestCase}{sync(...)}}
-
-When using the \method{threadXXX(...)} form for creating implicit
-\class{TBean} instances, the \indexclass{SystemTestCase} provides
-a simple \indexmethod{SystemTestCase}{sync(...)} identical to the
-one provided by \class{AbstractSynchronizableTBean}.  
-
-\begin{codelisting}
-public class MySystemTest
+public class MySystemTest 
     extends SystemTestCase
 \{
-    public void threadOne()
+    public void threadOne() 
+        throws Exception 
     \{
-        doSomething();
-        sync( "after-something" );
+        \dots
     \}
 
-    public void threadTwo()
+    public void threadTwo() 
+        throws Exception 
     \{
-        doDifferentSomething();
-        sync( "after-something" );
+        \dots
     \}
 \}
 \end{codelisting}
+\caption{Example SysUnit \indexclass{SystemTestCase}-based test, demonstrating
+a single test with two logical threads of execution named
+\texttt{threadOne} and \texttt{threadTwo}.
+\texttt{testSomethingElse}.}
+\end{figure}
+
+Whereas JUnit tests define a single thread of execution, SysUnit
+allows test writers to define multiple threads of execution and
+provides two methods for their creation.  Simple tests can be
+created using \emph{thread methods} while more complex
+tests may be created using \emph{\indexclass{TBean}s}.
+
+\begin{note}
+The term ``thread'' as used in reference to SysUnit's logical
+threads of execution should \emph{not} be confused with
+the \class{java.lang.Thread} multithreading class provided
+by Java.
+\end{note}
+
+\section{Thread methods\index{thread method}}
+
+By far, the simplest method for creating multiple logical threads
+is by using \emph{thread methods}.  Similar to JUnit's
+special handling of \texttt{testXXX()} methods, SysUnit will
+inspect test classes for public methods that are named with
+the prefix \texttt{thread}.  For example, a test may include
+two methods named \texttt{threadClient()} and \texttt{threadServer()}.
+
+\begin{figure}
+\begin{codelisting}
+import org.sysunit.SystemTestCase;
+
+public class TestTheServer
+\{
+    public void threadServer()
+        throws Exception 
+    \{
+         \dots
+    \}
+
+    public void threadClient()
+        throws Exception 
+    \{
+         \dots
+    \}
+\}
+\caption{Example system test defining two thread methods named
+\texttt{threadServer} and \texttt{threadClient}.}
+\end{codelisting}
+\end{figure}
+
+A test class may define any number of thread methods.  Thread methods
+are allowed to throw exceptions and are required to have \texttt{void}
+return values.  SysUnit itself is responsible for the execution of
+the thread methods.  The thread method itself \emph{should not}
+explicitly spawn or start any \class{Thread}s.  The thread method is
+simply the body to be run concurrently with other logical threads.
+It is somewhat equivalent to \method{run()} method of the
+\class{Runnable} class.  When using thread methods, there is no
+equivalent to JUnit's \method{setUp()} and \method{tearDown()} 
+methods.  For logical threads requiring more complex initialization
+and termination, the \indexclass{TBean} method should be used.
+
+\section{\indexclass{TBean} class}
+
+The \indexclass{TBean} class bridges the gap between simplistic
+thread methods and the 3-stage standard JUnit testing methodology.
+A system test may opt to use \class{TBean} instances instead of
+(or in addition to) thread methods.  A \indexclass{TBean} allows
+for a \indexmethod{TBean}{run()} method which plays the same role
+as a thread method and also provides for \indexmethod{TBean}{setUp()}
+and \indexmethod{TBean}{tearDown()} methods for initializing and
+terminating each logical thread.
+Additionally, \indexclass{TBean} instances may define an
+\indexmethod{TBean}{assertValid()} method to do post-test 
+validation of its internal state.
+
+\begin{figure}
+\begin{codelisting}
+import org.sysunit.TBean;
+
+public class ServerTBean 
+    implements TBean
+\{
+    public void setUp()
+        throws Exception
+    \{
+        \dots
+    \}
+
+    public void run()
+         throws Exception
+    \{
+        \dots
+    \}
+
+    public void tearDown()
+        throws Exception
+    \{
+        \dots
+    \}
+
+    public void assertValid()
+    \{
+        \dots
+    \}
+\}
+\end{codelisting}
+\caption{Example \indexclass{TBean} demonstrating initialization,
+thread logic, and termination.}
+\end{figure}
+
+Like the thread methods, the \indexmethod{TBean}{run()} method of
+\class{TBean} is comparable to the \method{run()} method of
+\class{Runnable} in that it should not actually spawn any real
+threads, but is simply the body to be executed by the SysUnit engine
+itself. 
+
+To weave a \class{TBean} into a system test, SysUnit looks for
+publc methods named with the prefix \texttt{tbean} that return
+\class{TBean}.  These methods should not execute the \class{TBean}
+but are merely \emph{factories}\index{factory pattern} to
+construct the \class{TBean} instances.
+
+\begin{figure}
+\begin{codelisting}
+import org.sysunit.SystemTestCase;
+import org.sysunit.TBean;
+
+public class TestTheServer 
+\{
+    public TBean tbeanServer()
+        throws Exception 
+    \{
+        TBean server = \dots
+        \dots
+        return server;
+    \}
+
+    public TBean tbeanClient()
+        throws Exception 
+    \{
+        TBean client = \dots
+        \dots
+        return client;
+    \}
+\}
+\end{codelisting}
+\caption{Example usage of \emph{\class{TBean} factory methods}.}
+\end{figure}
+

@@ -130,6 +130,7 @@ public class TBeanThread
         }
 
         try {
+            tbean.setUp();
             tbean.run();
         } catch (Throwable e) {
             setError( e );
@@ -140,6 +141,11 @@ public class TBeanThread
             }
             synchronized ( this ) {
                 this.isDone = true;
+            }
+            try {
+                tbean.tearDown();
+            } catch (Throwable t) {
+                setError( t );
             }
             try {
                 getEndBarrier().block();
