@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body>
+<h1>User Guide</h1>
+
+<h2>How does a distributed test work?</h2>
+
+<p> A number of TBeans are created, setup and then ran in parallel. The
+JUnit test then waits until they all finish (or terminate with some
+error). Then each TBean is validated with the assertValid() method. Then
+the SysUnit test is validated via the assertValid() method.</p>
+
+<h2>How do I write a SysUnit test?</h2>
+
+<p> Create a TBean implementation which does something. This could be a
+remote MBean, web service, Session bean invocation, a JMS producer or
+consumer etc.</p>
+
+<p>Then create a JUnit test case by deriving from <b>SysUnitSupport</b>
+and then implement the following method</p>
+
+<pre>createTBeans()</pre>
+
+<p>creating new TBean implementations and calling addTBean(TBean)
+method to register the new tbean.</p>
+<p>Thats all you need to do. Then if you want to perform any post-run
+analysis to check TBeans are in the correct state (such as to check the
+consistency of each TBean or whatever), overload the following method to
+do whatever checks you need...</p>
+
+<pre>assertValid()</pre>
+
+<p>This method can be implemented either inside your SysUnit TestCase
+to do cross-TBean validation or inside a specific TBean.</p>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <pomVersion>3</pomVersion>
+  <name>SysUnit</name>
+  <id>sysunit</id>
+  <currentVersion>1.0</currentVersion>
+  
+  <organization>
+    <name>SpritSoft, Inc.</name>
+    <url>http://www.spiritsoft.com</url>
+    <logo>/images/group-logo.gif</logo>
+  </organization>
+  <logo>http://sourceforge.net/sflogo.php?group_id=76653&amp;type=5</logo>
+
+
+  <inceptionYear>2003</inceptionYear>
+  <package>org.sysunit</package>
+  <shortDescription>SysUnit is a JUnit framework for system testing</shortDescription>
+
+  <!-- Gump integration -->
+  <gumpRepositoryId>sysunit</gumpRepositoryId>
+  
+  <description>
+  	SysUnit is a JUnit framework for system testing
+  </description>
+  
+  <url>http://sysunit.sourceforge.net/</url>
+  <issueTrackingUrl>http://sourceforge.net/tracker/?group_id=76653</issueTrackingUrl>
+  
+  <siteAddress>sysunit.sourceforge.net</siteAddress>
+  <siteDirectory>/home/groups/s/sy/sysunit/htdocs</siteDirectory>
+  <distributionDirectory>/home/groups/s/sy/sysunit/htdocs/dist</distributionDirectory>
+  
+  <repository>
+    <connection>scm:cvs:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sysunit:sysunit</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.sourceforge.net:/cvsroot/sysunit:sysunit</developerConnection>
+    <url>http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/sysunit/sysunit/</url>
+  </repository>
+  
+  <mailingLists>
+    <mailingList>
+      <name>SysUnit Interest List</name>
+      <subscribe></subscribe>
+      <unsubscribe></unsubscribe>
+      <archive></archive>
+    </mailingList>
+  </mailingLists>
+  
+  
+  <versions>
+    <version>
+      <id>1.0-beta-1</id>
+      <name>1.0-beta-1</name>
+      <tag>1.0-beta-1</tag>
+    </version>
+  </versions>
+  <branches></branches>
+  
+  <mailingLists>
+    <mailingList>
+      <name>sysunit@spiritsoft.com</name>
+      <subscribe></subscribe>
+      <unsubscribe></unsubscribe>
+      <archive></archive>
+    </mailingList>
+  </mailingLists>
+  
+  <developers>
+    <developer>
+      <name>James Strachan</name>
+      <id>jstrachan</id>
+      <email>jstrachan@apache.org</email>
+      <organization>SpiritSoft, Inc.</organization>
+    </developer>
+  </developers>
+
+  <developers>
+    <developer>
+      <name>Bob McWhirter</name>
+      <id>werken</id>
+      <email>bob@werken.com</email>
+      <organization>The Werken Company</organization>
+    </developer>
+  </developers>
+
+  <contributors>
+  </contributors>
+
+  <dependencies>
+    <dependency>
+      <id>commons-logging</id>
+      <version>1.0.2</version>
+    </dependency>
+
+		<!-- used by the JMX connectors -->
+    <dependency>
+      <id>mx4j+jmx</id>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <id>mx4j+tools</id>
+      <version>1.1.1</version>
+    </dependency>
+
+		<!-- jars for jboss -->
+<!--
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+-->
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-system</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+<!--
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-common</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+-->
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-jmx</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jmx-adaptor-plugin</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jnp-client</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jnet</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jbossall-client</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+<!--
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-j2ee</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+-->
+
+		<!-- jars for unit tests -->
+
+    <dependency>
+      <id>junit</id>
+      <version>3.8.1</version>
+    </dependency>
+    
+<!--
+    <dependency>
+      <id>xml-apis</id>
+      <version>1.0.b2</version>
+    </dependency>
+    
+    <dependency>
+      <id>xerces</id>
+      <version>2.0.2</version>
+    </dependency>
+-->
+  </dependencies>
+  
+  <build>
+    <nagEmailAddress>sysunit@spiritsoft.com</nagEmailAddress>
+    <sourceDirectory>src/java</sourceDirectory>
+    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+    
+    <integrationUnitTestSourceDirectory/>
+    <aspectSourceDirectory/>
+    
+    <unitTest>
+      <resources>
+        <resource>
+          <directory>src/java</directory>
+          <includes>
+            <include>**/*.properties</include>
+          </includes>
+        </resource>
+      </resources>
+      <includes>
+        <include>**/Test*.java</include>
+      </includes>
+    </unitTest>
+
+    
+    <!-- J A R  R E S O U R C E S -->
+    <!-- Resources that are packaged up inside the JAR file -->
+    <resources>
+<!--
+      <resource>
+        <directory>src/jar</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+        </includes>
+      </resource>
+-->
+<!--
+      <includes>
+        <include>**/*.properties</include>
+      </includes>
+-->
+    </resources>
+  </build>
+</project>
