@@ -211,17 +211,8 @@ public class SlaveNode
 
         Properties props = tbeanInfo.getProperties();
 
-        for ( Enumeration names = props.propertyNames();
-              names.hasMoreElements(); )
-        {
-            String propName = (String) names.nextElement();
-            String propValue = props.getProperty( propName );
-
-            PropUtils.setProperty( tbean,
-                                   propName,
-                                   propValue );
-        }
-
+        PropUtils.setProperties( tbean,
+                                 props );
 
         return tbean;
     }

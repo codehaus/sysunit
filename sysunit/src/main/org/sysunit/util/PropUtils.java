@@ -4,8 +4,28 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
 
+import java.util.Enumeration;
+import java.util.Properties;
+
 public class PropUtils
 {
+    public static void setProperties(Object bean,
+                                     Properties props)
+        throws InvalidPropertyException, IllegalAccessException, InvocationTargetException
+    {
+        Enumeration propNames = props.propertyNames();
+
+        while ( propNames.hasMoreElements() )
+        {
+            String propName  = (String) propNames.nextElement();
+            String propValue = props.getProperty( propName );
+
+            setProperty( bean,
+                         propName,
+                         propValue );
+        }
+    }
+
     public static void setProperty(Object bean,
                                    String propName,
                                    String propValue)
@@ -45,6 +65,8 @@ public class PropUtils
 
                             methods[ i ].invoke( bean,
                                                  new Object[] { value } );
+
+                            propertySet = true;
                         }
                         else if (paramClass.equals( float.class )
                                  ||
@@ -54,6 +76,8 @@ public class PropUtils
 
                             methods[ i ].invoke( bean,
                                                  new Object[] { value } );
+
+                            propertySet = true;
                         }
                         else if ( paramClass.equals( double.class )
                                   ||
@@ -63,6 +87,8 @@ public class PropUtils
 
                             methods[ i ].invoke( bean,
                                                  new Object[] { value } );
+
+                            propertySet = true;
                         }
                         else if ( paramClass.equals( long.class )
                                   ||
@@ -72,6 +98,8 @@ public class PropUtils
 
                             methods[ i ].invoke( bean,
                                                  new Object[] { value } );
+
+                            propertySet = true;
                         }
                         else if ( paramClass.equals( boolean.class )
                                   ||
@@ -90,11 +118,15 @@ public class PropUtils
                             
                             methods[ i ].invoke( bean,
                                                  new Object[] { value } );
+
+                            propertySet = true;
                         }
                         else if ( paramClass.equals( String.class ) )
                         {
                             methods[ i ].invoke( bean,
                                                  new Object[] { propValue } );
+
+                            propertySet = true;
                         }
                     }
                 }
