@@ -54,96 +54,102 @@ public class PingPongThread
     {
         this.pingSocket = null;
 
-        if ( getPingAddress() != null )
+        try
         {
-            try
+            if ( getPingAddress() != null )
             {
-                MulticastSocket mcastSocket = new MulticastSocket( getPingPort() );
-                mcastSocket.setSoTimeout( 100 );
-                mcastSocket.joinGroup( getPingAddress() );
-                pingSocket = mcastSocket;
-            }
-            catch (IOException e)
-            {
-                // swallow, we'll retry below
-            }
-        } 
-
-        if ( pingSocket == null )
-        {
-            try
-            {
-                pingSocket = new DatagramSocket( getPingPort() + 1 );
-                pingSocket.setSoTimeout( 100 );
-            }
-            catch (SocketException e)
-            {
-                e.printStackTrace();
-                return;
-            }
-        }
-        
-        byte[] buf = new byte[256];
-        
-        DatagramPacket ping = new DatagramPacket( buf,
-                                                  buf.length );
-
-      LOOP:
-        while ( true )
-        {
-            try
-            {
-                pingSocket.receive( ping );
-                
-                String message = new String( ping.getData(),
-                                             0,
-                                             ping.getLength() );
-
-                System.err.println( "got message: " + message );
-                
-                if ( message.startsWith( PingPongNode.PING_PREFIX ) )
+                try
                 {
-                    String payload = message.substring( PingPongNode.PING_PREFIX.length() ).trim();
+                    MulticastSocket mcastSocket = new MulticastSocket( getPingPort() );
+                    mcastSocket.setSoTimeout( 100 );
+                    mcastSocket.joinGroup( getPingAddress() );
+                    pingSocket = mcastSocket;
+                }
+                catch (IOException e)
+                {
+                    // swallow, we'll retry below
+                }
+            } 
+            
+            if ( pingSocket == null )
+            {
+                try
+                {
+                    pingSocket = new DatagramSocket( getPingPort() + 1 );
+                    pingSocket.setSoTimeout( 100 );
+                }
+                catch (SocketException e)
+                {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+            
+            byte[] buf = new byte[256];
+            
+            DatagramPacket ping = new DatagramPacket( buf,
+                                                      buf.length );
+            
+          LOOP:
+            while ( true )
+            {
+                try
+                {
+                    pingSocket.receive( ping );
                     
-                    try
+                    String message = new String( ping.getData(),
+                                                 0,
+                                                 ping.getLength() );
+                    
+                    System.err.println( "got message: " + message );
+                    
+                    if ( message.startsWith( PingPongNode.PING_PREFIX ) )
                     {
-                        InetAddress address = ping.getAddress();
-                        int port = Integer.parseInt( payload );
+                        String payload = message.substring( PingPongNode.PING_PREFIX.length() ).trim();
                         
-                        RemoteNodeInfo master = new RemoteNodeInfo( getSlaveHostNode(),
-                                                                    "master",
-                                                                    address,
-                                                                    port );
-
                         try
                         {
-                            getSlaveHostNode().executeOn( master,
-                                                          new AddSlaveHostCommand( getSlaveHostNode().getPhysicalMachineInfo() ) );
+                            InetAddress address = ping.getAddress();
+                            int port = Integer.parseInt( payload );
+                            
+                            RemoteNodeInfo master = new RemoteNodeInfo( getSlaveHostNode(),
+                                                                        "master",
+                                                                        address,
+                                                                        port );
+                            
+                            try
+                            {
+                                getSlaveHostNode().executeOn( master,
+                                                              new AddSlaveHostCommand( getSlaveHostNode().getPhysicalMachineInfo() ) );
+                            }
+                            catch (Exception e)
+                            {
+                                // ignore, try again
+                            }
                         }
-                        catch (Exception e)
+                        catch (NumberFormatException e)
                         {
                             // ignore, try again
                         }
                     }
-                    catch (NumberFormatException e)
-                    {
-                        // ignore, try again
-                    }
+                }
+                catch (SocketTimeoutException e)
+                { 
+                    continue LOOP;
+                }
+                catch (IOException e)
+                {
+                    //e.printStackTrace();
+                    break LOOP;
                 }
             }
-            catch (SocketTimeoutException e)
-            { 
-                continue LOOP;
-            }
-            catch (IOException e)
-            {
-                //e.printStackTrace();
-                break LOOP;
-            }
         }
-        if ( this.pingSocket != null )
+        finally
         {
-          this.pingSocket.close();
+            if ( this.pingSocket != null )
+            {
+                this.pingSocket.close();
+            }
         }
     }
 }
