@@ -3,9 +3,9 @@
          xmlns:util="jelly:util"
          xmlns:test="test">
 
-  <goal name="sysunit:slave" prereqs="setclasspath" description="Runs a slave node">
+  <goal name="sysunit:slave" description="Runs a slave node">
     <java classname="org.sysunit.transport.jms.SlaveNode" fork="yes">
-      <classpath refid="maven.dependency.classpath"/>
+      <classpath path="${plugin.dependencyClasspath}"/>
     </java>
   </goal>
 

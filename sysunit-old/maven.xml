@@ -42,11 +42,12 @@
     <ant:jar jarfile="${maven.build.dir}/plugin-${maven.final.name}.jar"
              basedir="${basedir}/src/plugin"
              includes="plugin.jelly,project.xml"/>
-    <copy file="${maven.build.dir}/plugin-${maven.final.name}.jar"
-          todir="${maven.home}/plugins"/>
   </goal>
 
   <goal name="sysunit:install-plugin" prereqs="sysunit:build-plugin">
+    <echo>installing plugin to ${maven.home}/plugins</echo>
+    <copy file="${maven.build.dir}/plugin-${maven.final.name}.jar"
+          todir="${maven.home}/plugins"/>
   </goal>
 
   <goal name="sysunit:install" prereqs="jar:install,sysunit:install-plugin"/>

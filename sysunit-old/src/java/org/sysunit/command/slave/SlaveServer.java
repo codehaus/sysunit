@@ -120,9 +120,8 @@ public class SlaveServer extends Server {
     private synchronized void launchNodeInForkedJvm(LaunchTestNodeCommand command)
         throws Exception {
 
-        String mungedId = command.getMasterID().replace( File.pathSeparatorChar,
-                                                         '@' );
-        
+        String mungedId = sanitizePath( command.getMasterID() );
+
         File dir = new File( this.tmpDir,
                              mungedId );
 
@@ -136,6 +135,28 @@ public class SlaveServer extends Server {
                           waiter );
 
         waiter.start();
+    }
+
+    protected String sanitizePath(String path) {
+        path = path.replace( File.pathSeparatorChar,
+                             '@' );
+
+        path = path.replace( '/',
+                             '_' );
+
+        path = path.replace( '\\',
+                             '_' );
+
+        path = path.replace( ':',
+                             '_' );
+
+        path = path.replace( '#',
+                             '_' );
+
+        path = path.replace( '$',
+                             '_' );
+
+        return path;
     }
 
     public synchronized void storeJar(String jarName,
