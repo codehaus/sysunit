@@ -19,8 +19,8 @@ public class InputStreamForwarder
 
     public void run()
     {
-        byte[] buf = new byte[1024];
-        int read = 0;
+        byte[] buf  = new byte[1024];
+        int    read = 0;
 
         try
         {

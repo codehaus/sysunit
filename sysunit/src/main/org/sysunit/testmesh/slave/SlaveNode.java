@@ -88,6 +88,8 @@ public class SlaveNode
         ClassLoader cl = initializeClassLoader( classpathServerPort,
                                                 relativeUrls );
 
+        Thread.currentThread().setContextClassLoader( cl );
+
         TBean[] tbeans = initializeTBeans( cl,
                                            jvmInfo );
 
