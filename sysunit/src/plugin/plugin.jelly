@@ -48,17 +48,22 @@
   </preGoal>
 
   <goal name="sysunit:generate-test-classes" prereqs="test:test-resources">
+
     <test:dependency-handle/>
     <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
     <j:set var="testDir">${testPlugin.findVariable('maven.test.dest')}</j:set>
-    
-    <sysunit:gen-systest baseDir="${testDir}" 
+
+	  <j:if test="${sysunit_src_exists == 'true'}">
+    	
+       <sysunit:gen-systest baseDir="${testDir}" 
                          outputDir="${maven.build.dir}/sysunit" 
                          extension="systest"/>
-
-    <sysunit:gen-scenario baseDir="${testDir}" 
+ 
+       <sysunit:gen-scenario baseDir="${testDir}" 
                           outputDir="${maven.build.dir}/sysunit" 
                           extension="scenario"/>
+  	</j:if>
+  	
 <!--
 
     <j:set var="testDirLen" value="${size(testDir)}"/>
