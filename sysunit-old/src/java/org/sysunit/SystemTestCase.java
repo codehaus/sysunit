@@ -69,7 +69,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Timer;
 
 /**
  * Base for all system tests.
@@ -89,11 +88,15 @@ import java.util.Timer;
  * @version $Id$
  */
 public class SystemTestCase
-    extends TestCase {
+    extends TestCase
+    implements Watched {
 
     // ----------------------------------------------------------------------
     //     Constants
     // ----------------------------------------------------------------------
+
+    /** Prefix for <code>ThreadMethodTBean</code> reflected methods. */
+    public static final String WATCHDOG_MULTIPLIER_PROPERTY = "org.sysunit.watchdog.multiplier";
 
     /** Prefix for <code>ThreadMethodTBean</code> reflected methods. */
     private static final String THREAD_PREFIX = "thread";
@@ -185,11 +188,6 @@ public class SystemTestCase
      */
     public String[] getTBeanFactoryNames() {
         return (String[]) this.tbeanFactories.keySet().toArray( EMPTY_STRING_ARRAY );
-    }
-
-    public long getTimeout()
-    {
-        return 0;
     }
 
     /**
@@ -315,27 +313,62 @@ public class SystemTestCase
         }
     }
 
+    /** 
+     * Retrieve the watchdog timeout, in milliseconds.
+     *
+     * <p>
+     * By default, this returns <code>0</code> to indicate
+     * that no watchdog should be used.  By overriding and
+     * providing a value greater-than zero, the watchdog
+     * will fail the test if it takes more than the specified
+     * number of milliseconds to complete.
+     * </p>
+     *
+     * <p>
+     * By setting the <code>org.sysunit.watchdog.multiplier</code>
+     * property to a floating-point number, the watchdog timer
+     * may be adjusted at runtime to account for slower or faster
+     * test environments.
+     * </p>
+     *
+     * @return The watchdog timeout in milliseconds.
+     */
+    public long getTimeout() {
+        return 0;
+    }
+
+    protected double getWatchdogMultiplier() {
+        String multString = System.getProperty( WATCHDOG_MULTIPLIER_PROPERTY );
+
+        if ( multString == null ) {
+            return 1.0;
+        }
+
+        return Double.parseDouble( multString );
+    }
+
+    protected long getAdjustedWatchdogTimeout() {
+        return Math.round( getTimeout() * getWatchdogMultiplier() );
+    }
+
     protected void setUpWatchdog() {
         if ( getTimeout() <= 0 ) {
             return;
         }
-        this.watchdog = new Watchdog( this );
 
-        Timer timer = new Timer( true );
-
-        timer.schedule( this.watchdog,
-                        getTimeout() );
+        this.watchdog = new Watchdog( this,
+                                      getAdjustedWatchdogTimeout() );
     }
 
     protected void cancelWatchdog() {
-        if ( getTimeout() <= 0 ) {
-            return;
+        if ( this.watchdog != null ) {
+            this.watchdog.cancel();
         }
-        this.watchdog.cancel();
     }
 
-    protected void fireWatchdog() {
-        fail( "watchdog expired before test completion" );
+    public void triggerTimeout() {
+        fail( "tests did not complete before watchdog expiration in " +
+              getAdjustedWatchdogTimeout() + " ms" );
     }
 
     /**

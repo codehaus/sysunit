@@ -20,23 +20,6 @@ public class TestSystemTestCase
                       testCase.getTBeanFactoryNames() );
     }
 
-    /*
-    public void testConstruct_Bare_WithName()
-        throws Exception {
-
-        SystemTestCase testCase = new SystemTestCase( "foo" );
-
-        assertEquals( "foo",
-                      testCase.getName() );
-
-        assertLength( 0,
-                      testCase.getTBeanFactories() );
-
-        assertLength( 0,
-                      testCase.getTBeanFactoryNames() );
-    }
-    */
-
     public void testInit_WithThreadMethodTBeanFactory()
         throws Exception {
 

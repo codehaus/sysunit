@@ -1,21 +1,29 @@
 package org.sysunit;
 
+import java.util.Timer;
 import java.util.TimerTask;
 
 class Watchdog extends TimerTask {
 
-    private SystemTestCase testCase;
+    private Watched watched;
 
-    Watchdog(SystemTestCase testCase) {
-        this.testCase = testCase;
+    Watchdog(Watched watched,
+             long timeout) {
+
+        Timer timer = new Timer( true );
+
+        timer.schedule( this,
+                        timeout );
+
+        this.watched = watched;
     }
 
-    private SystemTestCase getTestCase() {
-        return this.testCase;
+    private Watched getWatched() {
+        return this.watched;
     }
 
     public void run() {
-        getTestCase().fireWatchdog();
+        getWatched().triggerTimeout();
     }
 
 }
