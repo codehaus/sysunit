@@ -11,7 +11,7 @@
  that the following conditions are met:
 
  1. Redistributions of source code must retain copyright
-    statements and notices.  Redistributions must also contain a
+    statements and notices. Redistributions must also contain a
     copy of this document.
  
  2. Redistributions in binary form must reproduce the
