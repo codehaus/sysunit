@@ -238,6 +238,14 @@ public class RemoteTBeanManager { // implements Runnable {
         beginCheckpoint.pass();
     }
 
+    public void kill()
+        throws Exception {
+        for ( Iterator threadIter = this.tbeanThreads.iterator();
+              threadIter.hasNext(); ) {
+            ((TBeanThread)threadIter.next()).kill();
+        }
+    }
+
     public void waitForTBeans(long timeout) throws InterruptedException, WatchdogException {
 
 		log.info("Waiting for TBeans...");

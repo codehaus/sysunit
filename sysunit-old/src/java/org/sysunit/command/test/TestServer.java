@@ -22,6 +22,7 @@ import org.sysunit.command.master.TBeansSetUpCommand;
 import org.sysunit.command.master.TBeansRanCommand;
 import org.sysunit.command.master.TBeansTornDownCommand;
 import org.sysunit.command.master.SyncCommand;
+import org.sysunit.command.master.TBeanErrorCommand;
 import org.sysunit.jelly.JvmRunner;
 import org.sysunit.util.Checkpoint;
 import org.sysunit.util.CheckpointCallback;
@@ -43,7 +44,6 @@ public class TestServer
     private Dispatcher masterDispatcher;
     private String jvmName;
     private String xml;
-    private Synchronizer synchronizer;
 
     private int syncCounter;
     private Object syncLock;
@@ -55,7 +55,6 @@ public class TestServer
         log.info( "test server " + jvmName + " with " + xml + " is " + getName() );
         this.xml = xml;
         this.jvmName = jvmName;
-        this.synchronizer = new TestSynchronizer();
         this.runner = new JvmRunner( this,
                                      this,
                                      this,
@@ -98,6 +97,10 @@ public class TestServer
     public void tearDownTBeans() throws Exception {
         log.info( getName() + " //// tearDownTBeans()" );
         getRunner().getManager().tearDownTBeans();
+    }
+
+    public void kill() throws Exception {
+        getRunner().getManager().kill();
     }
 
     // Properties
@@ -169,7 +172,14 @@ public class TestServer
     }
 
     public void error(String tbeanId) {
-        log.info( "error in tbean " + tbeanId + " with " + getName() );
+        try {
+            log.info( "error in tbean " + tbeanId + " with " + getName() );
+            getMasterDispatcher().dispatch( new TBeanErrorCommand( getName(),
+                                                                   tbeanId ) );
+        } catch(DispatchException e) {
+            log.error( "error dispatching error",
+                       e );
+        }
     }
 
     public void notify(Checkpoint checkpoint)

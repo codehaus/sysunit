@@ -5,6 +5,7 @@ import org.sysunit.command.State;
 import org.sysunit.command.StateCommand;
 import org.sysunit.command.test.UnblockAllCommand;
 import org.sysunit.command.test.RunTestCommand;
+import org.sysunit.command.test.KillCommand;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -128,7 +129,10 @@ public class RunState
     public void tbeanError(String testServerName,
                            String tbeanId)
         throws Exception {
-
+        for ( int i = 0 ; i < testNodeInfos.length ; ++i ) {
+            testNodeInfos[ i ].getDispatcher().dispatch( new KillCommand() );
+        }
+        getServer().exitState( this );
     }
 
     public TestNodeInfo[] getTestNodeInfos() {

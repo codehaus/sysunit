@@ -78,6 +78,10 @@ public class TBeanThread
     public Checkpoint getDoneCheckpoint() {
         return this.doneCheckpoint;
     }
+
+    public void kill() {
+        interrupt();
+    }
     
     public void run() {
         try {

@@ -4,6 +4,9 @@ import org.sysunit.command.Dispatcher;
 import org.sysunit.command.DispatchException;
 import org.sysunit.command.master.RequestJarCommand;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Map;
@@ -12,12 +15,15 @@ import java.util.Iterator;
 public class JarFetcher
     extends Thread {
 
+    private static final Log log = LogFactory.getLog( JarFetcher.class );
+
     private Dispatcher dispatcher;
     private File dir;
     private Map jarMap;
     private int numStored;
     private SlaveServer slaveServer;
-
+    private boolean failed;
+    
     public JarFetcher(Dispatcher dispatcher,
                       File dir,
                       Map jarMap,
@@ -26,21 +32,34 @@ public class JarFetcher
         this.dir = dir;
         this.jarMap = jarMap;
         this.slaveServer = slaveServer;
+        this.failed = false;
     }
-
+    
     public void run() {
         try { 
             fetchJars();
+        } catch (DispatchException e) {
+            log.error( "failed to transfer all jars",
+                       e.getCause() );
         } catch (Exception e) {
-            e.printStackTrace();
+            this.failed = true;
+            notifyAll();
+            log.error( "failed to transfer all jars",
+                       e );
         }
     }
 
     public synchronized void waitFor()
         throws InterruptedException {
 
-        while ( this.numStored != this.jarMap.size() ) {
+        while ( ! this.failed
+                &&
+                this.numStored != this.jarMap.size() ) {
             wait( 1000 );
+        }
+
+        if ( this.failed ) {
+            throw new InterruptedException( "failed to transfer all jars" );
         }
     }
 
