@@ -53,10 +53,15 @@ public class ExampleSystemTest extends SystemTestCase {
     public void threadClient() throws Exception {
 		clientCount++;
         log.info("client thread started: " + clientCount);
+
+        sync( "a" );
+        sync( "b" );
     }
 
     public void threadServer() throws Exception {
 		serverCount++;
         log.info("server thread started: " + serverCount);
+
+        sync( "a" );
     }
 }

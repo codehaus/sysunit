@@ -48,7 +48,6 @@ public class MasterSynchronizer {
     }
 
     public synchronized void addTestNode(TestNodeInfo testNodeInfo) {
-        this.numTBeans += testNodeInfo.getNumSynchronizableTBeans();
         this.dispatchers.add( testNodeInfo.getDispatcher() );
         log.info( "adding test node: " + testNodeInfo );
     }
@@ -64,5 +63,30 @@ public class MasterSynchronizer {
         }
 
         this.waitingTBeans.clear();
+    }
+
+    protected void checkUnblockAll()
+        throws DispatchException {
+        if ( this.waitingTBeans.size() == this.numTBeans ) {
+            unblockAll();
+        }
+    }
+
+    public void registerSynchronizableTBean(String tbeanId)
+        throws DispatchException {
+        ++this.numTBeans;
+    }
+
+    public void unregisterSynchronizableTBean(String tbeanId)
+        throws DispatchException {
+        --this.numTBeans;
+        this.waitingTBeans.remove( tbeanId );
+        checkUnblockAll();
+    }
+
+    public void error(String tbeanId)
+        throws DispatchException {
+        this.numTBeans = 0;
+        unblockAll();
     }
 }

@@ -31,7 +31,7 @@ public class SlaveServer extends Server {
     /**
      * @param command
      */
-    public void startTestNode(StartTestNodeCommand command) {
+    public void launchTestNode(LaunchTestNodeCommand command) {
         log.info(
             "About to start xml: "
                 + command.getXml()
@@ -41,10 +41,10 @@ public class SlaveServer extends Server {
                 + command.getMasterID());
 
         if (isForkJvm()) {
-            runTestInForkedJvm(command);
+            launchNodeInForkedJvm(command);
         }
         else {
-            runTestLocally(command);
+            launchNodeLocally(command);
         }
     }
 
@@ -71,18 +71,25 @@ public class SlaveServer extends Server {
     /**
      * @param command
      */
-    private void runTestLocally(StartTestNodeCommand command) {
-        String[] args = getTestArguments(command);
+    private void launchNodeLocally(LaunchTestNodeCommand command) {
+        final String[] args = getTestArguments(command);
 
         // lets run the TestNode
-        TestNode.main(args);
+
+        Thread thread = new Thread() {
+                public void run() {
+                    TestNode.main(args);
+                }
+            };
+
+        thread.start();
     }
 
     /**
       * Runs the Test logical machine in a new forked JVM
       * @param command
       */
-    private void runTestInForkedJvm(StartTestNodeCommand command) {
+    private void launchNodeInForkedJvm(LaunchTestNodeCommand command) {
         String[] args = getTestArguments(command);
 
         ProcessRunner runner = ProcessRunner.newJavaProcess(TestNode.class, args);
@@ -96,7 +103,7 @@ public class SlaveServer extends Server {
      * @param command
      * @return
      */
-    protected String[] getTestArguments(StartTestNodeCommand command) {
+    protected String[] getTestArguments(LaunchTestNodeCommand command) {
         // the TestNode needs to know the destination of the Master
         String destination = command.getMasterID();
 

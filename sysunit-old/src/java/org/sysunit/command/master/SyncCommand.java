@@ -3,13 +3,20 @@ package org.sysunit.command.master;
 public class SyncCommand
     extends MasterCommand {
 
+    private String testServerName;
     private String tbeanId;
     private String syncPointName;
 
-    public SyncCommand(String tbeanId,
+    public SyncCommand(String testServerName,
+                       String tbeanId,
                        String syncPointName) {
+        this.testServerName = testServerName;
         this.tbeanId = tbeanId;
         this.syncPointName = syncPointName;
+    }
+
+    public String getTestServerName() {
+        return this.testServerName;
     }
 
     public String getTBeanId() {

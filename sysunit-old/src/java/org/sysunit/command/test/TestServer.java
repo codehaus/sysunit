@@ -12,9 +12,12 @@ package org.sysunit.command.test;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sysunit.command.Dispatcher;
+import org.sysunit.command.DispatchException;
 import org.sysunit.command.MissingPropertyException;
 import org.sysunit.command.Server;
-import org.sysunit.command.master.TestNodeStartedCommand;
+import org.sysunit.command.master.TestNodeLaunchedCommand;
+import org.sysunit.command.master.RegisterSynchronizableTBeanCommand;
+import org.sysunit.command.master.UnregisterSynchronizableTBeanCommand;
 import org.sysunit.command.master.SyncCommand;
 import org.sysunit.jelly.JvmRunner;
 import org.sysunit.Synchronizer;
@@ -57,9 +60,13 @@ public class TestServer
 
         log.info( "tellilng master that " + getName() + " has " + getRunner().getManager().getNumSynchronizableTBeans() );
 
-		getMasterDispatcher().dispatch(new TestNodeStartedCommand(getName(),
-                                                                  getRunner().getManager().getNumSynchronizableTBeans()));
+		getMasterDispatcher().dispatch(new TestNodeLaunchedCommand(getName(),
+                                                                   getRunner().getManager().getNumSynchronizableTBeans()));
 
+        //getRunner().getManager().run();
+    }
+
+    public void runTest() throws Exception {
         getRunner().getManager().run();
     }
 
@@ -93,7 +100,8 @@ public class TestServer
         throws InterruptedException, SynchronizationException {
         log.info( "sync " + tbeanId + " on " + syncPointName + " on test server " + getName() );
         try {
-            getMasterDispatcher().dispatch( new SyncCommand( tbeanId,
+            getMasterDispatcher().dispatch( new SyncCommand( getName(),
+                                                             tbeanId,
                                                              syncPointName ) );
         } catch (Exception e) {
             throw new SynchronizationException( e );
@@ -104,15 +112,28 @@ public class TestServer
 
     public void unblockAll() {
         log.info( "unblocking all on " + getName() );
-        getRunner().getSynchronizer().unblockAll();
+        //getRunner().getSynchronizer().unblockAll();
+        this.synchronizer.unblockAll();
     }
 
-    public void registerSynchronizableTBean(String tbeanId) {
+    public void registerSynchronizableTBean(String tbeanId)
+        throws SynchronizationException {
         log.info( "registering synchronizable tbean " + tbeanId + " with " + getName() );
+        try {
+            getMasterDispatcher().dispatch( new RegisterSynchronizableTBeanCommand( tbeanId ) );
+        } catch (DispatchException e) {
+            throw new SynchronizationException( e );
+        }
     }
 
-    public void unregisterSynchronizableTBean(String tbeanId) {
+    public void unregisterSynchronizableTBean(String tbeanId)
+        throws SynchronizationException {
         log.info( "unregistering synchronizable tbean " + tbeanId + " with " + getName() );
+        try {
+            getMasterDispatcher().dispatch( new UnregisterSynchronizableTBeanCommand( tbeanId ) );
+        } catch (DispatchException e) {
+            throw new SynchronizationException( e );
+        }
     }
 
     public void error(String tbeanId) {

@@ -34,11 +34,13 @@ public class TBeanTag extends UseBeanTag {
         super.processBean(var, bean);
 
         // now lets register the bean with the TBeanManager
-        SystemTestTag tag = (SystemTestTag) findAncestorWithClass(SystemTestTag.class);
-        if (tag == null) {
+        SystemTestTag systemTestTag = (SystemTestTag) findAncestorWithClass(SystemTestTag.class);
+        if (systemTestTag == null) {
             throw new JellyTagException("This tag should be nested inside a <systemTest> tag");
         }
-        RemoteTBeanManager manager = tag.getManager();
+
+        RemoteTBeanManager manager = systemTestTag.getManager();
+
         manager.addTBean((TBean) bean);
     }
 

@@ -96,9 +96,11 @@ public interface Synchronizer {
 
     void unblockAll();
 
-    void registerSynchronizableTBean(String tbeanId);
+    void registerSynchronizableTBean(String tbeanId)
+        throws SynchronizationException;
 
-    void unregisterSynchronizableTBean(String tbeanId);
+    void unregisterSynchronizableTBean(String tbeanId)
+        throws SynchronizationException;
 
     void error(String tbeanId);
 

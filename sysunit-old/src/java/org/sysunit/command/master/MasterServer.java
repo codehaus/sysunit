@@ -22,7 +22,8 @@ import org.sysunit.command.Dispatcher;
 import org.sysunit.command.MissingPropertyException;
 import org.sysunit.command.Server;
 import org.sysunit.command.slave.RequestMembersCommand;
-import org.sysunit.command.slave.StartTestNodeCommand;
+import org.sysunit.command.slave.LaunchTestNodeCommand;
+import org.sysunit.command.test.RunTestCommand;
 import org.sysunit.jelly.JvmNameExtractor;
 import org.sysunit.SynchronizationException;
 
@@ -32,7 +33,8 @@ import org.sysunit.SynchronizationException;
  * @author James Strachan
  * @version $Revision$
  */
-public class MasterServer extends Server {
+public class MasterServer
+    extends Server {
     private static final Log log = LogFactory.getLog(MasterServer.class);
 
 	private Map members = new HashMap();
@@ -43,6 +45,8 @@ public class MasterServer extends Server {
     private Dispatcher slaveGroupDispatcher;
 	private JvmNameExtractor jvmNameExtractor = new JvmNameExtractor();
     private MasterSynchronizer synchronizer = new MasterSynchronizer();
+
+    private List jvmNames;
 	
     public MasterServer(String xml) {
     	this.xml = xml;
@@ -63,9 +67,11 @@ public class MasterServer extends Server {
 		Thread.sleep(waitTime);
 
 		// now lets start kicking off the JVMs
-		List jvmNames = jvmNameExtractor.getJvmNames(xml);
+		this.jvmNames = jvmNameExtractor.getJvmNames(xml);
 
-		roundRobbinJvms(xml, jvmNames);
+        System.err.println( "###################### " + jvmNames );
+
+		roundRobbinJvms(xml);
 	}
 	
 	
@@ -81,14 +87,35 @@ public class MasterServer extends Server {
 	/**
 	 * @param command
 	 */
-	public void addTestNode(TestNodeStartedCommand command) {
+	public void addTestNode(TestNodeLaunchedCommand command) {
         TestNodeInfo testNodeInfo = new TestNodeInfo( command.getName(),
                                                       command.getNumSynchronizableTBeans(),
                                                       command.getReplyDispatcher() );
         log.info( "adding test node: " + testNodeInfo );
 		testNodes.put(command.getName(), testNodeInfo );
         getSynchronizer().addTestNode( testNodeInfo );
+
+        try {
+            if ( jvmNames.size() > testNodes.size() ) {
+                runTest();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
+
+    protected void runTest()
+        throws Exception {
+
+        for ( Iterator testNodeInfoIter = this.testNodes.values().iterator();
+              testNodeInfoIter.hasNext(); ) {
+            TestNodeInfo testNodeInfo = (TestNodeInfo) testNodeInfoIter.next();
+
+            log.info( "starting test on " + testNodeInfo.getName() );
+            testNodeInfo.getDispatcher().dispatch( new RunTestCommand() );
+            log.info( "started test on " + testNodeInfo.getName() );
+        }
+    }
 
     public TestNodeInfo getTestNodeInfo(String name) {
         return (TestNodeInfo) testNodes.get( name );
@@ -155,13 +182,13 @@ public class MasterServer extends Server {
 
     public void sync(SyncCommand syncCommand)
         throws SynchronizationException, DispatchException {
-        getSynchronizer().sync( syncCommand.getTBeanId(),
+        getSynchronizer().sync( syncCommand.getTestServerName() + ":" + syncCommand.getTBeanId(),
                                 syncCommand.getSyncPointName() );
     }
 
 	// Implementation methods
 	//-------------------------------------------------------------------------    
-	protected void roundRobbinJvms(String xml, List jvmNames) throws DispatchException {
+	protected void roundRobbinJvms(String xml) throws DispatchException {
 		// lets create an Array of the dispatchers
 		Collection dispatcherCollection = members.values();
 		
@@ -182,8 +209,26 @@ public class MasterServer extends Server {
 			Dispatcher dispatcher = dispatchers[idx];
 			
 			log.info("Dispatching jvm: " + jvmName + " to dispatcher: " + dispatcher);
+
+            String mungedName = getName().substring( 0,
+                                                     getName().lastIndexOf( "-false" ) );
 			
-			dispatcher.dispatch(new StartTestNodeCommand(xml, jvmName, getName()));
+			dispatcher.dispatch(new LaunchTestNodeCommand(xml, jvmName, mungedName ));
 		}
 	}
+
+    public void registerSynchronizableTBean(String tbeanId)
+        throws DispatchException {
+        this.synchronizer.registerSynchronizableTBean( tbeanId );
+    }
+
+    public void unregisterSynchronizableTBean(String tbeanId)
+        throws DispatchException {
+        this.synchronizer.unregisterSynchronizableTBean( tbeanId );
+    }
+
+    public void error(String tbeanId)
+        throws DispatchException {
+        this.synchronizer.error( tbeanId );
+    }
 }

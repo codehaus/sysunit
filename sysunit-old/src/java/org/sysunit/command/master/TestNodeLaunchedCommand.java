@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
  * @author James Strachan
  * @version $Revision$
  */
-public class TestNodeStartedCommand
+public class TestNodeLaunchedCommand
     extends MasterCommand {
 
     private static final Log log = LogFactory.getLog(TestNodeStartedCommand.class);
@@ -26,15 +26,15 @@ public class TestNodeStartedCommand
     private String name;
     private int numSynchronizableTBeans;
 
-    public TestNodeStartedCommand(String name,
-                                  int numSynchronizableTBeans) {
+    public TestNodeLaunchedCommand(String name,
+                                   int numSynchronizableTBeans) {
 		this.name = name;
         this.numSynchronizableTBeans = numSynchronizableTBeans;
    }
 
     public void run(MasterServer masterServer) throws Exception {
-        //log.info( "running TestNodeStartedCommand for " + name );
-    	//masterServer.addTestNode(this);
+        log.info( "running TestNodeStartedCommand for " + name );
+    	masterServer.addTestNode(this);
     }
     
     public String getName() {

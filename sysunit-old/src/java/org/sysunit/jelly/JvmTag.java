@@ -9,6 +9,7 @@
  */
 package org.sysunit.jelly;
 
+import org.sysunit.remote.RemoteTBeanManager;
 import org.apache.commons.jelly.JellyTagException;
 import org.apache.commons.jelly.MissingAttributeException;
 import org.apache.commons.jelly.TagSupport;
@@ -46,6 +47,7 @@ public class JvmTag extends TagSupport {
         }
         
 		SystemTestTag tag = (SystemTestTag) findAncestorWithClass(SystemTestTag.class);
+
 		if (tag == null) {
 			throw new JellyTagException("This tag should be nested inside a <systemTest> tag");
 		}
@@ -74,6 +76,10 @@ public class JvmTag extends TagSupport {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
     }
     
     /**

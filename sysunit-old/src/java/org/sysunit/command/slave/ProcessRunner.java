@@ -9,11 +9,16 @@
  */
 package org.sysunit.command.slave;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 import java.io.IOException;
 
 public class ProcessRunner
     implements Runnable {
+
+    private static final Log log = LogFactory.getLog(ProcessRunner.class);
 
     private String executable;
     private String[] arguments;
@@ -83,9 +88,9 @@ public class ProcessRunner
             process.waitFor();
 
         } catch (IOException e) {
-            
+            e.printStackTrace();
         } catch (InterruptedException e) {
-
+            e.printStackTrace();
         }
     }
 }

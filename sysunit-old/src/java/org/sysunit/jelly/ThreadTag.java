@@ -47,20 +47,28 @@ public class ThreadTag extends TagSupport {
             throw new MissingAttributeException("method");
         }
 
-        SystemTestTag tag = (SystemTestTag) findAncestorWithClass(SystemTestTag.class);
-        if (tag == null) {
+        SystemTestTag systemTestTag = (SystemTestTag) findAncestorWithClass(SystemTestTag.class);
+
+        if (systemTestTag == null) {
             throw new JellyTagException("This tag should be nested inside a <systemTest> tag");
         }
+
+        JvmTag jvmTag = (JvmTag) findAncestorWithClass(JvmTag.class);
+
+        if (jvmTag == null) {
+            throw new JellyTagException("This tag should be nested inside a <jvm> tag");
+        }
+        
         invokeBody(output);
 
-        Class testClass = tag.getSystemTestClass();
-		RemoteTBeanManager manager = tag.getManager();
+        Class testClass = systemTestTag.getSystemTestClass();
+		RemoteTBeanManager manager = systemTestTag.getManager();
         try {
             for (int i = 0; i < count; i++) {
                 SystemTestCase instance = (SystemTestCase) testClass.newInstance();
                 ThreadMethodTBeanFactory factory = new ThreadMethodTBeanFactory(instance, method);
                 TBean tbean = factory.newTBean();
-                String tbeanId = method + ":" + (i+1);
+                String tbeanId = jvmTag.getName() + ":" + method + ":" + (i+1);
                 manager.addTBean(tbeanId, tbean);
             }
         }

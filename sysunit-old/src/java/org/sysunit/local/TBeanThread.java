@@ -64,7 +64,7 @@ import org.sysunit.SynchronizableTBean;
 import org.sysunit.TBean;
 import org.sysunit.TBeanSynchronizer;
 import org.sysunit.Synchronizer;
-
+import org.sysunit.SynchronizationException;
 
 public class TBeanThread
     extends Thread {
@@ -130,7 +130,11 @@ public class TBeanThread
             getSynchronizer().error( getTBeanId() );
         } finally {
             if ( getTBean() instanceof SynchronizableTBean ) {
-                getSynchronizer().unregisterSynchronizableTBean( getTBeanId() );
+                try {
+                    getSynchronizer().unregisterSynchronizableTBean( getTBeanId() );
+                } catch (SynchronizationException e) {
+                    setError( e );
+                }
             }
             synchronized ( this ) {
                 this.isDone = true;

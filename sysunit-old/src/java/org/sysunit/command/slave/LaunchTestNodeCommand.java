@@ -18,19 +18,19 @@ package org.sysunit.command.slave;
  * @author James Strachan
  * @version $Revision$
  */
-public class StartTestNodeCommand extends SlaveCommand {
+public class LaunchTestNodeCommand extends SlaveCommand {
     private String xml;
     private String jvmName;
     private String masterID;
 
-    public StartTestNodeCommand(String xml, String jvmName, String masterID) {
+    public LaunchTestNodeCommand(String xml, String jvmName, String masterID) {
 		this.xml = xml;
 		this.jvmName = jvmName;
 		this.masterID = masterID;
    }
 
     public void run(SlaveServer context) throws Exception {
-		context.startTestNode(this);
+		context.launchTestNode(this);
     }
 
     public String getXml() {
