@@ -88,6 +88,7 @@ public class TBeanThread
                        TBean tbean,
                        LocalSynchronizer synchronizer,
                        Barrier barrier) {
+        super( "tbean-thread." + tbeanId );
         this.tbeanId      = tbeanId;
         this.tbean        = tbean;
         this.synchronizer = synchronizer;

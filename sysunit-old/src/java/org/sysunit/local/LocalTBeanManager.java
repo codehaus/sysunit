@@ -107,6 +107,8 @@ public class LocalTBeanManager
     /** <code>Thread</code>s for each <code>TBean</code>. */
     private Set tbeanThreads;
 
+    private LocalSynchronizer synchronizer;
+
     // ----------------------------------------------------------------------
     //     Constructors
     // ----------------------------------------------------------------------
@@ -117,6 +119,7 @@ public class LocalTBeanManager
     public LocalTBeanManager() {
         this.tbeans       = new HashMap();
         this.tbeanThreads = new HashSet();
+        this.synchronizer = new LocalSynchronizer();
     }
 
     // ----------------------------------------------------------------------
@@ -138,6 +141,10 @@ public class LocalTBeanManager
         return (TBean[]) this.tbeans.values().toArray( TBean.EMPTY_ARRAY );
     }
 
+    LocalSynchronizer getSynchronizer() {
+        return this.synchronizer;
+    }
+
     /**
      * @see TBeanManager
      */
@@ -146,11 +153,9 @@ public class LocalTBeanManager
         throws Throwable {
 
         String[] factoryNames = testCase.getTBeanFactoryNames();
-        
-        final LocalSynchronizer synchronizer = new LocalSynchronizer();
 
         for ( int i = 0 ; i < factoryNames.length ; ++i ) {
-            final String tbeanId = factoryNames[i];
+            String tbeanId = factoryNames[i];
             TBean tbean = testCase.getTBeanFactory( tbeanId ).newTBean();
 
             this.tbeans.put( tbeanId,
@@ -161,17 +166,17 @@ public class LocalTBeanManager
             }
         }
 
+        Barrier barrier = new Barrier( this.tbeans.size() );
+
         for ( Iterator tbeanIdIter = this.tbeans.keySet().iterator();
               tbeanIdIter.hasNext(); ) {
 
-            final String tbeanId = (String) tbeanIdIter.next();
-            final TBean  tbean   = (TBean) this.tbeans.get( tbeanId );
-
-            Barrier barrier = new Barrier( this.tbeans.size() );
+            String tbeanId = (String) tbeanIdIter.next();
+            TBean  tbean   = (TBean) this.tbeans.get( tbeanId );
 
             TBeanThread thread = new TBeanThread( tbeanId,
                                                   tbean,
-                                                  synchronizer,
+                                                  this.synchronizer,
                                                   barrier );
 
             this.tbeanThreads.add( thread );
@@ -187,10 +192,6 @@ public class LocalTBeanManager
         long start = new Date().getTime();
 
         long timeLeft = timeout;
-
-        //for ( Iterator threadIter = this.tbeanThreads.iterator();
-              //threadIter.hasNext(); ) {
-            //TBeanThread thread = (TBeanThread) threadIter.next();
 
         TBeanThread[] threads = getTBeanThreads();
 

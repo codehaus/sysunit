@@ -204,7 +204,7 @@ public class SystemTestCase
      *         non-static, no-arg and return type with public default
      *         constructor.
      */
-    void initializeFactories()
+    public void initializeFactories()
         throws Exception {
 
         Set names = new HashSet();
