@@ -12,6 +12,8 @@ package org.sysunit.transport.jms;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.messenger.Messenger;
 import org.sysunit.command.Lifecycle;
 import org.sysunit.command.Server;
@@ -23,6 +25,8 @@ import org.sysunit.command.Server;
  * @version $Revision$
  */
 public class Node implements Lifecycle {
+
+	private static final Log log = LogFactory.getLog(Node.class);
 
 	private Server server;
 	private Messenger messenger;
@@ -47,7 +51,10 @@ public class Node implements Lifecycle {
     public void start() throws Exception {
 		// lets subscribe to our own messages
 		// and to the group messages
+		log.info("Subscribing to personal commands for me on: " + replyToDestination);
 		messenger.addListener(replyToDestination, messageListener);
+
+		log.info("Subscribing to group commands on: " + groupDestination);
 		messenger.addListener(groupDestination, messageListener);
 
 		server.start();
