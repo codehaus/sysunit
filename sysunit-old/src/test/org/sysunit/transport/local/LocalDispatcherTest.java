@@ -54,7 +54,7 @@ public class LocalDispatcherTest extends TestCase {
      * Factory method to create a new dispatcher
      * @return a new dispatcher of commands to the given server
      */
-    protected Dispatcher createDispatcher() {
+    protected Dispatcher createDispatcher() throws Exception {
          return new LocalDispatcher(server);
     }
 }

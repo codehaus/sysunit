@@ -13,6 +13,7 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 
 import org.apache.commons.messenger.Messenger;
+import org.sysunit.Lifecycle;
 import org.sysunit.command.Server;
 
 /**
@@ -21,7 +22,7 @@ import org.sysunit.command.Server;
  * @author James Strachan
  * @version $Revision$
  */
-public class Node {
+public class Node implements Lifecycle {
 
 	private Server server;
 	private Messenger messenger;
@@ -41,21 +42,18 @@ public class Node {
         messageListener = new CommandMessageListener(adapter, server);
         server.setName(replyToDestination.toString());
 		
-		// lets subscribe to our own messages
-		messenger.addListener(replyToDestination, messageListener);
-		
-		// and to the group messages
-		messenger.addListener(groupDestination, messageListener);
     }
 
     public void start() throws Exception {
+		// lets subscribe to our own messages
+		// and to the group messages
+		messenger.addListener(replyToDestination, messageListener);
+		messenger.addListener(groupDestination, messageListener);
     }
     
     public void stop() throws Exception {
-		messenger.addListener(replyToDestination, messageListener);
-		
-		// and to the group messages
-		messenger.addListener(groupDestination, messageListener);
+		messenger.removeListener(replyToDestination, messageListener);
+		messenger.removeListener(groupDestination, messageListener);
     }
     
     protected Server getServer() {
