@@ -71,10 +71,22 @@
     ${testPlugin.setVariable('maven.test.skip', 'true')}
   </goal>
 
+  <goal name="sysunit:unsetskip">
+    <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
+    ${testPlugin.setVariable('maven.test.skip', 'false')}
+  </goal>
+
   <goal name="sysunit:single" prereqs="sysunit:setskip,sysunit:generate-jar-list,sysunit:jar-test-classes">
     <attainGoal name="jar:jar"/>
     <attainGoal name="test:single"/>
   </goal>
+
+  <goal name="sysunit:test" prereqs="sysunit:setskip,sysunit:generate-jar-list,sysunit:jar-test-classes">
+    <attainGoal name="jar:jar"/>
+    <attainGoal name="sysunit:unsetskip"/>
+    <attainGoal name="test:test"/>
+  </goal>
+
 
   <goal name="sysunit:generate-jar-list" prereqs="test:prepare-filesystem">
     <j:set var="testPlugin" value="${pom.getPluginContext('maven-test-plugin')}"/>
