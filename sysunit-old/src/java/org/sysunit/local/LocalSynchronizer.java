@@ -173,6 +173,7 @@ public class LocalSynchronizer
     }
 
     protected synchronized void addWaitingTBean(String tbeanId) {
+        log.info( this + " local-sync: add " + tbeanId + " to " + this.waitingTBeanIds );
         this.waitingTBeanIds.add( tbeanId );
     }
 
@@ -184,11 +185,11 @@ public class LocalSynchronizer
                      String syncPointName)
         throws SynchronizationException, InterruptedException {
 
-        log.debug( "sync " + tbeanId + " on " + syncPointName );
-
         LocalSyncPoint syncPoint = null;
 
         synchronized ( this ) {
+            log.info( "sync " + tbeanId + " on " + syncPointName );
+
             if ( isWaitingTBean( tbeanId ) ) {
                 throw new AlreadySynchronizedException( tbeanId,
                                                         syncPointName );
@@ -237,7 +238,7 @@ public class LocalSynchronizer
      * @see Synchronizer
      */
     public synchronized void unblockAll() {
-        log.debug( "unblocking all " + this.waitingTBeanIds );
+        log.info( this + " /////// local-sync: unblocking all " + this.waitingTBeanIds );
         for ( Iterator syncPointIter = this.syncPoints.values().iterator();
               syncPointIter.hasNext(); ) {
             LocalSyncPoint syncPoint = (LocalSyncPoint) syncPointIter.next();

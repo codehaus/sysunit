@@ -45,6 +45,9 @@ public class TestServer
     private String xml;
     private Synchronizer synchronizer;
 
+    private int syncCounter;
+    private Object syncLock;
+
     public TestServer(String xml, String jvmName) {
         log.info( "test server " + jvmName + " with " + xml + " is " + getName() );
         this.xml = xml;
@@ -54,6 +57,8 @@ public class TestServer
                                      this,
                                      this,
                                      this );
+
+        this.syncLock = new Object();
     }
 
     public void start() throws Exception {
@@ -119,6 +124,12 @@ public class TestServer
 
         log.info( "sync " + tbeanId + " on " + syncPointName + " on test server " + getName() );
 
+        int counter = 0;
+
+        synchronized ( this.syncLock ) {
+            counter = this.syncCounter;
+        }
+
         try {
             getMasterDispatcher().dispatch( new SyncCommand( getName(),
                                                              tbeanId,
@@ -127,13 +138,27 @@ public class TestServer
             throw new SynchronizationException( e );
         }
 
-        this.synchronizer.sync( tbeanId,
-                                syncPointName );
+        synchronized ( this.syncLock ) {
+            if ( counter != this.syncCounter ) {
+                log.info( "test-server: unblocking inside sync on " + getName() );
+                this.synchronizer.unblockAll();
+                return;
+            }
+        }
+
+        log.info( "test-server: syncing inside sync on " + getName() );
+        synchronizer.sync( tbeanId,
+                           syncPointName );
     }
 
     public synchronized void unblockAll() {
-        log.info( "unblocking all on " + getName() );
-        this.synchronizer.unblockAll();
+        log.info( "test-server: unblocking all on " + getName() );
+
+        synchronized ( this.syncLock ) {
+            ++this.syncCounter;
+            this.synchronizer.unblockAll();
+        }
+        log.info( "test-server: unblocked all on " + getName() );
     }
 
     public void registerSynchronizableTBean(String tbeanId)

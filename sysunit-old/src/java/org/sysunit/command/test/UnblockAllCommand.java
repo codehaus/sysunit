@@ -13,5 +13,6 @@ public class UnblockAllCommand
         
         log.info( "* * * * * * unblock all " + this + " on " + testServer.getName() );
         testServer.unblockAll();
+        log.info( "* * * * * * unblocked all " + this + " on " + testServer.getName() );
     }
 }
