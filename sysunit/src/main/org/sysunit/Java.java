@@ -133,6 +133,7 @@ public class Java
         {
             try
             {
+                Thread.currentThread().setContextClassLoader( cl );
                 mainMethod.invoke( mainClass,
                                    new Object[] { realArgs } );
             }

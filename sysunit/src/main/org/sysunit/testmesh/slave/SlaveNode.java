@@ -45,6 +45,8 @@ public class SlaveNode
 
     private JvmInfo jvmInfo;
 
+    private ClassLoader cl;
+
     public SlaveNode(int jvmId,
                      InetAddress masterAddress,
                      int masterPort)
@@ -116,6 +118,9 @@ public class SlaveNode
         {
             this.tbeanThreads[ i ] = new TBeanThread( tbeans[ i ],
                                                       this );
+
+            this.tbeanThreads[ i ].setContextClassLoader( this.cl );
+
             this.tbeanThreads[ i ].start();
         }
     }
@@ -209,7 +214,9 @@ public class SlaveNode
         System.setProperty( "sysunit.classpath",
                             classpath.toString() );
 
-        return new ClasspathClassLoader( urls );
+        this.cl = new ClasspathClassLoader( urls );
+
+        return cl;
     }
 
     TBean[] initializeTBeans(ClassLoader cl,
