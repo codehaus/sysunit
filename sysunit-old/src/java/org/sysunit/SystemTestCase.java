@@ -369,14 +369,14 @@ public class SystemTestCase
         } catch (Throwable t) {
             testResult.addError( this,
                                  t );
-        } finally {
+        } /* finally {
             try {
                 tearDownTBeans();
             } catch (Throwable t) {
                 testResult.addError( this,
                                      t );
             }
-        }
+            } */
     }
 
     protected void startTBeans(TestResult testResult)
@@ -395,16 +395,6 @@ public class SystemTestCase
         throws Exception {
         getTBeanManager().validateTBeans( this,
                                           testResult );
-    }
-
-    /**
-     * Tear down the <code>TBean</code>s.
-     *
-     * @throws Exception If an error occurs.
-     */
-    protected void tearDownTBeans()
-        throws Exception {
-        getTBeanManager().tearDownTBeans( this );
     }
 
     /**

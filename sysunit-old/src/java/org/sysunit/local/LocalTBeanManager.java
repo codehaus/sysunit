@@ -95,7 +95,8 @@ public class LocalTBeanManager
     //     Constants
     // ----------------------------------------------------------------------
 
-    private static final Throwable[] EMPTY_THROWABLE_ARRAY = new Throwable[0];
+    /** Empty <code>String</code> array. */
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     // ----------------------------------------------------------------------
     //     Instace members
@@ -202,15 +203,23 @@ public class LocalTBeanManager
                 timeLeft = timeout - (now - start);
             }
 
-            if ( timeLeft <= 0 ) {
+            if ( timeout > 0
+                 &&
+                 timeLeft <= 0 ) {
                 ++i;
-                while ( i < (threads.length-1) ) {
-                    if ( threads[i].isAlive() ) {
-                        throw new WatchdogException( timeout );
+                Set longTBeanIds = new HashSet();
+                for ( int j = 0 ; j < threads.length ; ++j ) {
+                    if ( threads[j].isAlive() ) {
+                        longTBeanIds.add( threads[j].getTBeanId() );
                     }
-                    ++i;
                 }
-                break;
+
+                if ( ! longTBeanIds.isEmpty() ) {
+                    throw new WatchdogException( timeout,
+                                                 (String[]) longTBeanIds.toArray( EMPTY_STRING_ARRAY ) );
+                } else {
+                    break;
+                }
             }
         }
     }
@@ -218,12 +227,11 @@ public class LocalTBeanManager
     public void validateTBeans(SystemTestCase testCase,
                                TestResult testResult) {
 
-        for ( Iterator threadIter = this.tbeanThreads.iterator();
-              threadIter.hasNext(); ) {
-            TBeanThread thread = (TBeanThread) threadIter.next();
+        TBeanThread[] threads = getTBeanThreads();
 
-            if ( thread.hasError() ) {
-                Throwable t = thread.getError();
+        for ( int i = 0 ; i < threads.length ; ++i ) {
+            if ( threads[i].hasError() ) {
+                Throwable t = threads[i].getError();
 
                 if ( t instanceof AssertionFailedError ) {
                     testResult.addFailure( testCase,
@@ -234,7 +242,7 @@ public class LocalTBeanManager
                 }
             } else {
                 try {
-                    thread.getTBean().assertValid();
+                    threads[i].getTBean().assertValid();
                 } catch (Throwable t) {
                     if ( t instanceof AssertionFailedError ) {
                         testResult.addFailure( testCase,
@@ -246,13 +254,5 @@ public class LocalTBeanManager
                 }
             }
         }
-    }
-    
-    /**
-     * @see TBeanManager
-     */
-    public void tearDownTBeans(SystemTestCase testCase)
-        throws Exception {
-
     }
 }

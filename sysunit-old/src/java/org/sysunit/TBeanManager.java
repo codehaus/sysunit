@@ -94,14 +94,4 @@ public interface TBeanManager {
 
     void validateTBeans(SystemTestCase testCase,
                         TestResult testResult);
-    /**
-     * Tear down the <code>TBean</code>s for a <code>SystemTestCase</code>.
-     *
-     * @param testCase The test case.
-     *
-     * @throws Exception If an error occurs while attempting to tear down
-     *         the TBeans of the test case.
-     */
-    void tearDownTBeans(SystemTestCase testCase)
-        throws Exception;
 }
