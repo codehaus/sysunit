@@ -49,18 +49,21 @@ public class DistributedTestCaseTest
         super.tearDown();
     }
 
-    /*
     public void testNoOpNoSyncSuccessful()
         throws Exception
     {
+        Systm.err.println( "foo" );
         startSlaveHosts( 2 );
+        Systm.err.println( "bar" );
 
         runTest( "no-op" );
+        Systm.err.println( "baz" );
 
         assertErrors( 0 );
         assertFailures( 0 );
     }
 
+    /*
     public void testNoOpWithSyncSuccessful()
         throws Exception
     {
@@ -82,7 +85,6 @@ public class DistributedTestCaseTest
         assertErrors( 0 );
         assertFailures( 0 );
     }
-    */
 
     public void testThrowInRun()
         throws Exception
@@ -96,6 +98,7 @@ public class DistributedTestCaseTest
 
         dump();
     }
+    */
 
     void dump()
     {
