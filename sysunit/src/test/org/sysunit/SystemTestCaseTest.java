@@ -5,6 +5,7 @@ import org.sysunit.tests.*;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.textui.TestRunner;
+import junit.framework.TestSuite;
 
 import java.io.PrintStream;
 import java.io.ByteArrayOutputStream;
@@ -31,6 +32,44 @@ public class SystemTestCaseTest
         this.testRunner = null;
         this.testResult = null;
         super.tearDown();
+    }
+
+    public void testTwoSystemTestWithSingleAssertValidCall() 
+        throws Exception 
+    {
+	WatchedSystemTestCase tests[] = new WatchedSystemTestCase[2]; 
+
+	TestSuite suite = new TestSuite();
+
+	for( int i = 0 ; i < tests.length ; i++ ) {
+	    tests[i] = new SystemTestCase_AssertValidCalled();
+	    suite.addTest( tests[i] );
+	}
+
+        runTest( suite );
+
+	this.test       = tests[0];
+
+        assertErrors( 1 );
+        assertFailures( 0 );
+
+        assertTouches( 4 );
+        assertTouch( "setUp()" );
+        assertTouch( "tearDown()" );
+        assertTouch( "threadOne()" );
+        assertTouch( "threadTwo()" );
+
+        this.test       = tests[1];
+
+        assertErrors( 1 );
+        assertFailures( 0 );
+
+        assertTouches( 5 );
+        assertTouch( "setUp()" );
+        assertTouch( "tearDown()" );
+        assertTouch( "assertValid()" );
+        assertTouch( "threadOne()" );
+        assertTouch( "threadTwo()" );
     }
 
     public void testThreadOnlySuccessful()
@@ -282,6 +321,12 @@ public class SystemTestCaseTest
         throws Exception
     {
         this.test       = test;
+        this.testResult = this.testRunner.doRun( test );
+    }
+
+    void runTest(TestSuite test)
+        throws Exception
+    {
         this.testResult = this.testRunner.doRun( test );
     }
 
