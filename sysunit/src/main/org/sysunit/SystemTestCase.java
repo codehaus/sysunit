@@ -14,6 +14,7 @@ import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.framework.AssertionFailedError;
+import junit.framework.TestListener;
 
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -28,6 +29,7 @@ public class SystemTestCase
     private Thread testThread;
     private TestResult testResult;
     private int completed;
+    private boolean testPassed;
 
     private Synchronizer synchronizer;
 
@@ -72,7 +74,27 @@ public class SystemTestCase
      */
     public void run(TestResult testResult)
     {
+
         this.testResult = testResult;
+
+	this.testPassed = true;
+
+	TestListener listener = new TestListener() {
+	    public void startTest(Test test) {}
+	    public void endTest(Test test) {}
+	    public void addFailure(Test test, AssertionFailedError t) {
+	      if ( SystemTestCase.this == test ) {
+		SystemTestCase.this.testPassed = false;
+	      }
+	    }
+	    public void addError(Test test, Throwable t) {
+	      if ( SystemTestCase.this == test ) {
+		SystemTestCase.this.testPassed = false;
+	      }
+	    }
+	  };
+
+	this.testResult.addListener( listener );
 
         this.testResult.startTest( this );
 
@@ -146,8 +168,7 @@ public class SystemTestCase
                 {
                     try
                     {
-                        if ( this.testResult.errorCount() +
-                             this.testResult.failureCount() == 0 )
+                        if ( this.testPassed )
                         {
                             try
                             {
@@ -175,6 +196,7 @@ public class SystemTestCase
                 }
             }
             this.testResult.endTest( this );
+	    this.testResult.removeListener( listener );
             this.testResult = null;
         }
     }
@@ -333,8 +355,7 @@ public class SystemTestCase
 
         waitFor( threads );
 
-        return ( this.testResult.failureCount() +
-                 this.testResult.errorCount() == 0 );
+        return ( this.testPassed );
     }
 
     boolean performRun(TBeanThread[] threads)
@@ -349,8 +370,7 @@ public class SystemTestCase
 
         waitFor( threads );
 
-        return ( this.testResult.failureCount() +
-                 this.testResult.errorCount() == 0 );
+        return ( this.testPassed );
     }
 
     boolean performAssertValid(TBeanThread[] threads)
@@ -365,8 +385,7 @@ public class SystemTestCase
 
         waitFor( threads );
 
-        return ( this.testResult.failureCount() +
-                 this.testResult.errorCount() == 0 );
+        return ( this.testPassed );
     }
 
     boolean performTearDown(TBeanThread[] threads)
@@ -381,8 +400,7 @@ public class SystemTestCase
 
         waitFor( threads );
 
-        return ( this.testResult.failureCount() +
-                 this.testResult.errorCount() == 0 );
+        return ( this.testPassed );
     }
 
     public void notifySetUp(TBeanThread thread)
@@ -479,5 +497,6 @@ public class SystemTestCase
 
         return suite;
     }
+
 }
 
