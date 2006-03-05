@@ -1,0 +1,24 @@
+
+	-----------
+	SysUnit - CVS Access
+	-----------
+	-----------
+
+Anonymous Checkout
+
++-------------------------------+
+
+cvs -d:pserver:anonymous@cvs.sysunit.codehaus.org:/home/projects/sysunit/scm login
+cvs -d:pserver:anonymous@cvs.sysunit.codehaus.org:/home/projects/sysunit/scm co sysunit
+
++-------------------------------+
+
+Developer Checkout
+
++-------------------------------+
+
+export CVS_RSH=ssh
+cvs -d USERNAME@cvs.sysunit.codehaus.org:/home/projects/sysunit/scm co sysunit
+
++-------------------------------+
+

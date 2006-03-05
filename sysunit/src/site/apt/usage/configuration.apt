@@ -1,0 +1,59 @@
+
+	------------
+	SysUnit - Physical Machines Configuration
+	------------
+	------------
+
+Purpose
+
+	As a test farm might have many different types of machines with different JDKs, each [slave host] member of the farm can optionally be configured with a set of <<tags>> and <<jdks>>.
+
+Usage
+
+* Maven
+
+	When invoking the sysunit:slave goal, you may optionally pass a -Dsysunit.conf=... property that points to a physical machine configuration for the slave.
+
++--------------------------------------+
+
+maven sysunit:slave -Dsysunit.conf=./machine.conf
+
++---------------------------------------+
+
+Format
+
+	The format is a simple .ini type of file with 2 sections:
+
+    * [tags]
+
+    * [jdks]
+
+* [tags]
+
+	The [tags] section simply lists supported tags, one per line:
+
++-----------------------------------+
+
+[tags]
+  Linux
+  Fast
+
++------------------------------------+
+
+	The tags themselves are arbitrary.
+
+* [jdks]
+
+	The [jdks] section is a set of name=value pairs that matches a JDK's JAVA_HOME to an identifier.
+
++---------------------------------------+
+
+[jdks]
+  sun-1.3.1=/usr/local/sun-java-1.3.1/
+  ibm-1.3.0=/usr/local/ibm-java-1.3.0/
+
++----------------------------------------+
+
+See also...
+
+    * {{{scenario.html}.scenario}}

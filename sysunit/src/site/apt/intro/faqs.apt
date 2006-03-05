@@ -1,0 +1,72 @@
+
+	----------
+	SysUnit - FAQ
+	----------
+	----------
+
+Distributed tests
+
+* Runtime.exec(...) does not seem to work when spawning a JVM.
+
+	Yes, Runtime.exec(...) typically won't do what you desire it to do, since the $CLASSPATH of the slave only includes JUnit and SysUnit jars. Classes and resouces are loaded over the network from the original master (ie, the junit test runner), so you cannot construct a valid parameter for the -classpath argument to java.
+
+	To solve this problem, org.sysunit.SysUnit exists. It launches a wrapper class org.sysunit.Java and runs its own main(String[] args) to setup a network classloader, then invokes the main of the specified class loaded through the network. Several forms are provided.
+
++----------------------------------+
+
+package org.sysunit;
+
+public class SysUnit
+{
+    public static Process execJava(Class, mainClass,
+                                   String[] args) 
+        throws IOException
+    {
+        ...
+    }
+ 
+    public static Process execJava(String className,
+                                   String[] args) 
+        throws IOException
+    {
+        ...
+    }
+  
+    public static Process execJava(File javaHome,
+                                   String className,
+                                   String[] args) 
+        throws IOException
+    {
+        ...
+    }
+}
+
++----------------------------------+
+
+	It returns a java.lang.Process as would Runtime.exec(...). Since it's used within the context of a distributed test, System.out and System.err of the executed JVM are hooked into the caller's System.out and System.err.
+
++----------------------------------+
+
+Process myProcess = SysUnit.execJava( new File( System.getProperty( "java.home" ),
+                                      com.myco.MyMain.class.getName(),
+                                      new String[] { "--password", "cheese" } );
+
++----------------------------------+
+
+* How do I access files consistently?
+
+	Since classes and resources are loaded over the network, tests should be written to be ignorant of files whenever possible.
+
+	The SysUnit class has a helper method to make it easy to convert a resource available through the network classloader into a file on the slave's local filesystem.
+
++----------------------------------+
+
+File configFile = SysUnit.getResourceAsFile( "com/myco/cheese.conf" );
+
+Process myJvm = SysUni.execJava( com.myco.MyMain.class,
+                                 new String[] { "--config", configFile.getPath() } );
+
++----------------------------------+
+
+	A temporary file will be created within the temp directory, allowing local access to the file. It is marked for deletion when the JVM is destroyed.
+

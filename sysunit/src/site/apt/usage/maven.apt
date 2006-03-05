@@ -1,0 +1,57 @@
+
+	-----------
+	SysUnit - Maven Usage
+	-----------
+	-----------
+
+Seamless integration
+
+	If you've followed the Maven installation instructions, SysUnit should be virtually seamless in the daily operation of Maven.
+
+Changes to project.xml
+
+	The <unitTest> block in your project.xml typically as an <include> similar to this:
+
++------------------------------------+
+
+<include>**/*Test.java</include>
+
++------------------------------------+
+
+	The extension should be changed from .java to .class, as the {{{systest.html}.systest}} and {{{scenario.html}.scenario}} tests are not Java sources, but do produce a .class that can be run by JUnit.
+
++------------------------------------+
+
+<include>**/*Test.class</include>
+
++------------------------------------+
+
+Changes to <<<project.properties>>>
+
+	The maven.test.search.classdir property should be added to your project.properties so that Maven will generate a test-suite based upon the test classes, and not the Java sources.
+
++------------------------------------+
+
+maven.test.search.classdir=true
+
++------------------------------------+
+
+Starting a [slave host]
+
++------------------------------------+
+
+maven sysunit:slave
+
++------------------------------------+
+
+	or with a {{{configuration.html}physical machine configuration}}
+
++------------------------------------+
+
+maven sysunit:slave -Dsysunit.conf=machine.conf
+
++------------------------------------+
+
+Naming Conventions
+
+	Name your tests exactly as you would name other JUnit tests, such as MyClientServerTest.systest or MyWin32ClientLinuxServerTest.scenario.

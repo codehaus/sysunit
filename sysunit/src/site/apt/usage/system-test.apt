@@ -1,0 +1,109 @@
+
+		-------
+		SysUnit - SystemTestCase
+		-------
+		-------
+		-------
+
+Purpose
+
+	The purpose of org.sysunit.SystemTestCase is to make writing local multithreaded tests easy. The SystemTestCase is a <<JUnit>> Test and thus will run within your normal test runs.
+
+Thread Methods
+
+	Where normal JUnit TestCase subclasses have a testXXX() for each test, with SystemTestCase, the entire class represents exactly one test. There are no testXXX() methods, but instead you may write threadXXX() methods to specify the body of the threads you wish to run.
+
++---------------------------------------------------+
+
+import org.sysunit.SystemTestCase;
+
+public class MyClientServerTest
+    extends SystemTestCase
+{
+    public void threadClient()
+        throws Exception
+    {
+        ...
+    }
+    public void threadServer()
+        throws Exception
+    {
+        ...
+    }
+}
+
++---------------------------------------------------+
+
+	When the test is run, a Thread is spawned for each threadXXX() method, and the method is used as the run() portion, with extra wrapping to catch exceptions and record them as test errors and failures.
+
+TBean Methods
+
+	If you are using [TBean] objects for your bits of the tests, SystemTestCase also supports tbeanXXX() methods, that are used as factories to construct the TBean objects during the test run.
+
++---------------------------------------------------+
+
+import org.sysunit.SystemTestCase;
+import org.sysunit.TBean;
+
+public class MyClientServerTest
+    extends SystemTEstCase
+{
+    public TBean tbeanClient()
+        throws Exception
+    {
+        ...
+    }
+    public TBean tbeanServer()
+        throws Exception
+    {
+        ...
+    }
+}
+
++---------------------------------------------------+
+
+	Both types of methods may be freely mixed within a single test class.
+
+Synchronization
+
+	To allow for coordination of the threads, a sync(...) method is provided. The parameter to sync(...) should be a string identifier to distinctly name the sync point. The sync(...) method blocks until all other threads have either quit or called sync(...) on the same sync-point. If two threads are syncing on different sync-points, an InconsistentSyncException will be thrown.
+
+	When using [TBean] objects, synchronization may be achieved by implementing [SynchronizableTBean].
+
+* assertValid()
+
+	Both TBean objects and SystemTestCase tests have an assertValid() method that runs before tearDown() in order to perform any after-the-fact assertion checking.
+Test lifecycle
+
+   [[1]] SystemTestCase::setUp()
+
+   [[2]] TBean::setUp() for each TBean
+
+   [[3]] SystemTestCase::threadXXX() and TBean::run()
+
+   [[4]] SystemTestCase::asertValid() and TBean::assertValid()
+
+   [[5]] TBean::tearDown() for each TBean
+
+   [[6]] SystemTestCase::tearDown()
+
+Create the Suite
+
+	You are required, in every SystemTestCase subclass, to provide a method for JUnit to obtain a test suite. The SystemTestCase base class provides a convenience method named suite(....) to which you should pass the .class constant for the class.
+
++---------------------------------------------------+
+
+import org.sysunit.SystemTestCase;
+
+public class MyClientServerTest
+    extends SystemTestCase
+{
+    public static Object suite() 
+        throws Exception
+    {
+        return suite( MyClientServerTest.class );
+    }
+    ...
+}
+
++---------------------------------------------------+

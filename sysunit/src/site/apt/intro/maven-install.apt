@@ -1,0 +1,34 @@
+
+	------------------
+	SysUnit - Maven Installation
+	------------------
+	------------------
+
+Acquire the SysUnit sources.
+
+	You can {{{downloads.html}download}} the SysUnit sources in a variety of ways.
+
+Remove old versions.
+
+	First, you <<must>> remove all old versions of sysunit.
+
++---------------------------------------+
+
+rm -Rf ~/.maven/plugins/plugin-sysunit*
+rm ~/maven/plugin/plugin-sysunit*
+
++---------------------------------------+
+
+Build sysunit and install, using Maven.
+
+The sysunit:install goal will build, test and install sysunit into your maven instance.
+
++---------------------------------------+
+
+maven syunit:install
+
++---------------------------------------+
+
+See also...
+
+    * {{{../usage/maven.html}Maven Usage}}

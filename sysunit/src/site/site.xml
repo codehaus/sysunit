@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<site>
+  <bannerLeft>
+    <name>SysUnit</name>
+    <href>http://www.sysunit.org/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>images/codehaus-small.png</src>
+  </bannerRight>
+
+  <title>SysUnit a JUnit extension for System Testing</title>
+
+  <body>
+    <links>
+      <item name="JUnit" href="http://www.junit.org/"/>
+      <item name="Maven" href="http://maven.apache.org/"/>
+      <item name="Apache" href="http://www.apache.org/"/>
+      <item name="Codehaus" href="http://www.codehaus.org/"/>
+    </links>
+
+    <menu name="Introduction">
+      <item name="About SysUnit" href="/intro/about.html"/>
+      <item name="Features" href="/intro/features.html"/>
+      <item name="Download" href="/intro/downloads.html" collapse="false">
+        <item name="Releases" href="http://dist.codehaus.org/sysunit/"/>
+        <item name="CVS Access" href="intro/cvs-access.html"/>
+        <item name="Browse CVS" href="http://cvs.sysunit.codehaus.org/"/>
+      </item>
+      <item name="Installation" href="/intro/install.html" collapse="true">
+         <item name="Ant Installation" href="/intro/ant-install.html"/>
+         <item name="Maven Installation" href="/intro/maven-install.html"/>
+      </item>
+      <item name="FAQ" href="/intro/faqs.html"/>
+    </menu>
+
+    <menu name="Usage">
+      <item name="SystemTestCase" href="/usage/system-test.html"/>
+      <item name="Distributed Tests" href="/usage/distributed-tests.html" collapse="true">
+         <item name=".systest"  href="/usage/systest.html"/>
+         <item name=".scenario"  href="/usage/scenario.html"/>
+         <item name="Physical Machine Configuration"  href="/usage/configuration.html"/>
+      </item>
+      <item name="Maven Usage" href="/usage/maven.html"/>
+    </menu>
+
+    <menu name="Feeds">
+      <item name="Site" 
+            href="http://docs.codehaus.org/spaces/rss.action?key=SYSUNIT"
+            img="http://docs.codehaus.org/images/icons/rss.gif"/>
+<!--            href="http://docs.codehaus.org/spaces/rss.action?key=SYSUNIT&newPages=false" -->
+      <item name="News" 
+            href="http://docs.codehaus.org/spaces/blogrss.action?key=SYSUNIT"
+            img="http://docs.codehaus.org/images/icons/rss.gif"/>
+    </menu>
+
+    ${reports}
+
+  </body>
+</site>

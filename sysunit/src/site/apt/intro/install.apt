@@ -1,0 +1,14 @@
+
+	--------------
+	SysUnit - Installation
+	--------------
+	--------------
+
+Installation
+
+	Soon SysUnit will support usage from both Ant and Maven.
+
+    * {{{ant-install.html}Ant Installation}}
+
+    * {{{maven-install.html}Maven Installation}}
+

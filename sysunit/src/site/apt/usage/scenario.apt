@@ -1,0 +1,42 @@
+		-------
+		SysUnit - .scenario
+		-------
+		-------
+		-------
+Purpose
+
+Format
+
+	Each .scenario descriptor is a simple Java properties file.
+
+*--------------+---------------+------------------------------------------------------+
+| <<Property>> | <<Required?>> | <<Description>>                                      |
+*--------------+---------------+------------------------------------------------------+
+| name 	       | yes           | Name of this scenario                                |
+*--------------+---------------+------------------------------------------------------+
+| test 	       | yes  	       | Path of the base test (com.myco.MyClientServerTest)  |
+*--------------+---------------+------------------------------------------------------+
+| jvm.JVM.tag  | no 	       | Tag for the specified JVM                            |
+*--------------+---------------+------------------------------------------------------+
+| jvm.JVM.jdk  | no 	       | JDK identifier for the specific JVM                  |
+*--------------*---------------+------------------------------------------------------+
+
+Example
+
+	Given a {{{systest.html}.systest}} test defined in com/myco/MyClientServerTest.systest, where the scenario desires to run a Win32 client against a Linux server, you would create com/myco/MyWin32ClientLinuxServerTest.scenario similar to:
+
++------------------------------------+
+
+name = Win32 Client vs Linux Server
+test = com.myco.MyClientServerTest
+
+jvm.client.tag = Win32
+jvm.server.tag = Linux
+
++------------------------------------+
+
+	This would cause the JVM identified with client to be launched upon a [slave host] with a Win32 tag, while the server JVM would be launched on a slave host with a Linux tag.
+
+See Also...
+
+	Building scenarios requires specific knowledge of your test network and they {{{configuration.html}physical machine configuration}} of the available [slave hosts].
